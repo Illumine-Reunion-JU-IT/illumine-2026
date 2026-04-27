@@ -9,7 +9,7 @@ import {
     bigCirclePaths,
     blueCirclePaths,
     vtLinePaths,
-} from '@/data/Paths/heroPaths'
+} from '@/data/paths/heroPaths'
 
 const oxanium = Oxanium({
     subsets: ['latin'],
