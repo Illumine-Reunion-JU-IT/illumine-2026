@@ -1,0 +1,597 @@
+
+
+
+.section {
+  position: relative;
+  width: 100%;
+  min-height: 904px;
+  background: #0F0F0F;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+}
+
+
+.targetGraphic {
+  position: absolute;
+  width: 586px;
+  height: 586px;
+  right: -200px;
+  top: 10px;
+  opacity: 0.5;
+  transform: rotate(112.45deg);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.targetSvg {
+  width: 100%;
+  height: 100%;
+}
+
+
+.titleContainer {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1122px;
+  margin: 0 auto;
+}
+
+.title {
+  margin-top: 20px;
+  font-family: 'Mechsuit', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 39px;
+  line-height: 88px;
+  color: #B6BBFF;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  align-self: center;
+  text-align: center;
+}
+
+
+.accentBar {
+  position: relative;
+  z-index: 2;
+  width: 342px;
+  height: 25px;
+  background: #D9D9D9;
+  opacity: 0.1;
+  margin-top: 4px;
+}
+
+
+.contentWrapper {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  padding-top: 80px;
+  padding-left: 36px;
+  padding-right: 40px;
+}
+
+
+.rulerWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 32px;
+  z-index: 1;
+  margin-top: 10px;
+}
+
+.rulerTickMajor {
+  width: 32px;
+  height: 0;
+  border-top: 2px solid rgba(255, 255, 255, 0.5);
+  margin-bottom: 8px;
+}
+
+.rulerTickMinor {
+  width: 22px;
+  height: 0;
+  border-top: 2px solid rgba(255, 255, 255, 0.5);
+  margin-left: 10px;
+  margin-bottom: 8px;
+}
+
+
+.thumbnailColumn {
+  position: relative;
+  height: 383px;
+  
+  width: 162px;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 29px;
+  margin-top: 80px;
+  
+  flex-shrink: 0;
+  z-index: 3;
+}
+
+.thumbnailColumn::-webkit-scrollbar {
+  display: none;
+}
+
+.activeRingContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 162px;
+  height: 172px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.activeRingSvg {
+  width: 100%;
+  height: 100%;
+}
+
+.galleryTrack {
+  position: absolute;
+  
+  
+  left: calc(50% - 5.33px);
+  
+  top: calc(50% - 0.18px);
+  
+  width: 0;
+  height: 0;
+  z-index: 2;
+  pointer-events: none;
+  
+}
+
+.thumbnailWrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid transparent;
+  
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  background: transparent;
+  padding: 0;
+  pointer-events: auto;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.thumbnailActive {
+  width: 100px;
+  height: 100px;
+  border-color: rgba(190, 243, 223, 0.6);
+  box-shadow: 0 0 20px rgba(190, 243, 223, 0.15);
+  z-index: 5;
+}
+
+.thumbnailInactive {
+  width: 70px;
+  height: 70px;
+  opacity: 0.5;
+  z-index: 4;
+}
+
+.thumbnailInactive:hover {
+  opacity: 0.8;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.thumbnailImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  pointer-events: none;
+  
+}
+
+
+.featuredColumn {
+  display: flex;
+  flex-direction: column;
+  margin-left: 80px;
+  flex-shrink: 0;
+  z-index: 3;
+}
+
+.featuredCard {
+  position: relative;
+  width: 272px;
+  height: 383px;
+}
+
+.frameSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.featuredImageWrapper {
+  position: absolute;
+  left: 1px;
+  top: 22px;
+  width: 251px;
+  height: 360px;
+  overflow: hidden;
+  z-index: 1;
+  clip-path: polygon(
+    99.58% 22.85%,
+    99.58% 0.17%,
+    25.75% 0.17%,
+    8.65% 10.91%,
+    8.65% 69.14%,
+    0.21% 72.96%,
+    0.21% 94.84%,
+    7.76% 99.87%,
+    36.44% 99.87%,
+    40.07% 97.21%,
+    67.84% 97.21%,
+    71.52% 99.87%,
+    99.56% 99.87%,
+    99.56% 76.43%,
+    89.53% 70.47%,
+    89.53% 28.51%
+  );
+}
+
+.featuredImage {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(50% 50% at 50% 50%,
+      rgba(0, 0, 0, 0) 48.6%,
+      rgba(0, 0, 0, 0.3) 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+
+.messageContent {
+  flex: 1;
+  min-width: 0;
+  margin-left: 50px;
+  padding-top: 8px;
+  z-index: 3;
+  max-width: 656px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 15px; 
+}
+
+
+.messageContent::-webkit-scrollbar {
+  width: 4px;
+}
+.messageContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+.messageContent::-webkit-scrollbar-thumb {
+  background: rgba(190, 243, 223, 0.3);
+  border-radius: 4px;
+}
+.messageContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(190, 243, 223, 0.6);
+}
+
+.messageHeading {
+  font-family: 'TT Lakes Neue Trial', sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 120%;
+  color: #BEF3DF;
+  margin-bottom: 4px;
+}
+
+.messageParagraph {
+  font-family: 'TT Lakes Neue Trial', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 120%;
+  color: #BEF3DF;
+}
+
+
+.profInfo {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profName {
+  font-family: 'TT Lakes Neue Trial', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 120%;
+  color: #BEF3DF;
+}
+
+.profDesignation {
+  font-family: 'TT Lakes Neue Trial', sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 120%;
+  color: #BEF3DF;
+  display: block;
+}
+
+
+.connectingLine {
+  position: absolute;
+  left: 154px;
+  
+  top: 85.82px;
+  
+  transform: translateY(-8px);
+  
+  width: 1051px;
+  height: 360px;
+  opacity: 0.5;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.connectingLineSvg {
+  width: 100%;
+  height: 100%;
+}
+
+
+.decorGraphic {
+  position: absolute;
+  left: 71.46%;
+  top: 70.58%;
+  z-index: 1;
+  pointer-events: none;
+  transform: scaleY(-1);
+}
+
+.decorGraphicSvg {
+  width: 108px;
+  height: 115px;
+}
+
+
+
+
+@media (max-width: 1024px) {
+  .section {
+    min-height: auto;
+    padding-bottom: 60px;
+  }
+
+  .title {
+    font-size: 28px;
+    line-height: 60px;
+  }
+
+  .accentBar {
+    width: 240px;
+    height: 18px;
+  }
+
+  .contentWrapper {
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 0;
+  }
+
+  .rulerWrapper {
+    display: none;
+  }
+
+  .thumbnailColumn {
+    margin-left: 0;
+    margin-top: 0;
+    margin-bottom: 30px;
+    height: auto;
+    width: 100%;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .activeRingContainer {
+    display: none;
+    
+  }
+
+  .galleryTrack {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    pointer-events: auto;
+  }
+
+  .thumbnailWrapper {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none !important;
+    
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  .thumbnailActive {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid rgba(190, 243, 223, 0.6);
+    box-shadow: 0 0 20px rgba(190, 243, 223, 0.15);
+  }
+
+  .thumbnailInactive {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+  }
+
+  .featuredColumn {
+    margin-left: 0;
+    margin-bottom: 30px;
+    align-items: center;
+  }
+
+  .featuredCard {
+    margin-bottom: 10px;
+  }
+
+  .messageContent {
+    margin-left: 0;
+    padding-top: 0;
+    max-width: 100%;
+  }
+
+  .messageParagraph,
+  .messageHeading {
+    font-size: 16px;
+  }
+
+  .profInfo {
+    padding-left: 0;
+    align-items: center;
+    text-align: center;
+  }
+
+  .connectingLine {
+    display: none;
+  }
+
+  .decorGraphic {
+    display: none;
+  }
+
+  .targetGraphic {
+    width: 350px;
+    height: 350px;
+    right: -80px;
+    top: 40px;
+    opacity: 0.25;
+  }
+}
+
+
+@media (max-width: 640px) {
+  .title {
+    font-size: 20px;
+    line-height: 44px;
+    margin-top: 12px;
+  }
+
+  .accentBar {
+    width: 160px;
+    height: 12px;
+  }
+
+  .contentWrapper {
+    padding: 24px 16px 0;
+  }
+
+  .galleryTrack {
+    gap: 8px;
+  }
+
+  .thumbnailActive {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 2px solid rgba(190, 243, 223, 0.6);
+    box-shadow: 0 0 16px rgba(190, 243, 223, 0.15);
+  }
+
+  .thumbnailInactive {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+
+  .featuredCard {
+    width: 220px;
+    height: 310px;
+  }
+
+  .featuredImageWrapper {
+    width: 203px;
+    height: 291px;
+  }
+
+  .messageParagraph,
+  .messageHeading {
+    font-size: 14px;
+  }
+
+  .profName {
+    font-size: 16px;
+  }
+
+  .profDesignation {
+    font-size: 13px;
+  }
+
+  .targetGraphic {
+    width: 250px;
+    height: 250px;
+    right: -60px;
+    top: 20px;
+    opacity: 0.15;
+  }
+}

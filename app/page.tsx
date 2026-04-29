@@ -1,6 +1,7 @@
 import Hero from "./sections/Hero";
 import AboutIllumine from "../components/about/AboutIllumine";
 import AboutDepartment from "@/components/about/AboutDepartment";
+import GoodwillMessage from "./sections/GoodwillMessage";
 
 /**
  * MODULE: Home Route (/)
@@ -12,7 +13,8 @@ export default function Home() {
     <div className="flex flex-col">
       <Hero />
       <AboutIllumine />
-      <AboutDepartment/>
+      <AboutDepartment />
+      <GoodwillMessage />
     </div>
   );
 }
