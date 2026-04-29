@@ -8,6 +8,7 @@ import Group93 from '@/assets/coming_soon_svgs/svg/Group93';
 import Frame30 from '@/assets/coming_soon_svgs/svg/Frame30';
 import Vector2 from '@/assets/coming_soon_svgs/svg/Vector2';
 import ComingSoonText from '@/assets/coming_soon_svgs/svg/ComingSoonText';
+import BlueCircle from './BlueCircle';
 
 const Cross = ({ style }: { style?: React.CSSProperties }) => (
   <div className="absolute aspect-square" style={{ width: '1.25vw', ...style }}>
@@ -143,39 +144,28 @@ export default function ComingSoon() {
         <Cross style={{ left: '24.3vw',  bottom: '11.9%' }} />
         <Cross style={{ right: '24.3vw', bottom: '11.9%' }} />
 
-        {/* Dot — top-left, slow clockwise spin */}
-        <div className="absolute z-20" style={{ left: '10.08vw', top: '2%', width: '2.08vw' }}>
-          <div style={{ animation: 'slow-spin 6s linear infinite' }}>
-            <Dot />
-          </div>
-        </div>
+    
 
-        {/* Dot — bottom-right, slow counter-clockwise spin */}
-        <div className="absolute z-20" style={{ right: '8.68vw', bottom: '13.3%', width: '2.08vw' }}>
-          <div style={{ animation: 'slow-spin 6s linear infinite reverse' }}>
-            <Dot />
-          </div>
-        </div>
 
         {/* Vector2 — top-right, slow clockwise */}
         <div className="absolute z-10 opacity-50" style={{ right: '27.08vw', top: '5.6%', width: '2.77vw' }}>
-          <div style={{ animation: 'slow-spin 8s linear infinite' }}>
+          {/* <div style={{ animation: 'slow-spin 8s linear infinite' }}> */}
             <Vector2 />
-          </div>
+          {/* </div> */}
         </div>
 
         {/* Vector2 — bottom-left, slow counter-clockwise */}
         <div className="absolute z-10" style={{ left: '27.08vw', bottom: '5.6%', width: '2.77vw', opacity: 1 }}>
-          <div style={{ animation: 'slow-spin 8s linear infinite reverse' }}>
+          {/* <div style={{ animation: 'slow-spin 8s linear infinite reverse' }}> */}
             <Vector2 />
-          </div>
+          {/* </div> */}
         </div>
-
+        
         {/* Frame30 — bottom-center, gentle pulse + slow spin */}
         <div className="absolute z-10" style={{ bottom: '0.5%', left: '44.93vw', width: '10.41vw' }}>
-          <div style={{ animation: 'slow-spin 20s linear infinite' }}>
+          {/* <div style={{ animation: 'slow-spin 20s linear infinite' }}> */}
             <Frame30 />
-          </div>
+          {/* </div> */}
         </div>
 
         {/* Group93 — bottom-left gauge, clockwise */}
@@ -184,7 +174,8 @@ export default function ComingSoon() {
             <Group93 />
           </div>
         </div>
-
+               <BlueCircle className='hidden sm:block top-12 left-22' />
+                <BlueCircle className='hidden sm:block bottom-8 right-22 rotate-180' />
         {/* Group93 — top-right gauge, counter-clockwise */}
         <div className="absolute z-10" style={{ top: '23.8%', right: '21.52vw', width: '8vw' }}>
           <div style={{ animation: 'slow-spin 10s linear infinite reverse', transformOrigin: '43% 38.5%' }}>
