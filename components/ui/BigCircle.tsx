@@ -4,8 +4,18 @@ import React, { useEffect, useLayoutEffect, useRef } from 'react'
 import { useMotionValue, useTransform, animate } from 'framer-motion'
 import { bigCirclePaths } from '@/data/Paths/heroPaths'
 
+type BigCircleColor = 'neutral' | 'cyan' | 'red' | 'yellow'
+
+const COLOR_MAP: Record<BigCircleColor, string> = {
+    neutral: '#FFFFFF',
+    cyan:    '#AEDECC',
+    red:     '#E85D52',
+    yellow:  '#E8DE49',
+}
+
 type BigCircleProps = {
     className?: string
+    color?: BigCircleColor
 }
 
 const CX = 68.17
@@ -181,10 +191,12 @@ function CenterDot({
     direction,
     idleDuration,
     entryDelay,
+    accentColor,
 }: {
     direction: 1 | -1
     idleDuration: number
     entryDelay: number
+    accentColor: string
 }) {
     const angle = useMotionValue(direction * 540)
     const opacity = useMotionValue(0)
@@ -269,14 +281,16 @@ function CenterDot({
             <path
                 ref={dotRef}
                 d={bigCirclePaths.centerDot}
-                fill="white"
+                fill={accentColor}
                 fillOpacity="0.4"
             />
         </g>
     )
 }
 
-const BigCircle: React.FC<BigCircleProps> = ({ className = '' }) => {
+const BigCircle: React.FC<BigCircleProps> = ({ className = '', color = 'neutral' }) => {
+    const accentColor = COLOR_MAP[color]
+
     return (
         <div className={`h-12 aspect-square absolute ${className}`}>
             <svg
@@ -310,7 +324,7 @@ const BigCircle: React.FC<BigCircleProps> = ({ className = '' }) => {
                     <g opacity="0.35">
                         <path d={bigCirclePaths.outerRing} fill="white" fillOpacity="0.15" />
                     </g>
-                    <path d={bigCirclePaths.topArcAccent} fill="white" />
+                    <path d={bigCirclePaths.topArcAccent} fill={accentColor} />
                 </RingGroup>
 
                 <RingGroup
@@ -343,18 +357,19 @@ const BigCircle: React.FC<BigCircleProps> = ({ className = '' }) => {
                         <g opacity="0.15">
                             <path d={bigCirclePaths.arcBottom} fill="white" fillOpacity="0.15" />
                         </g>
-                        <path d={bigCirclePaths.highlight} fill="white" />
+                        <path d={bigCirclePaths.highlight} fill={accentColor} />
                     </g>
                     <g opacity="0.3">
                         <path d={bigCirclePaths.outerRingOverlay} fill="white" fillOpacity="0.15" />
                     </g>
-                    <path d={bigCirclePaths.smallLineAccent} fill="white" fillOpacity="0.15" />
+                    <path d={bigCirclePaths.smallLineAccent} fill={accentColor} fillOpacity="0.15" />
                 </RingGroup>
 
                 <CenterDot
                     direction={-1}
                     idleDuration={10}
                     entryDelay={0.32}
+                    accentColor={accentColor}
                 />
             </svg>
         </div>

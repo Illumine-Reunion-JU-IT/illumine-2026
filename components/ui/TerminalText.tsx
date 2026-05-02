@@ -62,11 +62,11 @@ const TerminalText: React.FC<TerminalTextProps> = ({
     return (
         <div
             className={`
-                hidden lg:block absolute
+                hidden lg:block
                 font-tt-lakes ${fontWeight}
-                text-xs text-[#BEF3DF] blur-[0.6px]
+                text-[#BEF3DF] blur-[0.6px]
                 ${align === 'right' ? 'text-right' : ''}
-                ${className}
+                ${className} // Now text-3xl will apply correctly
             `}
         >
             <DecryptedText

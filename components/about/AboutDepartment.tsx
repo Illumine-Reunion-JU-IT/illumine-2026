@@ -29,14 +29,14 @@ export default function AboutDepartment() {
             <Cross style={{ top: '45%', right: '5%' }} />
 
             <h1 className="font-mechsuit text-2xl lg:text-2xl xl:text-[2.5vw] text-[#C4CCFF] drop-shadow-[0_0_12px_rgba(196,204,255,0.4)] tracking-widest z-10 mb-16 text-center">
-                <DecryptedText 
-                    text="ABOUT THE DEPARTMENT" 
-                    animateOn="view" 
-                    speed={60} 
-                    sequential={true} 
+                <DecryptedText
+                    text="ABOUT THE DEPARTMENT"
+                    animateOn="view"
+                    speed={60}
+                    sequential={true}
                     revealDirection="start"
                 />
-                ABOUT THE DEPARTMENT
+
             </h1>
 
             <div className="relative w-[90vw] max-w-[1200px] h-auto min-h-[700px] lg:min-h-[600px] lg:h-[600px] mt-8 z-10">
@@ -57,25 +57,25 @@ export default function AboutDepartment() {
                     </div>
                 </div>
 
-                <div className="hidden lg:block absolute bottom-[-70px] left-[-60px] z-30 pointer-events-none w-[395px] h-[277px]">
+                <div className="hidden lg:block absolute bottom-[-70px] left-[-60px] z-30 pointer-events-none w-[395px] h-[277px] ">
                     <Vector4 />
                 </div>
 
-                <div className="hidden lg:block absolute top-[20px] right-[20px] z-30 pointer-events-none w-[112px] h-[12px]">
+                <div className="hidden lg:block absolute top-[20px] right-[20px] z-30 pointer-events-none w-[112px] h-[12px] ">
                     <Vector5 />
                 </div>
 
-                <div className="hidden lg:block absolute -bottom-20 left-[20%] z-30 pointer-events-none w-[296px] h-[22px]">
+                <div className="hidden lg:block absolute -bottom-20 left-[20%] z-30 pointer-events-none w-[296px] h-[22px] ">
                     <Group95 />
                 </div>
 
-                <div className="hidden lg:block absolute top-[55%] -left-[10px] -translate-y-1/2 z-30 pointer-events-none w-[11px] h-[115px]">
+                <div className="hidden lg:block absolute top-[55%] -left-[10px] -translate-y-1/2 z-30 pointer-events-none w-[11px] h-[115px] ">
                     <Rectangle70 />
                 </div>
 
 
                 <div className="hidden lg:flex absolute -top-24 -left-20 w-[180px] h-[180px] z-20 mix-blend-screen opacity-90 items-center justify-center">
-                    <BigCircle className="!w-[120%] !h-[120%] !relative" />
+                    <BigCircle className='!w-[120%] !h-[120%] !relative' />
                 </div>
 
                 <div className="hidden lg:flex absolute -bottom-16 -right-16 w-[140px] h-[140px] z-20 mix-blend-screen opacity-50 items-center justify-center">
@@ -99,23 +99,23 @@ export default function AboutDepartment() {
 
                     <div className="relative w-full lg:w-[40%] h-[60%] lg:h-full p-6 lg:p-10 flex flex-col justify-center text-right z-30">
                         <div className="w-full max-w-[380px] ml-auto">
-                            
+
                             <div className="text-[#BEF3DF] text-[15px] mb-1 font-normal text-right">
-                                <DecryptedText 
-                                    text="About our Department" 
-                                    animateOn="view" 
-                                    speed={40} 
+                                <DecryptedText
+                                    text="About our Department"
+                                    animateOn="view"
+                                    speed={40}
                                     sequential={true}
                                 />
                             </div>
 
                             <p className="text-[#BEF3DF] text-[13px] lg:text-[14px] leading-[1.8] font-light text-right">
-                                <DecryptedText 
-                                    text="Illumine is a biennial reunion event organized by the Department of Information Technology at Jadavpur University. Held every two years, this gathering brings together alumni, current students, and faculty members to celebrate the department's achievements and foster connections within the IT community. Illumine provides a unique platform for former students to reconnect with old friends and mentors, share their career experiences, and contribute to the ongoing development of the department. It also offers current students' valuable opportunities to gain insights from alumni, explore potential career paths, and engage with the broader IT professional community. With its focus on celebrating the department's legacy and future, Illumine is a significant and anticipated occasion for all involved. This time we intend to make the reunion even more special and grand since this year marks the Silver Jubilee of our department." 
-                                    animateOn="view" 
-                                    speed={12}           
-                                    maxIterations={15}   
-                                    sequential={false}   
+                                <DecryptedText
+                                    text="Illumine is a biennial reunion event organized by the Department of Information Technology at Jadavpur University. Held every two years, this gathering brings together alumni, current students, and faculty members to celebrate the department's achievements and foster connections within the IT community. Illumine provides a unique platform for former students to reconnect with old friends and mentors, share their career experiences, and contribute to the ongoing development of the department. It also offers current students' valuable opportunities to gain insights from alumni, explore potential career paths, and engage with the broader IT professional community. With its focus on celebrating the department's legacy and future, Illumine is a significant and anticipated occasion for all involved. This time we intend to make the reunion even more special and grand since this year marks the Silver Jubilee of our department."
+                                    animateOn="view"
+                                    speed={12}
+                                    maxIterations={15}
+                                    sequential={false}
                                 />
                             </p>
                         </div>

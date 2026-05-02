@@ -2,6 +2,9 @@ import Hero from "./sections/Hero";
 import AboutIllumine from "../components/about/AboutIllumine";
 import AboutDepartment from "@/components/about/AboutDepartment";
 import GoodwillMessage from "./sections/GoodwillMessage";
+import About from "./sections/About";
+import Goodwill from "./sections/Goodwill";
+
 
 /**
  * MODULE: Home Route (/)
@@ -12,8 +15,11 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       <Hero />
+
       <AboutIllumine />
-      <AboutDepartment />
+      {/* <AboutDepartment /> */}
+      <About />
+      {/* <Goodwill /> */}
       <GoodwillMessage />
     </div>
   );

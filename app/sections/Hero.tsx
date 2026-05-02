@@ -51,7 +51,7 @@ const Hero: React.FC = () => {
                     style={{ clipPath: buttonClipPath }}
                 >
                     <div className="absolute inset-0 border-4 border-white pointer-events-none" />
-                    <button 
+                    <button
                         onClick={() => router.push('/magazine')} // <-- Added onClick
                         className="font-tt-lakes font-medium w-full h-full bg-transparent text-white text-xs sm:text-sm hover:bg-white/10 transition-colors cursor-pointer"
                     >
@@ -64,14 +64,14 @@ const Hero: React.FC = () => {
             {/* Left terminal text */}
             <TerminalText
                 text={`> boot_illumine.exe\n\nINITIALIZING...\nILLUMINE 0x2K26\n\nNODE: IT DEPT // JADAVPUR UNIVERSITY\nEVENT: BIENNIAL REUNION\n\nFLAG: SILVER JUBILEE (25Y)\n\n...processing memories\n...compiling legacy\n...rendering future\n\n>> ACCESS GRANTED`}
-                className='h-[30%] w-[15%] left-22 top-[50%]'
+                className='h-[30%] w-[15%] left-22 top-[50%] absolute text-xs'
                 speed={450}
             />
 
             {/* Right terminal text */}
             <TerminalText
                 text={`TRMX CORE\nLAB\nVRS 03.44.77   SYS INIT\nSEC NODE 77AF91C2   AUTH: ROOT\n\nPROCESS : EXEC [98.7%]\n----------------------\n\nCFG RESET   ACT:B-9\nNET CHN     QNT:D-4\n\nMEM:67%   TEMP:34C   GPU:OK\n\nINPUT:READY   OUTPUT:READY\nERR:NONE\n\n----------------------\n                    END >>`}
-                className='h-[40%] w-[15%] right-22 top-[30%]'
+                className='h-[40%] w-[15%] right-22 top-[30%] absolute text-xs'
                 align="right"
                 revealDirection="end"
                 speed={500}
@@ -92,7 +92,7 @@ const Hero: React.FC = () => {
 
                 {/* Decorative elements — hidden on small screens */}
                 <BigCircle className='hidden lg:block right-[23%] top-[45%] scale-120' />
-                <BigCircle className='hidden lg:block left-[20%] bottom-[20%] scale-80 rotate-180' />
+                <BigCircle className='hidden lg:block left-[20%] bottom-[20%] scale-80 rotate-180' color='cyan' />
                 <BlueCircle className='hidden sm:block top-12 left-22' />
                 <BlueCircle className='hidden sm:block bottom-8 right-22 rotate-180' />
                 <VtLine className='hidden lg:block top-1/2 -translate-y-1/2 right-8 mt-16' />
