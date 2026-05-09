@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from "next/image";
 import { usePathname } from 'next/navigation';
 import { mechsuit, ttLakes } from './fonts'; 
 
 const navLinks = [
   { label: 'HOME', href: '/' },
   { label: 'ABOUT', href: '/#about-illumine' },
-  { label: 'MAGAZINE', href: '/magazine' },
+  { label: 'MAGAZINE', href: '/magazine'},
   { label: 'ALUMNI', href: '/alumni' },
   { label: 'CONTACT US', href: '/#footer' },
 ];
@@ -41,14 +42,19 @@ export default function Navbar() {
         <div className="max-w-[90rem] mx-auto px-4 sm:px-6 h-20 flex items-center justify-between relative">
           
           {/* 1. LOGO */}
-          <div className="flex-1 flex justify-start z-10">
-            <Link href="/" className={`group relative ${mechsuit.className}`}>
-              <span className="text-xl sm:text-2xl tracking-[0.25em] text-white group-hover:text-[#7B61FF] transition-all duration-300 drop-shadow-[0_0_8px_rgba(123,97,255,0)] group-hover:drop-shadow-[0_0_12px_rgba(123,97,255,0.8)]">
-                ILLUMINE
-              </span>
-              <div className="absolute -bottom-1 left-0 h-[1px] w-0 bg-[#7B61FF] group-hover:w-full transition-all duration-500 shadow-[0_0_10px_#7B61FF]" />
-            </Link>
-          </div>
+         <div className="flex items-center gap-2">
+  {/* JU Logo */}
+  <img
+    src="/photos/Hero/logo.jpeg"   // keep your actual path
+    alt="Jadavpur University"
+    className="h-20 w-20 object-contain translate-y-[1px]"
+  />
+
+  {/* Illumine Text (UNCHANGED styling) */}
+  <span className="font-mechsuit text-xl tracking-[0.25em] text-white transition-all duration-300 ease-in-out hover:text-[#7B61FF] hover:[text-shadow:0_0_15px_#7B61FF]">
+  ILLUMINE
+</span>
+</div>
 
           {/* 2. DESKTOP LINKS */}
           <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-2 w-max z-10">

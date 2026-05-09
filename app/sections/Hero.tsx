@@ -51,14 +51,15 @@ const Hero: React.FC = () => {
                     style={{ clipPath: buttonClipPath }}
                 >
                     <div className="absolute inset-0 border-4 border-white pointer-events-none" />
-                    <button
-                        onClick={() => router.push('/magazine')} // <-- Added onClick
-                        className="font-tt-lakes font-medium w-full h-full bg-transparent text-white text-xs sm:text-sm hover:bg-white/10 transition-colors cursor-pointer"
+                    <a
+                        href="https://drive.google.com/file/d/12Mm7dJbenzOH1eOHfEo-tZb07NLZ1k9N/view?usp=sharing"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center font-tt-lakes font-medium w-full h-full bg-transparent text-white text-xs sm:text-sm hover:bg-white/10 transition-colors cursor-pointer"
                     >
-                        <DecryptedText text='MAGAZINE' animateOn='view' speed={250} />
-                    </button>
+                        <DecryptedText text='NEWSLETTER' animateOn='view' speed={250} />
+                    </a>
                 </div>
-
             </div>
 
             {/* Left terminal text */}

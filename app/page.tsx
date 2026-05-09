@@ -4,6 +4,7 @@ import AboutDepartment from "@/components/about/AboutDepartment";
 import GoodwillMessage from "./sections/GoodwillMessage";
 import About from "./sections/About";
 import Goodwill from "./sections/Goodwill";
+import Event from "./sections/Event";
 
 
 /**
@@ -21,6 +22,7 @@ export default function Home() {
       <About />
       {/* <Goodwill /> */}
       <GoodwillMessage />
+
     </div>
   );
 }
