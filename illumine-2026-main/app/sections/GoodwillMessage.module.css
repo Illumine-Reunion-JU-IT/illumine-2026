@@ -1,0 +1,615 @@
+/* ============================================================
+   GOODWILL MESSAGE — HUD MODULE CSS
+   Self-sequencing data terminal aesthetic
+   ============================================================ */
+
+/* ── Section shell ── */
+.section {
+  position: relative;
+  width: 100%;
+  min-height: 904px;
+  background: #0F0F0F;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+}
+
+/* ── SYSTEM UPDATE glitch ── */
+/* Applied for 500ms on every professor swap */
+.systemUpdate {
+  animation: sectionGlitch 0.5s steps(2) forwards;
+}
+
+@keyframes sectionGlitch {
+  0%   { filter: hue-rotate(0deg)   skewX(0deg);    }
+  15%  { filter: hue-rotate(40deg)  skewX(-1.5deg); }
+  30%  { filter: hue-rotate(-20deg) skewX(1deg);    }
+  50%  { filter: hue-rotate(80deg)  skewX(-0.5deg); }
+  70%  { filter: hue-rotate(0deg)   skewX(0.8deg);  }
+  100% { filter: hue-rotate(0deg)   skewX(0deg);    }
+}
+
+/* ── Target graphic ── */
+.targetGraphic {
+  position: absolute;
+  width: 586px;
+  height: 586px;
+  right: -200px;
+  top: 10px;
+  opacity: 0.5;
+  transform: rotate(112.45deg);
+  pointer-events: none;
+  z-index: 0;
+}
+.targetSvg { width: 100%; height: 100%; }
+
+/* ── Title area ── */
+.titleContainer {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1122px;
+  margin: 0 auto;
+}
+
+.title {
+  margin-top: 20px;
+  font-family: 'Mechsuit', sans-serif;
+  font-weight: 400;
+  font-size: 39px;
+  line-height: 88px;
+  color: #B6BBFF;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  align-self: center;
+  text-align: center;
+}
+
+.accentBar {
+  position: relative;
+  z-index: 2;
+  width: 342px;
+  height: 25px;
+  background: #D9D9D9;
+  opacity: 0.1;
+  margin-top: 4px;
+}
+
+/* ── Content wrapper ── */
+.contentWrapper {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  padding-top: 80px;
+  padding-left: 36px;
+  padding-right: 40px;
+}
+
+/* ============================================================
+   RULER / EQUALIZER BARS
+   ============================================================ */
+.rulerWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 32px;
+  z-index: 1;
+  margin-top: 10px;
+}
+
+.rulerTickMajor {
+  width: 32px;
+  height: 0;
+  border-top: 2px solid rgba(255, 255, 255, 0.5);
+  margin-bottom: 8px;
+  transform-origin: left center;
+}
+
+.rulerTickMinor {
+  width: 22px;
+  height: 0;
+  border-top: 2px solid rgba(255, 255, 255, 0.5);
+  margin-left: 10px;
+  margin-bottom: 8px;
+  transform-origin: left center;
+}
+
+/* Equalizer flicker animation */
+.equalizerBar {
+  animation: equalizerPulse calc(0.8s + (var(--bar-index) * 0.04s)) ease-in-out infinite alternate;
+}
+
+@keyframes equalizerPulse {
+  0%   { transform: scaleX(1);    opacity: 0.5; border-color: rgba(190,243,223,0.3); }
+  50%  { transform: scaleX(0.55); opacity: 0.2; border-color: rgba(255,255,255,0.3); }
+  100% { transform: scaleX(0.85); opacity: 0.4; border-color: rgba(190,243,223,0.5); }
+}
+
+/* ============================================================
+   THUMBNAIL COLUMN
+   ============================================================ */
+.thumbnailColumn {
+  position: relative;
+  height: 383px;
+  width: 162px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 29px;
+  margin-top: 80px;
+  flex-shrink: 0;
+  z-index: 3;
+}
+.thumbnailColumn::-webkit-scrollbar { display: none; }
+
+/* ── Active HUD ring container ── */
+.activeRingContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 162px;
+  height: 172px;
+  pointer-events: none;
+  z-index: 1;
+}
+.activeRingSvg { width: 100%; height: 100%; }
+
+/* ── Slow rotating rings ── */
+.slowRingCW {
+  transform-origin: 75.67px 85.75px;
+  animation: rotateCW 18s linear infinite;
+}
+.slowRingCCW {
+  transform-origin: 75.67px 85.75px;
+  animation: rotateCCW 12s linear infinite;
+}
+
+@keyframes rotateCW  { to { transform: rotate(360deg);  } }
+@keyframes rotateCCW { to { transform: rotate(-360deg); } }
+
+/* ── Static Progress arc ── */
+.progressRing {
+  filter: drop-shadow(0 0 3px rgba(190,243,223,0.6));
+}
+
+/* ── Gallery track ── */
+.galleryTrack {
+  position: absolute;
+  left: calc(50% - 5.33px);
+  top: calc(50% - 0.18px);
+  width: 0;
+  height: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* ── Thumbnail buttons ── */
+.thumbnailWrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  overflow: visible;      /* allow glow to bleed outside */
+  border: 2px solid transparent;
+  transition:
+    transform       0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity         0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color    0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow      0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    width           0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    height          0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  background: transparent;
+  padding: 0;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.thumbnailActive {
+  width: 100px;
+  height: 100px;
+  border-color: rgba(190, 243, 223, 0.6);
+  box-shadow: 0 0 20px rgba(190, 243, 223, 0.15);
+  z-index: 5;
+}
+
+.thumbnailInactive {
+  width: 70px;
+  height: 70px;
+  opacity: 0.5;
+  z-index: 4;
+}
+.thumbnailInactive:hover {
+  opacity: 0.8;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.thumbnailImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* ── Breathing glow on active thumbnail ── */
+.activeBreath {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid #BEF3DF;
+  opacity: 0;
+  animation: breathGlow 2.4s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+@keyframes breathGlow {
+  0%   { opacity: 0;    transform: scale(1);    box-shadow: 0 0 0   rgba(190,243,223,0);   }
+  50%  { opacity: 0.7;  transform: scale(1.08); box-shadow: 0 0 16px rgba(190,243,223,0.5); }
+  100% { opacity: 0;    transform: scale(1);    box-shadow: 0 0 0   rgba(190,243,223,0);   }
+}
+
+/* ============================================================
+   CONNECTING LINE — running light
+   ============================================================ */
+.connectingLine {
+  position: absolute;
+  left: 154px;
+  top: 85.82px;
+  transform: translateY(-8px);
+  width: 1051px;
+  height: 360px;
+  opacity: 0.5;
+  z-index: -1;
+  pointer-events: none;
+}
+.connectingLineSvg { width: 100%; height: 100%; }
+
+/* The running-light rect gets its gradient animated via SVG animateTransform */
+.runningLight {
+  /* extra shimmer via CSS as fallback */
+  animation: lightPulse 3s ease-in-out infinite;
+}
+@keyframes lightPulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1;   }
+}
+
+/* ============================================================
+   FEATURED CARD
+   ============================================================ */
+.featuredColumn {
+  display: flex;
+  flex-direction: column;
+  margin-left: 80px;
+  flex-shrink: 0;
+  z-index: 3;
+}
+
+.featuredCard {
+  position: relative;
+  width: 272px;
+  height: 383px;
+}
+
+.frameSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.featuredImageWrapper {
+  position: absolute;
+  left: 1px;
+  top: 22px;
+  width: 251px;
+  height: 360px;
+  overflow: hidden;
+  z-index: 1;
+  clip-path: polygon(
+    99.58% 22.85%, 99.58% 0.17%, 25.75% 0.17%,
+    8.65% 10.91%,  8.65% 69.14%, 0.21% 72.96%,
+    0.21% 94.84%,  7.76% 99.87%, 36.44% 99.87%,
+    40.07% 97.21%, 67.84% 97.21%, 71.52% 99.87%,
+    99.56% 99.87%, 99.56% 76.43%, 89.53% 70.47%,
+    89.53% 28.51%
+  );
+}
+
+.featuredImage {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  transition: filter 0.3s ease;
+}
+
+/* Scan-reveal: new image slides in with a CSS mask */
+.scanReveal {
+  animation: scanDown 0.8s steps(20) forwards;
+}
+@keyframes scanDown {
+  0%   { mask-image: linear-gradient(to bottom, black 0%,   transparent 0%);   -webkit-mask-image: linear-gradient(to bottom, black 0%,   transparent 0%); }
+  100% { mask-image: linear-gradient(to bottom, black 100%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 100%, transparent 100%); }
+}
+
+/* ── Scanlines overlay ── */
+.scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent              0px,
+    transparent              3px,
+    rgba(0, 0, 0, 0.18)      3px,
+    rgba(0, 0, 0, 0.18)      4px
+  );
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0.4;
+  animation: scanlinesScroll 6s linear infinite;
+}
+@keyframes scanlinesScroll {
+  from { background-position: 0 0; }
+  to   { background-position: 0 40px; }
+}
+
+.scanlinesPulse {
+  opacity: 1 !important;
+  animation: scanlinesPulseAnim 0.5s steps(3) forwards;
+}
+@keyframes scanlinesPulseAnim {
+  0%   { opacity: 0.4; }
+  50%  { opacity: 1;   }
+  100% { opacity: 0.4; }
+}
+
+/* ── Chromatic aberration fringe (glitch only) ── */
+.chromaticFringe {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  animation: chromaFlash 0.5s steps(2) forwards;
+  background: transparent;
+  /* red/blue split via box-shadow trick */
+  box-shadow:
+    inset  3px 0 0 rgba(255,50,50,0.2),
+    inset -3px 0 0 rgba(50,100,255,0.2);
+}
+@keyframes chromaFlash {
+  0%   { box-shadow: inset  3px 0 0 rgba(255,50,50,0.3), inset -3px 0 0 rgba(50,100,255,0.3); }
+  33%  { box-shadow: inset -5px 0 0 rgba(255,50,50,0.4), inset  5px 0 0 rgba(50,100,255,0.4); }
+  66%  { box-shadow: inset  2px 0 0 rgba(255,50,50,0.15),inset -2px 0 0 rgba(50,100,255,0.15);}
+  100% { box-shadow: none; }
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(50% 50% at 50% 50%,
+    rgba(0,0,0,0) 48.6%,
+    rgba(0,0,0,0.3) 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* ============================================================
+   PROFESSOR INFO
+   ============================================================ */
+.profInfo {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profName {
+  font-family: 'TT Lakes Neue Trial', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 120%;
+  color: #BEF3DF;
+}
+
+.profDesignation {
+  font-family: 'TT Lakes Neue Trial', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 120%;
+  color: #BEF3DF;
+  display: block;
+}
+
+/* ============================================================
+   MESSAGE CONTENT — scan reveal + steps typewriter
+   ============================================================ */
+.messageContent {
+  flex: 1;
+  min-width: 0;
+  margin-left: 50px;
+  padding-top: 8px;
+  z-index: 3;
+  max-width: 656px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 15px;
+  /* Fixed height prevents layout jump between short/long messages */
+  min-height: 300px;
+  /* Grid trick for smooth height transitions */
+  display: grid;
+  grid-template-rows: auto;
+  align-content: start;
+}
+.messageContent::-webkit-scrollbar        { width: 4px; }
+.messageContent::-webkit-scrollbar-track  { background: transparent; }
+.messageContent::-webkit-scrollbar-thumb  { background: rgba(190,243,223,0.3); border-radius: 4px; }
+.messageContent::-webkit-scrollbar-thumb:hover { background: rgba(190,243,223,0.6); }
+
+/* On new message reveal, rows stagger in from top */
+.messageRevealing .messageRow {
+  animation: rowReveal 0.6s steps(12) forwards;
+  animation-delay: calc(var(--row-index) * 0.12s);
+  opacity: 0;
+}
+@keyframes rowReveal {
+  0%   {
+    opacity: 0;
+    letter-spacing: 0.18em;
+    mask-image: linear-gradient(to bottom, black 0%,   transparent 20%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 20%);
+    /* Chromatic aberration on text */
+    text-shadow: -2px 0 rgba(255,80,80,0.4), 2px 0 rgba(80,120,255,0.4);
+  }
+  60%  {
+    opacity: 0.8;
+    letter-spacing: 0.04em;
+    mask-image: linear-gradient(to bottom, black 60%,  transparent 80%);
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 80%);
+    text-shadow: -1px 0 rgba(255,80,80,0.2), 1px 0 rgba(80,120,255,0.2);
+  }
+  100% {
+    opacity: 1;
+    letter-spacing: normal;
+    mask-image: none;
+    -webkit-mask-image: none;
+    text-shadow: none;
+  }
+}
+
+.messageHeading {
+  font-family: 'TT Lakes Neue Trial', sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 120%;
+  color: #BEF3DF;
+  margin-bottom: 4px;
+}
+
+.messageParagraph {
+  font-family: 'TT Lakes Neue Trial', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 120%;
+  color: #BEF3DF;
+}
+
+/* ============================================================
+   DECOR GRAPHIC
+   ============================================================ */
+.decorGraphic {
+  position: absolute;
+  left: 71.46%;
+  top: 70.58%;
+  z-index: 1;
+  pointer-events: none;
+  transform: scaleY(-1);
+}
+.decorGraphicSvg { width: 108px; height: 115px; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+  .section    { min-height: auto; padding-bottom: 60px; }
+  .title      { font-size: 28px; line-height: 60px; }
+  .accentBar  { width: 240px; height: 18px; }
+
+  .contentWrapper {
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 0;
+  }
+
+  .rulerWrapper { display: none; }
+
+  .thumbnailColumn {
+    margin-left: 0;
+    margin-top: 0;
+    margin-bottom: 30px;
+    height: auto;
+    width: 100%;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .activeRingContainer { display: none; }
+
+  .galleryTrack {
+    position: relative;
+    top: auto; left: auto;
+    width: 100%; height: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    pointer-events: auto;
+  }
+
+  .thumbnailWrapper {
+    position: relative;
+    left: auto; top: auto;
+    transform: none !important;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  .thumbnailActive  { width: 80px; height: 80px; border-radius: 50%; border: 2px solid rgba(190,243,223,0.6); box-shadow: 0 0 20px rgba(190,243,223,0.15); }
+  .thumbnailInactive { width: 56px; height: 56px; border-radius: 50%; border: 2px solid transparent; }
+
+  .featuredColumn  { margin-left: 0; margin-bottom: 30px; align-items: center; }
+  .featuredCard    { margin-bottom: 10px; }
+
+  .messageContent  { margin-left: 0; padding-top: 0; max-width: 100%; min-height: 200px; }
+  .messageParagraph, .messageHeading { font-size: 16px; }
+
+  .profInfo        { padding-left: 0; align-items: center; text-align: center; }
+  .connectingLine  { display: none; }
+  .decorGraphic    { display: none; }
+  .targetGraphic   { width: 350px; height: 350px; right: -80px; top: 40px; opacity: 0.25; }
+}
+
+@media (max-width: 640px) {
+  .title      { font-size: 20px; line-height: 44px; margin-top: 12px; }
+  .accentBar  { width: 160px; height: 12px; }
+  .contentWrapper { padding: 24px 16px 0; }
+  .galleryTrack   { gap: 8px; }
+
+  .thumbnailActive  { width: 56px; height: 56px; border-radius: 50%; border: 2px solid rgba(190,243,223,0.6); box-shadow: 0 0 16px rgba(190,243,223,0.15); }
+  .thumbnailInactive { width: 40px; height: 40px; border-radius: 50%; }
+
+  .featuredCard       { width: 220px; height: 310px; }
+  .featuredImageWrapper { width: 203px; height: 291px; }
+
+  .messageParagraph, .messageHeading { font-size: 14px; }
+  .profName        { font-size: 16px; }
+  .profDesignation { font-size: 13px; }
+  .targetGraphic   { width: 250px; height: 250px; right: -60px; top: 20px; opacity: 0.15; }
+}
