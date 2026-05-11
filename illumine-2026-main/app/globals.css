@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+/* ─── Local Fonts ──────────────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Mechsuit';
+  src: url('/fonts/Mechsuit.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT Lakes Neue Trial';
+  src: url('/fonts/TT-Lakes-Neue-Trial-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT Lakes Neue Trial';
+  src: url('/fonts/TT-Lakes-Neue-Trial-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT Lakes Neue Trial';
+  src: url('/fonts/TT-Lakes-Neue-Trial-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT Lakes Neue Trial';
+  src: url('/fonts/TT-Lakes-Neue-Trial-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT Lakes Neue Trial';
+  src: url('/fonts/TT-Lakes-Neue-Trial-DemiBold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT Lakes Neue Trial';
+  src: url('/fonts/TT-Lakes-Neue-Trial-Bold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+
+@font-face {
+  font-family: 'TT Lakes Neue Trial';
+  src: url('/fonts/TT-Lakes-Neue-Trial-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* ─── Local font tokens → utility classes ──────────────────────────────── */
+  /* font-mechsuit                                                             */
+  --font-mechsuit: 'Mechsuit', sans-serif;
+  /* font-tt-lakes (weight controlled by font-weight utilities)               */
+  --font-tt-lakes: 'TT Lakes Neue Trial', sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes slow-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
