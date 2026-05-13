@@ -1,0 +1,405 @@
+/* ============================================================
+   EVENT SECTION — HUD Perspective Stack
+   Matches the reference design with stacked angular event cards
+   ============================================================ */
+
+/* ── Section shell ── */
+.section {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: #141414;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+/* ── SYSTEM UPDATE glitch ── */
+/* Applied for 500ms on initial load */
+.systemUpdate {
+  animation: sectionGlitch 0.5s steps(2) forwards;
+}
+
+@keyframes sectionGlitch {
+  0%   { filter: hue-rotate(0deg)   skewX(0deg);    }
+  15%  { filter: hue-rotate(40deg)  skewX(-1.5deg); }
+  30%  { filter: hue-rotate(-20deg) skewX(1deg);    }
+  50%  { filter: hue-rotate(80deg)  skewX(-0.5deg); }
+  70%  { filter: hue-rotate(0deg)   skewX(0.8deg);  }
+  100% { filter: hue-rotate(0deg)   skewX(0deg);    }
+}
+
+/* ── Background particles ── */
+.particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+}
+
+/* ── Cross markers (bottom decoration) ── */
+.crossMarker {
+  position: absolute;
+  bottom: 32px;
+  color: rgba(255, 255, 255, 0.15);
+  font-size: 14px;
+  font-family: "TT Lakes Neue Trial", sans-serif;
+  font-weight: 300;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Plus markers beneath EVENTS title ── */
+.plusBelowTitle1 {
+  top: 100%;
+  right: 75%;
+  margin-top: 8px;
+  padding-top: 10px;
+  z-index: 1;
+}
+
+.plusBelowTitle2 {
+  top: 100%;
+  right: 0%;
+  margin-top: 8px;
+  padding-top: 10px;
+  z-index: 1;
+}
+
+/* ── Plus markers at bottom of section ── */
+.plusBottom1 {
+  bottom: 28px;
+  left: 42%;
+  z-index: 1;
+}
+
+.plusBottom2 {
+  bottom: 28px;
+  right: 22%;
+  z-index: 1;
+}
+
+/* ── Arc reactor (left side) ── */
+.arcReactorWrapper {
+  position: absolute;
+  left: -5%;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: 0;
+}
+
+/* ── BigCircle (right of center) ── */
+.bigCircleWrapper {
+  position: absolute;
+  right: 28%;
+  top: 42%;
+  pointer-events: none;
+  opacity: 0.35;
+  z-index: 0;
+}
+
+/* ── Content layout ── */
+.content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Title ── */
+.titleWrapper {
+  position: relative;
+  align-self: flex-end;
+  margin-bottom: 60px;
+  margin-right: 40px;
+}
+
+.title {
+  font-family: "Mechsuit", sans-serif;
+  font-weight: 400;
+  font-size: 52px;
+  line-height: 1.2;
+  color: #b6bbff;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Events stack ── */
+.eventsStack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  max-width: 720px;
+}
+
+/* ── Individual event card ── */
+.eventCard {
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+}
+
+.eventCard:hover {
+  filter: brightness(1.15);
+}
+
+/* ── Card inner (the clipped hexagonal shape) ── */
+.cardInner {
+  position: relative;
+  width: 100%;
+  padding: 12px 32px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  clip-path: polygon(0% 50%, 2% 0%, 98% 0%, 100% 50%, 98% 100%, 2% 100%);
+}
+
+/* ── Card states ── */
+.cardInactive .cardInner {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.cardActive .cardInner {
+  background: rgba(140, 140, 200, 0.22);
+}
+
+/* ── Event text ── */
+.eventText {
+  font-family: "TT Lakes Neue Trial", sans-serif;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  transition: all 0.4s ease;
+  display: block;
+}
+
+.cardInactive .eventText {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.cardActive .eventText {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* ── Active card decorations ── */
+.activeFrame {
+  position: absolute;
+  inset: -2px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── Horizontal line extending RIGHT from active card ── */
+.activeLine {
+  position: absolute;
+  right: -60px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Horizontal line extending LEFT from active card ── */
+.activeLineLeft {
+  position: absolute;
+  left: -35px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.lineSegment {
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.lineDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(200, 200, 230, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+/* ── Vertical connector line ── */
+.connectorLine {
+  position: absolute;
+  right: -20px;
+  top: 10%;
+  bottom: 10%;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 255, 255, 0.06) 20%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.06) 80%,
+    transparent 100%
+  );
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── Bottom event navigation dots ── */
+.eventNav {
+  display: flex;
+  gap: 24px;
+  margin-top: 48px;
+  z-index: 5;
+}
+
+.navBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 0;
+  transition: all 0.3s ease;
+}
+
+.navDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.navLabel {
+  font-family: "TT Lakes Neue Trial", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.25);
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.navBtn:hover .navDot {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.navBtn:hover .navLabel {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.navBtnActive .navDot {
+  background: #b6bbff;
+  box-shadow: 0 0 8px rgba(182, 187, 255, 0.4);
+  width: 8px;
+  height: 8px;
+}
+
+.navBtnActive .navLabel {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+  .section {
+    min-height: auto;
+    padding: 60px 0;
+  }
+
+  .titleWrapper {
+    align-self: center;
+    margin-right: 0;
+    margin-bottom: 40px;
+  }
+
+  .title {
+    font-size: 38px;
+  }
+
+  .arcReactorWrapper {
+    left: -15%;
+    opacity: 0.3;
+  }
+
+  .bigCircleWrapper {
+    display: none;
+  }
+
+  .activeLine,
+  .activeLineLeft {
+    display: none;
+  }
+
+  .connectorLine {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .section {
+    padding: 40px 0;
+  }
+
+  .content {
+    padding: 0 16px;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+
+  .titleWrapper {
+    margin-bottom: 30px;
+  }
+
+  .cardInner {
+    padding: 10px 20px;
+  }
+
+  .arcReactorWrapper {
+    display: none;
+  }
+
+  .crossMarker {
+    display: none;
+  }
+
+  .eventNav {
+    gap: 14px;
+    margin-top: 32px;
+  }
+
+  .navLabel {
+    font-size: 10px;
+  }
+}
