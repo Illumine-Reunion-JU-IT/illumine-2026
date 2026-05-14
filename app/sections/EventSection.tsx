@@ -12,7 +12,8 @@ const EVENTS = [
     id: 1,
     title: "Inauguration",
     time: "10:00 a.m.",
-    description: "The official start of Illumine 2026 with a grand opening ceremony.",
+    description:
+      "The official start of Illumine 2026 with a grand opening ceremony.",
   },
   {
     id: 2,
@@ -24,7 +25,8 @@ const EVENTS = [
     id: 3,
     title: "Football Match",
     time: "11:30 a.m.",
-    description: "An adrenaline-fueled clash on the field for the championship.",
+    description:
+      "An adrenaline-fueled clash on the field for the championship.",
   },
   {
     id: 4,
@@ -70,9 +72,6 @@ const EVENTS = [
   },
 ];
 
-/**
- * Particle positions — seeded manually (deterministic, no hydration mismatch).
- */
 const PARTICLES = [
   { left: "12%", top: "18%", size: 2, opacity: 0.25 },
   { left: "25%", top: "8%", size: 1.5, opacity: 0.2 },
@@ -91,13 +90,6 @@ const PARTICLES = [
   { left: "50%", top: "88%", size: 1.5, opacity: 0.18 },
 ];
 
-/**
- * Build the visual stack: the active event is prominently displayed
- * in the lower-center area, with ghost copies receding above it
- * (shifting left + scaling down + fading) showing PREVIOUS events,
- * and a couple below showing NEXT events.
- * This matches the reference image's perspective cascade.
- */
 function buildStack(activeId: number) {
   const activeEvent = EVENTS.find((e) => e.id === activeId)!;
   const activeLabel = `${activeEvent.id}) ${activeEvent.title} – ${activeEvent.time}`;
@@ -110,60 +102,76 @@ function buildStack(activeId: number) {
     opacity: number;
     fontSize: number;
     translateX: number;
+    translateY: number;
     isActive: boolean;
     bgOpacity: number;
   }[] = [];
 
-  // 5 ghost copies ABOVE showing PREVIOUS events (receding upward-left, progressively fading)
-  for (let i = 5; i >= 1; i--) {
-    // Calculate previous event index with wrap-around
+  // Upper Cascade (Previous Events)
+  for (let i = 3; i >= 1; i--) {
     const prevEventId = activeId - i;
-    const eventToShow = EVENTS[(prevEventId - 1 + EVENTS.length) % EVENTS.length];
+    const eventToShow =
+      EVENTS[(prevEventId - 1 + EVENTS.length) % EVENTS.length];
     const label = `${eventToShow.id}) ${eventToShow.title} – ${eventToShow.time}`;
+
+    const scale = 0.86 - (i - 1) * 0.18;
+    const opacity = 0.65 - i * 0.2;
+    const fontSize = 20 - i * 3;
+    const translateX = -40 - (i - 1) * 45;
+    const translateY = -32 - (i - 1) * 36;
 
     slots.push({
       key: `above-${i}`,
       event: eventToShow,
       label,
-      scale: Math.max(0.5, 1 - i * 0.09),
-      opacity: Math.max(0.04, 0.38 - i * 0.07),
-      fontSize: Math.max(10, 22 - i * 2.5),
-      translateX: -i * 22,
+      scale,
+      opacity,
+      fontSize,
+      translateX,
+      translateY,
       isActive: false,
-      bgOpacity: Math.max(0.02, 0.07 - i * 0.012),
+      bgOpacity: 0.12,
     });
   }
 
-  // ACTIVE card (center-bottom)
+  // Active Card (Center Anchor)
   slots.push({
     key: `active`,
     event: activeEvent,
     label: activeLabel,
     scale: 1,
     opacity: 1,
-    fontSize: 24,
+    fontSize: 28,
     translateX: 0,
+    translateY: 0,
     isActive: true,
-    bgOpacity: 0.22,
+    bgOpacity: 0.6,
   });
 
-  // 2 ghost copies BELOW showing NEXT events (receding downward, less shift)
-  for (let i = 1; i <= 2; i++) {
-    // Calculate next event index with wrap-around
+  // Lower Cascade (Next Events)
+  for (let i = 1; i <= 3; i++) {
     const nextEventId = activeId + i;
-    const eventToShow = EVENTS[(nextEventId - 1 + EVENTS.length) % EVENTS.length];
+    const eventToShow =
+      EVENTS[(nextEventId - 1 + EVENTS.length) % EVENTS.length];
     const label = `${eventToShow.id}) ${eventToShow.title} – ${eventToShow.time}`;
+
+    const scale = 0.88 - i * 0.09;
+    const opacity = 0.55 - i * 0.17;
+    const fontSize = 22 - i * 3.5;
+    const translateX = -14 - i * 12;
+    const translateY = 26 + i * 28;
 
     slots.push({
       key: `below-${i}`,
       event: eventToShow,
       label,
-      scale: Math.max(0.7, 1 - i * 0.08),
-      opacity: Math.max(0.08, 0.35 - i * 0.12),
-      fontSize: Math.max(14, 20 - i * 2),
-      translateX: 0,
+      scale,
+      opacity,
+      fontSize,
+      translateX,
+      translateY,
       isActive: false,
-      bgOpacity: Math.max(0.03, 0.06 - i * 0.015),
+      bgOpacity: 0.1,
     });
   }
 
@@ -174,22 +182,18 @@ export default function EventSection() {
   const [activeId, setActiveId] = useState(3);
   const [glitching, setGlitching] = useState(false);
   const stack = buildStack(activeId);
-
-  // Trigger glitch effect on initial load
   useEffect(() => {
     setGlitching(true);
     const timer = setTimeout(() => setGlitching(false), 500);
     return () => clearTimeout(timer);
   }, []);
-
-  // Cycle to next event
   const cycleNext = () => {
     setActiveId((prev) => (prev >= EVENTS.length ? 1 : prev + 1));
   };
 
   return (
     <section className={styles.section}>
-      {/* Background particles */}
+      {/* Background Particles */}
       <div className={styles.particles} aria-hidden="true">
         {PARTICLES.map((p, i) => (
           <div
@@ -206,25 +210,25 @@ export default function EventSection() {
         ))}
       </div>
 
-      {/* Arc Reactor — left side */}
+      {/* Left Arc Reactor */}
       <div className={styles.arcReactorWrapper} aria-hidden="true">
         <ArcReactor size={550} accentColor="teal" />
       </div>
 
-      {/* BigCircle — right of center */}
+      {/* Right Big Circle */}
       <div className={styles.bigCircleWrapper} aria-hidden="true">
-        <div style={{ transform: "scale(1.6)" }}>
-          <BigCircle />
-        </div>
+        <BigCircle />
       </div>
 
-      {/* Plus markers at the bottom of the section */}
+      {/* Bottom Plus Markers */}
       <Plus className={styles.plusBottom1} delay={0.9} />
       <Plus className={styles.plusBottom2} delay={1.2} />
 
-      {/* Main content */}
-      <div className={`${styles.content} ${glitching ? styles.systemUpdate : ''}`}>
-        {/* Title — top right */}
+      {/* Main Content Area */}
+      <div
+        className={`${styles.content} ${glitching ? styles.systemUpdate : ""}`}
+      >
+        {/* Title Section */}
         <div className={styles.titleWrapper}>
           <h2 className={styles.title}>
             <DecryptedText
@@ -235,14 +239,13 @@ export default function EventSection() {
               revealDirection="start"
             />
           </h2>
-          {/* Plus markers beneath the EVENTS title */}
-          <Plus className={styles.plusBelowTitle1} delay={0.3} />
+                    <Plus className={styles.plusBelowTitle1} delay={0.3} />
           <Plus className={styles.plusBelowTitle2} delay={0.6} />
         </div>
 
-        {/* Visual events stack */}
+        {/* Visual Events Stack */}
         <div className={styles.eventsStack}>
-          {/* Connector line */}
+          {/* Connector Line */}
           <div className={styles.connectorLine} aria-hidden="true" />
 
           {stack.map((slot) => (
@@ -253,15 +256,21 @@ export default function EventSection() {
                 slot.isActive
                   ? cycleNext
                   : () => {
-                      // Determine which event this ghost card represents and set it as active
                       const eventIndex = slot.key.startsWith("above")
-                        ? (activeId - parseInt(slot.key.replace("above-", "")) - 1 + EVENTS.length) % EVENTS.length
-                        : (activeId + parseInt(slot.key.replace("below-", "")) - 1) % EVENTS.length;
+                        ? (activeId -
+                            parseInt(slot.key.replace("above-", "")) -
+                            1 +
+                            EVENTS.length) %
+                          EVENTS.length
+                        : (activeId +
+                            parseInt(slot.key.replace("below-", "")) -
+                            1) %
+                          EVENTS.length;
                       setActiveId(eventIndex + 1);
                     }
               }
               style={{
-                transform: `scale(${slot.scale}) translateX(${slot.translateX}px)`,
+                transform: `scale(${slot.scale}) translate(${slot.translateX}px, ${slot.translateY}px)`,
                 opacity: slot.opacity,
                 zIndex: slot.isActive ? 10 : 1,
               }}
@@ -270,18 +279,10 @@ export default function EventSection() {
                 className={styles.cardInner}
                 style={{
                   background: slot.isActive
-                    ? `rgba(140, 140, 200, ${slot.bgOpacity})`
-                    : `rgba(255, 255, 255, ${slot.bgOpacity})`,
+                    ? `rgba(130, 120, 180, ${slot.bgOpacity})`
+                    : `rgba(40, 40, 60, ${slot.bgOpacity})`,
                 }}
               >
-                {/* Deprecated DecryptedText for event cards - keeping original text style */}
-                {/* <DecryptedText
-                  key={slot.key}
-                  text={slot.label}
-                  animateOn="view"
-                  speed={40}
-                  sequential={true}
-                /> */}
                 <span
                   className={styles.eventText}
                   style={{ fontSize: slot.fontSize }}
@@ -290,34 +291,35 @@ export default function EventSection() {
                 </span>
               </div>
 
-              {/* Active card frame + line decoration */}
+              {/* Active Card Decorations */}
               {slot.isActive && (
                 <>
-                  <svg
-                    className={styles.activeFrame}
-                    viewBox="0 0 720 52"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    preserveAspectRatio="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M1 26 L14 1 L706 1 L719 26 L706 51 L14 51 Z"
-                      fill="none"
-                      stroke="rgba(255,255,255,0.25)"
-                      strokeWidth="1.5"
-                    />
-                  </svg>
+                  <div className={styles.activeCardTab} />
 
-                  {/* Horizontal line extending right */}
-                  <div className={styles.activeLine}>
-                    <div className={styles.lineSegment} style={{ width: 50 }} />
-                    <div className={styles.lineDot} />
+                                    <div className={styles.activeLine}>
+                    <div
+                      className={styles.lineSegment}
+                      style={{ width: 200 }}
+                    />
+                    <div
+                      className={`${styles.lineDot} ${styles.lineDotPulse}`}
+                    />
                   </div>
 
-                  {/* Horizontal line extending left (shorter) */}
-                  <div className={styles.activeLineLeft}>
-                    <div className={styles.lineSegment} style={{ width: 30 }} />
+                                    <div className={styles.activeLineLeft}>
+                    <div
+                      className={styles.lineSegment}
+                      style={{ width: 300 }}
+                    />
+                    <div
+                      className={`${styles.lineDot} ${styles.lineDotPulse}`}
+                    />
+                  </div>
+
+                                    <div className={styles.bottomTrace}>
+                    <div className={styles.traceH1} />
+                    <div className={styles.traceAngle} />
+                    <div className={styles.traceH2} />
                   </div>
                 </>
               )}

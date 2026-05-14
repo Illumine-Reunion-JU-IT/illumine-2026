@@ -1,9 +1,4 @@
-/* ============================================================
-   EVENT SECTION — HUD Perspective Stack
-   Matches the reference design with stacked angular event cards
-   ============================================================ */
-
-/* ── Section shell ── */
+/* --- Base Layout --- */
 .section {
   position: relative;
   width: 100%;
@@ -16,22 +11,32 @@
   padding: 80px 0;
 }
 
-/* ── SYSTEM UPDATE glitch ── */
-/* Applied for 500ms on initial load */
+/* --- Effects & Particles --- */
 .systemUpdate {
   animation: sectionGlitch 0.5s steps(2) forwards;
 }
 
 @keyframes sectionGlitch {
-  0%   { filter: hue-rotate(0deg)   skewX(0deg);    }
-  15%  { filter: hue-rotate(40deg)  skewX(-1.5deg); }
-  30%  { filter: hue-rotate(-20deg) skewX(1deg);    }
-  50%  { filter: hue-rotate(80deg)  skewX(-0.5deg); }
-  70%  { filter: hue-rotate(0deg)   skewX(0.8deg);  }
-  100% { filter: hue-rotate(0deg)   skewX(0deg);    }
+  0% {
+    filter: hue-rotate(0deg) skewX(0deg);
+  }
+  15% {
+    filter: hue-rotate(40deg) skewX(-1.5deg);
+  }
+  30% {
+    filter: hue-rotate(-20deg) skewX(1deg);
+  }
+  50% {
+    filter: hue-rotate(80deg) skewX(-0.5deg);
+  }
+  70% {
+    filter: hue-rotate(0deg) skewX(0.8deg);
+  }
+  100% {
+    filter: hue-rotate(0deg) skewX(0deg);
+  }
 }
 
-/* ── Background particles ── */
 .particles {
   position: absolute;
   inset: 0;
@@ -47,7 +52,7 @@
   border-radius: 50%;
 }
 
-/* ── Cross markers (bottom decoration) ── */
+/* --- Markers & Elements --- */
 .crossMarker {
   position: absolute;
   bottom: 32px;
@@ -59,10 +64,9 @@
   z-index: 1;
 }
 
-/* ── Plus markers beneath EVENTS title ── */
 .plusBelowTitle1 {
   top: 100%;
-  right: 75%;
+  right: 82%;
   margin-top: 8px;
   padding-top: 10px;
   z-index: 1;
@@ -70,29 +74,27 @@
 
 .plusBelowTitle2 {
   top: 100%;
-  right: 0%;
+  right: 8%;
   margin-top: 8px;
   padding-top: 10px;
   z-index: 1;
 }
 
-/* ── Plus markers at bottom of section ── */
 .plusBottom1 {
   bottom: 28px;
-  left: 42%;
+  left: 36%;
   z-index: 1;
 }
 
 .plusBottom2 {
   bottom: 28px;
-  right: 22%;
+  right: 28%;
   z-index: 1;
 }
 
-/* ── Arc reactor (left side) ── */
 .arcReactorWrapper {
   position: absolute;
-  left: -5%;
+  left: calc(50% - 935px);
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
@@ -100,17 +102,17 @@
   z-index: 0;
 }
 
-/* ── BigCircle (right of center) ── */
 .bigCircleWrapper {
   position: absolute;
-  right: 28%;
-  top: 42%;
+  left: calc(50% + 443px);
+  top: 50%;
+  transform: translateY(-50%) scale(1.6);
   pointer-events: none;
   opacity: 0.35;
   z-index: 0;
 }
 
-/* ── Content layout ── */
+/* --- Content Layout --- */
 .content {
   position: relative;
   z-index: 2;
@@ -122,12 +124,11 @@
   align-items: center;
 }
 
-/* ── Title ── */
 .titleWrapper {
   position: relative;
   align-self: flex-end;
-  margin-bottom: 60px;
-  margin-right: 40px;
+  margin-bottom: 70px;
+  margin-right: 60px;
 }
 
 .title {
@@ -138,20 +139,22 @@
   color: #b6bbff;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  text-shadow:
+    0 0 30px rgba(182, 187, 255, 0.35),
+    0 0 60px rgba(182, 187, 255, 0.15);
 }
 
-/* ── Events stack ── */
+/* --- Event Cards --- */
 .eventsStack {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 0;
   width: 100%;
-  max-width: 720px;
+  max-width: 800px;
 }
 
-/* ── Individual event card ── */
 .eventCard {
   position: relative;
   width: 100%;
@@ -167,25 +170,28 @@
   filter: brightness(1.15);
 }
 
-/* ── Card inner (the clipped hexagonal shape) ── */
 .cardInner {
   position: relative;
   width: 100%;
-  padding: 12px 32px;
+  padding: 14px 36px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  clip-path: polygon(0% 50%, 2% 0%, 98% 0%, 100% 50%, 98% 100%, 2% 100%);
+  clip-path: polygon(3% 0%, 100% 0%, 100% 100%, 3% 100%, 0% 50%);
 }
 
-/* ── Card states ── */
 .cardInactive .cardInner {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(30, 30, 45, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .cardActive .cardInner {
-  background: rgba(140, 140, 200, 0.22);
+  background: rgba(120, 110, 170, 0.6);
+  border: 1px solid rgba(182, 187, 255, 0.25);
+  box-shadow:
+    0 0 30px rgba(140, 130, 190, 0.2),
+    inset 0 0 16px rgba(182, 187, 255, 0.06);
+  padding: 16px 40px;
 }
 
-/* ── Event text ── */
 .eventText {
   font-family: "TT Lakes Neue Trial", sans-serif;
   font-weight: 700;
@@ -196,25 +202,34 @@
 }
 
 .cardInactive .eventText {
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
 }
 
 .cardActive .eventText {
   color: rgba(255, 255, 255, 0.95);
+  font-weight: 800;
+  text-shadow: 0 0 14px rgba(182, 187, 255, 0.7);
+  letter-spacing: 0.02em;
 }
 
-/* ── Active card decorations ── */
-.activeFrame {
+/* --- Active Card Details --- */
+.activeCardTab {
   position: absolute;
-  inset: -2px;
+  right: -28px;
+  top: 0;
+  bottom: 0;
+  width: 28px;
+  background: rgba(140, 130, 190, 0.95);
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
   pointer-events: none;
   z-index: 2;
+  box-shadow: -4px 0 14px rgba(140, 130, 190, 0.4);
 }
 
-/* ── Horizontal line extending RIGHT from active card ── */
 .activeLine {
   position: absolute;
-  right: -60px;
+  left: 100%;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -224,10 +239,9 @@
   z-index: 1;
 }
 
-/* ── Horizontal line extending LEFT from active card ── */
 .activeLineLeft {
   position: absolute;
-  left: -35px;
+  right: 100%;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -235,23 +249,82 @@
   gap: 0;
   pointer-events: none;
   z-index: 1;
+}
+
+@keyframes hudPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(200, 200, 230, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(200, 200, 230, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(200, 200, 230, 0);
+  }
+}
+
+.lineDotPulse {
+  animation: hudPulse 2s infinite;
 }
 
 .lineSegment {
-  height: 2px;
-  background: rgba(255, 255, 255, 0.2);
+  height: 3px;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 1px;
 }
 
 .lineDot {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: rgba(200, 200, 230, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(182, 187, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   flex-shrink: 0;
 }
 
-/* ── Vertical connector line ── */
+.bottomTrace {
+  position: absolute;
+  top: calc(100% + 22px);
+  left: 15%;
+  width: 85%;
+  height: 36px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.traceH1 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 42%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.traceAngle {
+  position: absolute;
+  top: 0;
+  left: 42%;
+  width: 2px;
+  height: 28px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0.2)
+  );
+  transform: rotate(25deg);
+  transform-origin: top center;
+}
+
+.traceH2 {
+  position: absolute;
+  top: 24px;
+  left: 48%;
+  width: 52%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
 .connectorLine {
   position: absolute;
   right: -20px;
@@ -270,7 +343,7 @@
   pointer-events: none;
 }
 
-/* ── Bottom event navigation dots ── */
+/* --- Navigation --- */
 .eventNav {
   display: flex;
   gap: 24px;
@@ -327,9 +400,7 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
+/* --- Responsive --- */
 @media (max-width: 1024px) {
   .section {
     min-height: auto;
@@ -347,7 +418,7 @@
   }
 
   .arcReactorWrapper {
-    left: -15%;
+    left: calc(50% - 700px);
     opacity: 0.3;
   }
 
@@ -356,7 +427,8 @@
   }
 
   .activeLine,
-  .activeLineLeft {
+  .activeLineLeft,
+  .bottomTrace {
     display: none;
   }
 
