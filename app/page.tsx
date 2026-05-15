@@ -2,8 +2,8 @@ import Hero from "./sections/Hero";
 import AboutIllumine from "../components/about/AboutIllumine";
 import AboutDepartment from "@/components/about/AboutDepartment";
 import GoodwillMessage from "./sections/GoodwillMessage";
-import EventSection from "./sections/EventSection";
 import Footer from "./sections/Footer";
+import EventSection from "./sections/EventSection";
 
 /**
  * MODULE: Home Route (/)

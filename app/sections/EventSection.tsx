@@ -1,358 +1,227 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import ArcReactor from "@/components/arc-reactor";
 import BigCircle from "@/components/ui/BigCircle";
 import Plus from "@/components/ui/Plus";
 import DecryptedText from "@/components/ui/DecryptedText";
-import styles from "./EventSection.module.css";
 
-const EVENTS = [
+const schedule = [
   {
     id: 1,
-    title: "Inauguration",
+    title: "1) Inauguration",
     time: "10:00 a.m.",
     description:
       "The official start of Illumine 2026 with a grand opening ceremony.",
   },
   {
     id: 2,
-    title: "Inaugural Speech",
+    title: "2) Inaugural Speech",
     time: "10:30 a.m.",
     description: "An inspiring address to kick off the festivities.",
   },
   {
     id: 3,
-    title: "Football Match",
+    title: "3) Football Match",
     time: "11:30 a.m.",
     description:
       "An adrenaline-fueled clash on the field for the championship.",
   },
   {
     id: 4,
-    title: "Lunch",
+    title: "4) Lunch",
     time: "1:00 p.m.",
     description: "A well-deserved break with a grand feast for all attendees.",
   },
   {
     id: 5,
-    title: "Cricket Match",
+    title: "5) Cricket Match",
     time: "3:00 p.m.",
     description: "A thrilling cricket showdown between rival teams.",
   },
   {
     id: 6,
-    title: "Student Performance",
+    title: "6) Student Performance",
     time: "5:00 p.m.",
     description: "Showcasing the incredible talent of our students on stage.",
   },
   {
     id: 7,
-    title: "Senior Performance",
+    title: "7) Senior Performance",
     time: "6:30 p.m.",
     description: "A special performance by the senior batch to remember.",
   },
   {
     id: 8,
-    title: "Band Performance",
+    title: "8) Band Performance",
     time: "7:30 p.m.",
     description: "Live music to electrify the evening atmosphere.",
   },
   {
     id: 9,
-    title: "DJ Night",
+    title: "9) DJ Night",
     time: "9:00 p.m.",
     description: "An electrifying DJ set to dance the night away.",
   },
   {
     id: 10,
-    title: "Closing Ceremony",
+    title: "10) Closing Ceremony",
     time: "10:00 p.m.",
     description: "The grand finale of Illumine 2026.",
   },
 ];
 
-const PARTICLES = [
-  { left: "12%", top: "18%", size: 2, opacity: 0.25 },
-  { left: "25%", top: "8%", size: 1.5, opacity: 0.2 },
-  { left: "38%", top: "72%", size: 2.5, opacity: 0.15 },
-  { left: "55%", top: "15%", size: 1.5, opacity: 0.3 },
-  { left: "68%", top: "85%", size: 2, opacity: 0.2 },
-  { left: "78%", top: "30%", size: 1.5, opacity: 0.15 },
-  { left: "85%", top: "60%", size: 2, opacity: 0.25 },
-  { left: "92%", top: "22%", size: 1.5, opacity: 0.2 },
-  { left: "15%", top: "55%", size: 2, opacity: 0.18 },
-  { left: "45%", top: "42%", size: 1.5, opacity: 0.22 },
-  { left: "72%", top: "48%", size: 2, opacity: 0.12 },
-  { left: "30%", top: "90%", size: 1.5, opacity: 0.2 },
-  { left: "60%", top: "65%", size: 2.5, opacity: 0.15 },
-  { left: "8%", top: "78%", size: 2, opacity: 0.2 },
-  { left: "50%", top: "88%", size: 1.5, opacity: 0.18 },
-];
+export default function EventsPage() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
-const CARD_HEIGHT = 62;
-const STACK_CENTER_TOP = 210;
+  const SPACING = 35; // 🔥 tighter than before, balanced
 
-function buildStack(activeId: number) {
-  const activeEvent = EVENTS.find((e) => e.id === activeId)!;
-  const activeLabel = `${activeEvent.id}) ${activeEvent.title} – ${activeEvent.time}`;
-
-  const slots: {
-    key: string;
-    event: (typeof EVENTS)[0];
-    label: string;
-    scale: number;
-    opacity: number;
-    fontSize: number;
-    offsetX: number;
-    offsetY: number;
-    paddingY?: number;
-    isActive: boolean;
-    bgOpacity: number;
-    zIndex: number;
-  }[] = [];
-
-  // Upper Cascade
-  for (let i = 3; i >= 1; i--) {
-    const prevEventId = activeId - i;
-    const eventToShow =
-      EVENTS[(prevEventId - 1 + EVENTS.length) % EVENTS.length];
-    const label = `${eventToShow.id}) ${eventToShow.title} – ${eventToShow.time}`;
-
-    const scale = 1 - i * 0.13;
-    const opacity = 0.65 - i * 0.16;
-    const fontSize = 22 - i * 3;
-    const offsetX = -(i * 90);
-    const offsetY = -(i * 68);
-
-    slots.push({
-      key: `above-${i}`,
-      event: eventToShow,
-      label,
-      scale,
-      opacity,
-      fontSize,
-      offsetX,
-      offsetY,
-      isActive: false,
-      bgOpacity: 0.52 - i * 0.08,
-      zIndex: i,
-    });
-  }
-
-  // Active Card
-  slots.push({
-    key: `active`,
-    event: activeEvent,
-    label: activeLabel,
-    scale: 1,
-    opacity: 1,
-    fontSize: 26,
-    offsetX: 0,
-    offsetY: 0,
-    isActive: true,
-    bgOpacity: 0.62,
-    zIndex: 10,
-  });
-
-  // Lower Cascade
-  for (let i = 1; i <= 3; i++) {
-    const nextEventId = activeId + i;
-    const eventToShow =
-      EVENTS[(nextEventId - 1 + EVENTS.length) % EVENTS.length];
-    const label = `${eventToShow.id}) ${eventToShow.title} – ${eventToShow.time}`;
-
-    const scale = 1 - i * 0.1;
-    const opacity = 0.6 - i * 0.16;
-    const fontSize = 20 - i * 2.5;
-    const offsetX = -(i * 80);
-    const offsetY = i * 72;
-    const paddingY = i * 100;
-
-    slots.push({
-      key: `below-${i}`,
-      event: eventToShow,
-      label,
-      scale,
-      opacity,
-      fontSize,
-      offsetX,
-      offsetY,
-      paddingY,
-      isActive: false,
-      bgOpacity: 0.48 - i * 0.08,
-      zIndex: 10 - i,
-    });
-  }
-
-  return slots;
-}
-
-export default function EventSection() {
-  const [activeId, setActiveId] = useState(3);
-  const [glitching, setGlitching] = useState(false);
-  const stack = buildStack(activeId);
-
-  useEffect(() => {
-    setGlitching(true);
-    const timer = setTimeout(() => setGlitching(false), 500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const cycleNext = () => {
-    setActiveId((prev) => (prev >= EVENTS.length ? 1 : prev + 1));
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const scrollTop = scrollRef.current.scrollTop;
+    setActiveIndex(Math.round(scrollTop / SPACING));
   };
 
   return (
-    <section className={styles.section}>
-      {/* Particles */}
-      <div className={styles.particles} aria-hidden="true">
-        {PARTICLES.map((p, i) => (
-          <div
-            key={i}
-            className={styles.particle}
-            style={{
-              left: p.left,
-              top: p.top,
-              width: p.size,
-              height: p.size,
-              opacity: p.opacity,
-            }}
+    <main className="relative h-screen w-screen overflow-hidden bg-[#070707] text-[#d9fff6] font-[Mechsuit]">
+      {/* PLUS */}
+
+      <Plus className="bottom-[150px] left-[600px]" />
+      <Plus className="bottom-[150px] right-[400px]" />
+
+      {/* TITLE */}
+      <div>
+        <h1 className="absolute right-[120px] top-[35px] text-[78px] tracking-[5px] text-[#b7b7ff]">
+          <DecryptedText
+            text="Events"
+            animateOn="view"
+            speed={120}
+            sequential={true}
+            revealDirection="start"
           />
-        ))}
+        </h1>
+        <Plus className="right-[500px] top-[160px]" />
+        <Plus className="right-[120px] top-[160px]" />
       </div>
 
-      {/* Arc Reactor */}
-      <div className={styles.arcReactorWrapper} aria-hidden="true">
-        <ArcReactor size={550} accentColor="teal" />
+      {/* ARC REACTOR */}
+      <div className="absolute left-[-100px] top-[42%] -translate-y-1/2 scale-[1.55]">
+        <ArcReactor size={440} accentColor="purple" />
       </div>
 
-      {/* Big Circle */}
-      <div className={styles.bigCircleWrapper} aria-hidden="true">
+      {/* SCROLL AREA */}
+      <div className="absolute left-[-80px] top-[60px] h-[760px] w-[1550px] overflow-hidden">
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="scrollbar-hide absolute inset-0 overflow-y-scroll"
+        >
+          <div className="h-[240px]" />
+
+          <div className="relative h-[2400px]">
+            {schedule.map((event, index) => {
+              const radius = 820;
+
+              const step = index - activeIndex;
+
+              const maxAngle = 1.25;
+              const angle = step * 0.28;
+
+              const clampedAngle = Math.max(
+                -maxAngle,
+                Math.min(maxAngle, angle),
+              );
+
+              const x = radius * Math.cos(clampedAngle);
+              const y = radius * Math.sin(clampedAngle);
+
+              const topBase = index * SPACING;
+
+              // 🔥 balanced positioning (NOT too left)
+              const leftPosition = -200 + x * 0.95;
+
+              const topPosition = topBase + y * 0.35;
+
+              const distance = Math.abs(step);
+
+              const opacity =
+                distance === 0
+                  ? 1
+                  : distance === 1
+                    ? 0.5
+                    : distance === 2
+                      ? 0.25
+                      : 0.08;
+
+              const scale = distance === 0 ? 1.05 : distance === 1 ? 0.9 : 0.8;
+
+              return (
+                <div
+                  key={index}
+                  className="absolute transition-all duration-700 ease-out"
+                  style={{
+                    left: `${leftPosition}px`,
+                    top: `${topPosition}px`,
+                    transform: `scale(${scale})`,
+                    opacity,
+                    filter: distance > 1 ? "blur(1px)" : "blur(0px)",
+                  }}
+                >
+                  <EventCard
+                    text={`${event.title} – ${event.time}`}
+                    active={distance === 0}
+                  />
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="h-[900px]" />
+        </div>
+      </div>
+
+      {/* BIG CIRCLE */}
+      <div className="absolute right-[240px] top-3/7 h-[88px] w-[88px] -translate-y-1/2 opacity-100">
         <BigCircle />
       </div>
 
-      {/* Plus Markers */}
-      <Plus className={styles.plusBottom1} delay={0.9} />
-      <Plus className={styles.plusBottom2} delay={1.2} />
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
+    </main>
+  );
+}
 
-      {/* Content */}
+/* ---------------- EVENT CARD ---------------- */
+
+function EventCard({ text, active }: { text: string; active: boolean }) {
+  return (
+    <div className="relative flex h-[64px] items-center whitespace-nowrap px-[42px] text-[28px] tracking-[2px] text-[#BEF3DF] font-bold font-['TT_Lakes_Neue_Trial'] ">
       <div
-        className={`${styles.content} ${glitching ? styles.systemUpdate : ""}`}
-      >
-        {/* Title */}
-        <div className={styles.titleWrapper}>
-          <h2 className={styles.title}>
-            <DecryptedText
-              text="Events"
-              animateOn="view"
-              speed={60}
-              sequential={true}
-              revealDirection="start"
-            />
-          </h2>
-          <Plus className={styles.plusBelowTitle1} delay={0.3} />
-          <Plus className={styles.plusBelowTitle2} delay={0.6} />
-        </div>
+        className="absolute inset-0"
+        style={{
+          clipPath:
+            "polygon(10% 0%, 100% 0%, 100% 45%, 90% 100%, 0% 100%, 0% 45%)",
+          background: active ? "#9d98e8" : "#5c5c7dff",
+        }}
+      />
 
-        {/* Events Stack */}
-        <div
-          className={styles.eventsStack}
-          style={{ height: STACK_CENTER_TOP * 2 + CARD_HEIGHT }}
-        >
-          <div className={styles.connectorLine} aria-hidden="true" />
-
-          {stack.map((slot) => {
-            const cardTop = STACK_CENTER_TOP + slot.offsetY - CARD_HEIGHT / 2;
-
-            return (
-              <div
-                key={slot.key}
-                className={`${styles.eventCard} ${
-                  slot.isActive ? styles.cardActive : styles.cardInactive
-                }`}
-                onClick={
-                  slot.isActive
-                    ? cycleNext
-                    : () => {
-                        const eventIndex = slot.key.startsWith("above")
-                          ? (activeId -
-                              parseInt(slot.key.replace("above-", "")) -
-                              1 +
-                              EVENTS.length) %
-                            EVENTS.length
-                          : (activeId +
-                              parseInt(slot.key.replace("below-", "")) -
-                              1) %
-                            EVENTS.length;
-                        setActiveId(eventIndex + 1);
-                      }
-                }
-                style={{
-                  top: cardTop,
-                  left: 0,
-                  right: 0,
-                  transform: `translateX(${slot.offsetX}px) scale(${slot.scale})`,
-                  opacity: slot.opacity,
-                  zIndex: slot.zIndex,
-                }}
-              >
-                <div
-                  className={styles.cardInner}
-                  style={{
-                    background: slot.isActive
-                      ? `rgba(130, 120, 180, ${slot.bgOpacity})`
-                      : `rgba(65, 60, 95, ${slot.bgOpacity})`,
-                  }}
-                >
-                  <span
-                    className={styles.eventText}
-                    style={{ fontSize: slot.fontSize }}
-                  >
-                    {slot.label}
-                  </span>
-                </div>
-
-                {/* Active Card Decorations */}
-                {slot.isActive && (
-                  <>
-                    <div className={styles.activeCardTab} />
-
-                    {/* Right line */}
-                    <div className={styles.activeLine}>
-                      <div
-                        className={styles.lineSegment}
-                        style={{ width: 240 }}
-                      />
-                      <div
-                        className={`${styles.lineDot} ${styles.lineDotPulse}`}
-                      />
-                    </div>
-
-                    {/* Left line */}
-                    <div className={styles.activeLineLeft}>
-                      <div
-                        className={`${styles.lineDot} ${styles.lineDotPulse}`}
-                      />
-                      <div
-                        className={styles.lineSegment}
-                        style={{ width: 240 }}
-                      />
-                    </div>
-
-                    {/* Bottom trace */}
-                    <div className={styles.bottomTrace}>
-                      <div className={styles.traceH1} />
-                      <div className={styles.traceAngle} />
-                      <div className={styles.traceH2} />
-                    </div>
-                  </>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
+      <span className="relative z-10">
+        <DecryptedText
+          text={text}
+          animateOn="view"
+          speed={60}
+          sequential={true}
+          revealDirection="start"
+        />
+      </span>
+    </div>
   );
 }
