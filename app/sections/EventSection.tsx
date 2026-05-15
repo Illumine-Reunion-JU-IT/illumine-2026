@@ -90,35 +90,40 @@ const PARTICLES = [
   { left: "50%", top: "88%", size: 1.5, opacity: 0.18 },
 ];
 
+const CARD_HEIGHT = 62;
+const STACK_CENTER_TOP = 210;
+
 function buildStack(activeId: number) {
   const activeEvent = EVENTS.find((e) => e.id === activeId)!;
   const activeLabel = `${activeEvent.id}) ${activeEvent.title} – ${activeEvent.time}`;
 
   const slots: {
     key: string;
-    event: typeof activeEvent;
+    event: (typeof EVENTS)[0];
     label: string;
     scale: number;
     opacity: number;
     fontSize: number;
-    translateX: number;
-    translateY: number;
+    offsetX: number;
+    offsetY: number;
+    paddingY?: number;
     isActive: boolean;
     bgOpacity: number;
+    zIndex: number;
   }[] = [];
 
-  // Upper Cascade (Previous Events)
+  // Upper Cascade
   for (let i = 3; i >= 1; i--) {
     const prevEventId = activeId - i;
     const eventToShow =
       EVENTS[(prevEventId - 1 + EVENTS.length) % EVENTS.length];
     const label = `${eventToShow.id}) ${eventToShow.title} – ${eventToShow.time}`;
 
-    const scale = 0.86 - (i - 1) * 0.18;
-    const opacity = 0.65 - i * 0.2;
-    const fontSize = 20 - i * 3;
-    const translateX = -40 - (i - 1) * 45;
-    const translateY = -32 - (i - 1) * 36;
+    const scale = 1 - i * 0.13;
+    const opacity = 0.65 - i * 0.16;
+    const fontSize = 22 - i * 3;
+    const offsetX = -(i * 90);
+    const offsetY = -(i * 68);
 
     slots.push({
       key: `above-${i}`,
@@ -127,39 +132,42 @@ function buildStack(activeId: number) {
       scale,
       opacity,
       fontSize,
-      translateX,
-      translateY,
+      offsetX,
+      offsetY,
       isActive: false,
-      bgOpacity: 0.12,
+      bgOpacity: 0.52 - i * 0.08,
+      zIndex: i,
     });
   }
 
-  // Active Card (Center Anchor)
+  // Active Card
   slots.push({
     key: `active`,
     event: activeEvent,
     label: activeLabel,
     scale: 1,
     opacity: 1,
-    fontSize: 28,
-    translateX: 0,
-    translateY: 0,
+    fontSize: 26,
+    offsetX: 0,
+    offsetY: 0,
     isActive: true,
-    bgOpacity: 0.6,
+    bgOpacity: 0.62,
+    zIndex: 10,
   });
 
-  // Lower Cascade (Next Events)
+  // Lower Cascade
   for (let i = 1; i <= 3; i++) {
     const nextEventId = activeId + i;
     const eventToShow =
       EVENTS[(nextEventId - 1 + EVENTS.length) % EVENTS.length];
     const label = `${eventToShow.id}) ${eventToShow.title} – ${eventToShow.time}`;
 
-    const scale = 0.88 - i * 0.09;
-    const opacity = 0.55 - i * 0.17;
-    const fontSize = 22 - i * 3.5;
-    const translateX = -14 - i * 12;
-    const translateY = 26 + i * 28;
+    const scale = 1 - i * 0.1;
+    const opacity = 0.6 - i * 0.16;
+    const fontSize = 20 - i * 2.5;
+    const offsetX = -(i * 80);
+    const offsetY = i * 72;
+    const paddingY = i * 100;
 
     slots.push({
       key: `below-${i}`,
@@ -168,10 +176,12 @@ function buildStack(activeId: number) {
       scale,
       opacity,
       fontSize,
-      translateX,
-      translateY,
+      offsetX,
+      offsetY,
+      paddingY,
       isActive: false,
-      bgOpacity: 0.1,
+      bgOpacity: 0.48 - i * 0.08,
+      zIndex: 10 - i,
     });
   }
 
@@ -182,18 +192,20 @@ export default function EventSection() {
   const [activeId, setActiveId] = useState(3);
   const [glitching, setGlitching] = useState(false);
   const stack = buildStack(activeId);
+
   useEffect(() => {
     setGlitching(true);
     const timer = setTimeout(() => setGlitching(false), 500);
     return () => clearTimeout(timer);
   }, []);
+
   const cycleNext = () => {
     setActiveId((prev) => (prev >= EVENTS.length ? 1 : prev + 1));
   };
 
   return (
     <section className={styles.section}>
-      {/* Background Particles */}
+      {/* Particles */}
       <div className={styles.particles} aria-hidden="true">
         {PARTICLES.map((p, i) => (
           <div
@@ -210,25 +222,25 @@ export default function EventSection() {
         ))}
       </div>
 
-      {/* Left Arc Reactor */}
+      {/* Arc Reactor */}
       <div className={styles.arcReactorWrapper} aria-hidden="true">
         <ArcReactor size={550} accentColor="teal" />
       </div>
 
-      {/* Right Big Circle */}
+      {/* Big Circle */}
       <div className={styles.bigCircleWrapper} aria-hidden="true">
         <BigCircle />
       </div>
 
-      {/* Bottom Plus Markers */}
+      {/* Plus Markers */}
       <Plus className={styles.plusBottom1} delay={0.9} />
       <Plus className={styles.plusBottom2} delay={1.2} />
 
-      {/* Main Content Area */}
+      {/* Content */}
       <div
         className={`${styles.content} ${glitching ? styles.systemUpdate : ""}`}
       >
-        {/* Title Section */}
+        {/* Title */}
         <div className={styles.titleWrapper}>
           <h2 className={styles.title}>
             <DecryptedText
@@ -239,92 +251,106 @@ export default function EventSection() {
               revealDirection="start"
             />
           </h2>
-                    <Plus className={styles.plusBelowTitle1} delay={0.3} />
+          <Plus className={styles.plusBelowTitle1} delay={0.3} />
           <Plus className={styles.plusBelowTitle2} delay={0.6} />
         </div>
 
-        {/* Visual Events Stack */}
-        <div className={styles.eventsStack}>
-          {/* Connector Line */}
+        {/* Events Stack */}
+        <div
+          className={styles.eventsStack}
+          style={{ height: STACK_CENTER_TOP * 2 + CARD_HEIGHT }}
+        >
           <div className={styles.connectorLine} aria-hidden="true" />
 
-          {stack.map((slot) => (
-            <div
-              key={slot.key}
-              className={`${styles.eventCard} ${slot.isActive ? styles.cardActive : styles.cardInactive}`}
-              onClick={
-                slot.isActive
-                  ? cycleNext
-                  : () => {
-                      const eventIndex = slot.key.startsWith("above")
-                        ? (activeId -
-                            parseInt(slot.key.replace("above-", "")) -
-                            1 +
-                            EVENTS.length) %
-                          EVENTS.length
-                        : (activeId +
-                            parseInt(slot.key.replace("below-", "")) -
-                            1) %
-                          EVENTS.length;
-                      setActiveId(eventIndex + 1);
-                    }
-              }
-              style={{
-                transform: `scale(${slot.scale}) translate(${slot.translateX}px, ${slot.translateY}px)`,
-                opacity: slot.opacity,
-                zIndex: slot.isActive ? 10 : 1,
-              }}
-            >
+          {stack.map((slot) => {
+            const cardTop = STACK_CENTER_TOP + slot.offsetY - CARD_HEIGHT / 2;
+
+            return (
               <div
-                className={styles.cardInner}
+                key={slot.key}
+                className={`${styles.eventCard} ${
+                  slot.isActive ? styles.cardActive : styles.cardInactive
+                }`}
+                onClick={
+                  slot.isActive
+                    ? cycleNext
+                    : () => {
+                        const eventIndex = slot.key.startsWith("above")
+                          ? (activeId -
+                              parseInt(slot.key.replace("above-", "")) -
+                              1 +
+                              EVENTS.length) %
+                            EVENTS.length
+                          : (activeId +
+                              parseInt(slot.key.replace("below-", "")) -
+                              1) %
+                            EVENTS.length;
+                        setActiveId(eventIndex + 1);
+                      }
+                }
                 style={{
-                  background: slot.isActive
-                    ? `rgba(130, 120, 180, ${slot.bgOpacity})`
-                    : `rgba(40, 40, 60, ${slot.bgOpacity})`,
+                  top: cardTop,
+                  left: 0,
+                  right: 0,
+                  transform: `translateX(${slot.offsetX}px) scale(${slot.scale})`,
+                  opacity: slot.opacity,
+                  zIndex: slot.zIndex,
                 }}
               >
-                <span
-                  className={styles.eventText}
-                  style={{ fontSize: slot.fontSize }}
+                <div
+                  className={styles.cardInner}
+                  style={{
+                    background: slot.isActive
+                      ? `rgba(130, 120, 180, ${slot.bgOpacity})`
+                      : `rgba(65, 60, 95, ${slot.bgOpacity})`,
+                  }}
                 >
-                  {slot.label}
-                </span>
+                  <span
+                    className={styles.eventText}
+                    style={{ fontSize: slot.fontSize }}
+                  >
+                    {slot.label}
+                  </span>
+                </div>
+
+                {/* Active Card Decorations */}
+                {slot.isActive && (
+                  <>
+                    <div className={styles.activeCardTab} />
+
+                    {/* Right line */}
+                    <div className={styles.activeLine}>
+                      <div
+                        className={styles.lineSegment}
+                        style={{ width: 240 }}
+                      />
+                      <div
+                        className={`${styles.lineDot} ${styles.lineDotPulse}`}
+                      />
+                    </div>
+
+                    {/* Left line */}
+                    <div className={styles.activeLineLeft}>
+                      <div
+                        className={`${styles.lineDot} ${styles.lineDotPulse}`}
+                      />
+                      <div
+                        className={styles.lineSegment}
+                        style={{ width: 240 }}
+                      />
+                    </div>
+
+                    {/* Bottom trace */}
+                    <div className={styles.bottomTrace}>
+                      <div className={styles.traceH1} />
+                      <div className={styles.traceAngle} />
+                      <div className={styles.traceH2} />
+                    </div>
+                  </>
+                )}
               </div>
-
-              {/* Active Card Decorations */}
-              {slot.isActive && (
-                <>
-                  <div className={styles.activeCardTab} />
-
-                                    <div className={styles.activeLine}>
-                    <div
-                      className={styles.lineSegment}
-                      style={{ width: 200 }}
-                    />
-                    <div
-                      className={`${styles.lineDot} ${styles.lineDotPulse}`}
-                    />
-                  </div>
-
-                                    <div className={styles.activeLineLeft}>
-                    <div
-                      className={styles.lineSegment}
-                      style={{ width: 300 }}
-                    />
-                    <div
-                      className={`${styles.lineDot} ${styles.lineDotPulse}`}
-                    />
-                  </div>
-
-                                    <div className={styles.bottomTrace}>
-                    <div className={styles.traceH1} />
-                    <div className={styles.traceAngle} />
-                    <div className={styles.traceH2} />
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
