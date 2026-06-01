@@ -7,7 +7,6 @@ import { buttonClipPath } from '@/data/Paths/heroPaths';
 export const ContactForm: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
-    company: '',
     phone: '',
     subject: '',
     message: '',
@@ -27,16 +26,15 @@ export const ContactForm: React.FC = () => {
 
     try {
       await emailjs.send(
-        'service_yo2rfuq',
-        'template_pibz4hd',
+        'service_tf9m7ui',
+        'template_hv1o3pu',
         {
           name: formData.name,
-          company: formData.company,
           phone: formData.phone,
           subject: formData.subject,
           message: formData.message,
         },
-        'uUr1Tvfn4EpmPNeZi'
+        '9PQC5QukXMTwvDS5W'
       );
 
       alert('Message sent successfully!');
@@ -44,7 +42,6 @@ export const ContactForm: React.FC = () => {
       // Reset form
       setFormData({
         name: '',
-        company: '',
         phone: '',
         subject: '',
         message: '',
@@ -171,22 +168,6 @@ export const ContactForm: React.FC = () => {
               required
               placeholder="Name"
               value={formData.name}
-              onChange={handleChange}
-              className="w-full px-4 py-3 bg-black/40 border border-[#6265fe]/30 rounded-none outline-none focus:border-[#bef3df]/80 focus:bg-black/60 transition-all text-sm text-[#d9fff6] placeholder-[#555555] font-tt-lakes shadow-[inset_0_0_8px_rgba(0,0,0,0.5)]"
-            />
-          </div>
-
-          {/* COMPANY */}
-          <div className="flex flex-col gap-1">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-[#6265fe]">
-              Company&apos;s Name
-            </label>
-
-            <input
-              type="text"
-              name="company"
-              placeholder="Company's Name"
-              value={formData.company}
               onChange={handleChange}
               className="w-full px-4 py-3 bg-black/40 border border-[#6265fe]/30 rounded-none outline-none focus:border-[#bef3df]/80 focus:bg-black/60 transition-all text-sm text-[#d9fff6] placeholder-[#555555] font-tt-lakes shadow-[inset_0_0_8px_rgba(0,0,0,0.5)]"
             />
