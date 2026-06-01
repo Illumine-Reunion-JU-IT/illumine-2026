@@ -17,7 +17,7 @@ export default function Home() {
       <AboutIllumine />
       <AboutDepartment />
       <GoodwillMessage />
-      <EventSection />
+      {/* <EventSection /> */}
       <Footer />
     </div>
   );

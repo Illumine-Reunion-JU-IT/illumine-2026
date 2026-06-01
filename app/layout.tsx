@@ -15,8 +15,31 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://illumine-reunion-ju-it.vercel.app'),
   title: "Illumine 2026",
-  description: "Illumine 2026 Coming Soon",
+  description: "Official Silver Jubilee Reunion of Jadavpur University Information Technology Department.",
+  openGraph: {
+    title: "Illumine 2026",
+    description: "Official Silver Jubilee Reunion of Jadavpur University Information Technology Department.",
+    url: "https://illumine-reunion-ju-it.vercel.app/",
+    siteName: "Illumine 2026",
+    images: [
+      {
+        url: "/photos/Hero/logo.jpeg",
+        width: 800,
+        height: 800,
+        alt: "Illumine 2026 Jadavpur University IT Reunion",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Illumine 2026",
+    description: "Official Silver Jubilee Reunion of Jadavpur University Information Technology Department.",
+    images: ["/photos/Hero/logo.jpeg"],
+  },
 };
 
 /**
@@ -36,7 +59,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-screen flex flex-col bg-[#090d19]">
+      <body className="min-h-screen flex flex-col bg-[#070707] overflow-x-hidden">
         <Navbar />
         <main className="flex-grow relative">
           {children}

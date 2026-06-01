@@ -5,11 +5,9 @@ import Image from "next/image";
 import BigCircle from "@/components/ui/BigCircle";
 import Vector4 from "@/assets/coming_soon_svgs/svg/Vector4";
 import Vector5 from "@/assets/coming_soon_svgs/svg/Vector5";
-import Svg60_50 from "@/assets/coming_soon_svgs/svg/Svg60_50";
 import Group95 from "@/assets/coming_soon_svgs/svg/Group95";
 import Rectangle70 from "@/assets/coming_soon_svgs/svg/Rectangle70";
 import DecryptedText from "@/components/ui/DecryptedText";
-
 const Cross = ({
   style,
   className,
@@ -28,7 +26,7 @@ const Cross = ({
 
 export default function AboutDepartment() {
   return (
-    <div className="relative w-full min-h-screen bg-black overflow-hidden flex flex-col items-center justify-center font-tt-lakes text-white py-20">
+    <div className="relative w-full min-h-screen bg-[#070707] overflow-hidden flex flex-col items-center justify-center font-tt-lakes text-white py-20">
 
       {/* subtle noise */}
       <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"

@@ -3,9 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import ArcReactor from '@/components/arc-reactor';
-import Dot from '@/assets/coming_soon_svgs/svg/Dot';
 import Group93 from '@/assets/coming_soon_svgs/svg/Group93';
-import Frame30 from '@/assets/coming_soon_svgs/svg/Frame30';
 import Vector2 from '@/assets/coming_soon_svgs/svg/Vector2';
 import ComingSoonText from '@/assets/coming_soon_svgs/svg/ComingSoonText';
 import BlueCircle from './BlueCircle';

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import ArcReactor from "@/components/arc-reactor";
 import BigCircle from "@/components/ui/BigCircle";
 import Plus from "@/components/ui/Plus";
@@ -20,12 +20,9 @@ const schedule = [
 ];
 
 export default function EventsPage() {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [dimensions, setDimensions] = useState({ width: 1200, height: 800 });
   const [isMobile, setIsMobile] = useState(false);
-
-  const SCROLL_STEP = 100;
 
   useEffect(() => {
     const handleResize = () => {
@@ -45,17 +42,8 @@ export default function EventsPage() {
     return () => clearInterval(timer);
   }, []);
 
-  const handleScroll = () => {
-    if (!scrollRef.current) return;
-    const scrollTop = scrollRef.current.scrollTop;
-    const newIndex = Math.round(scrollTop / SCROLL_STEP);
-    if (newIndex !== activeIndex && newIndex < schedule.length) {
-      setActiveIndex(newIndex);
-    }
-  };
-
   return (
-    <main className="relative h-screen w-screen overflow-hidden bg-[#070707] text-[#d9fff6] font-[Mechsuit]">
+    <main className="relative h-screen w-full overflow-hidden bg-[#070707] text-[#d9fff6] font-[Mechsuit]">
       {/* BACKGROUND DECORATIVE ACCENTS */}
       <Plus className="absolute bottom-[10%] left-[45%] hidden md:block" />
       <Plus className="absolute bottom-[15%] right-[20%] hidden md:block" />
@@ -129,7 +117,8 @@ export default function EventsPage() {
           return (
             <div
               key={event.id}
-              className="absolute transition-all duration-700 ease-out pointer-events-auto"
+              onClick={() => setActiveIndex(index)}
+              className="absolute transition-all duration-700 ease-out pointer-events-auto cursor-pointer"
               style={{
                 left: `${leftPosition}px`,
                 top: `${topPosition}px`,
@@ -149,18 +138,29 @@ export default function EventsPage() {
         })}
       </div>
 
-      {/* INVISIBLE SCROLL CONTAINER OVERLAY */}
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className="scrollbar-hide absolute left-0 top-0 h-full w-full overflow-y-scroll z-30"
-      >
-        <div style={{ height: `${(schedule.length - 1) * SCROLL_STEP + dimensions.height}px` }} />
-      </div>
-
-      {/* HUD DECORATIVE CIRCLE */}
-      <div className="absolute right-6 bottom-6 md:right-[240px] md:top-1/2 md:-translate-y-1/2 h-[56px] w-[56px] md:h-[88px] md:w-[88px] opacity-60 md:opacity-100">
-        <BigCircle />
+      {/* HUD DECORATIVE CIRCLE AND NAV CONTROLS */}
+      <div className="absolute right-6 bottom-6 md:right-[240px] md:top-1/2 md:-translate-y-1/2 flex flex-col items-center gap-4 z-20">
+        <div className="h-[56px] w-[56px] md:h-[88px] md:w-[88px] opacity-60 md:opacity-100 relative">
+          <BigCircle />
+        </div>
+        
+        {/* Futuristic cyberpunk button controls */}
+        <div className="flex gap-2 pointer-events-auto">
+          <button 
+            onClick={() => setActiveIndex((prev) => (prev === 0 ? schedule.length - 1 : prev - 1))}
+            className="w-10 h-10 border border-[#6265fe]/40 hover:border-[#bef3df] bg-black/60 text-[#bef3df] hover:text-white flex items-center justify-center font-bold font-mono transition-all duration-300 cursor-pointer select-none [clip-path:polygon(20%_0,100%_0,100%_80%,80%_100%,0_100%,0_20%)] shadow-[0_0_10px_rgba(98,101,254,0.1)] hover:shadow-[0_0_15px_rgba(190,243,223,0.3)] text-sm active:scale-90"
+            aria-label="Previous Event"
+          >
+            ▲
+          </button>
+          <button 
+            onClick={() => setActiveIndex((prev) => (prev === schedule.length - 1 ? 0 : prev + 1))}
+            className="w-10 h-10 border border-[#6265fe]/40 hover:border-[#bef3df] bg-black/60 text-[#bef3df] hover:text-white flex items-center justify-center font-bold font-mono transition-all duration-300 cursor-pointer select-none [clip-path:polygon(20%_0,100%_0,100%_80%,80%_100%,0_100%,0_20%)] shadow-[0_0_10px_rgba(98,101,254,0.1)] hover:shadow-[0_0_15px_rgba(190,243,223,0.3)] text-sm active:scale-90"
+            aria-label="Next Event"
+          >
+            ▼
+          </button>
+        </div>
       </div>
 
       <style jsx>{`

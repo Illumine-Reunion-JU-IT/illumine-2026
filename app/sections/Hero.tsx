@@ -19,7 +19,7 @@ const Hero: React.FC = () => {
     const router = useRouter() // <-- Initialized router
 
     return (
-        <div className='h-screen w-full relative flex flex-col justify-center items-center gap-4'>
+        <div className='h-screen w-full relative flex flex-col justify-center items-center gap-4 bg-[#070707]'>
             <Image
                 src={HeroBg}
                 alt="Hero Background"

@@ -22,20 +22,6 @@ const GlitchLogo: React.FC<{ className?: string }> = ({ className = "" }) => {
     const hasAnimated = useRef(false)
     const containerRef = useRef<HTMLDivElement>(null)
 
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting && !hasAnimated.current) {
-                    hasAnimated.current = true
-                    animatePaths()
-                }
-            },
-            { threshold: 0.3 }
-        )
-        if (containerRef.current) observer.observe(containerRef.current)
-        return () => observer.disconnect()
-    }, [])
-
     const animatePaths = () => {
         paths.forEach((_, i) => {
             // each letter glitches in with a small random flicker window
@@ -75,6 +61,20 @@ const GlitchLogo: React.FC<{ className?: string }> = ({ className = "" }) => {
             }, baseDelay + flickerCount * 60 + 60)
         })
     }
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting && !hasAnimated.current) {
+                    hasAnimated.current = true
+                    animatePaths()
+                }
+            },
+            { threshold: 0.3 }
+        )
+        if (containerRef.current) observer.observe(containerRef.current)
+        return () => observer.disconnect()
+    }, [])
 
     return (
         <div ref={containerRef} className={`relative z-10 text-[#B6BBFF] scale-75 sm:scale-100 lg:scale-150 ${className}`}>

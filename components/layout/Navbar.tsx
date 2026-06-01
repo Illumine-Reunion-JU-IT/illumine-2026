@@ -4,14 +4,16 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from "next/image";
 import { usePathname } from 'next/navigation';
-import { mechsuit, ttLakes } from './fonts'; 
+import { ttLakes } from './fonts'; 
 
 const navLinks = [
   { label: 'HOME', href: '/' },
-  { label: 'ABOUT', href: '/#about-illumine' },
+  { label: 'ABOUT', href: '/about' },
+  { label: 'EVENTS', href: '/events' },
+  { label: 'COMMITTEE', href: '/organising-committee' },
   { label: 'MAGAZINE', href: '/magazine'},
   { label: 'ALUMNI', href: '/alumni' },
-  { label: 'CONTACT US', href: '/#footer' },
+  { label: 'CONTACT US', href: '/contact-us' },
 ];
 
 export default function Navbar() {
@@ -70,15 +72,18 @@ export default function Navbar() {
         {/* Animated Gradient Scanline (Top) */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#7B61FF] to-transparent animate-pulse opacity-70" />
 
-        <div className="max-w-[90rem] mx-auto px-4 sm:px-6 h-20 flex items-center justify-between relative">
+        <div className="max-w-[90rem] mx-auto px-4 sm:px-6 h-20 grid grid-cols-[auto_1fr_auto] items-center">
           
           {/* 1. LOGO */}
          <div className="flex items-center gap-2">
   {/* JU Logo */}
-  <img
-    src="/photos/Hero/logo.jpeg"   // keep your actual path
+  <Image
+    src="/photos/Hero/logo.jpeg"
     alt="Jadavpur University"
+    width={80}
+    height={80}
     className="h-20 w-20 object-contain translate-y-[1px]"
+    priority
   />
 
   {/* Illumine Text (UNCHANGED styling) */}
@@ -88,7 +93,7 @@ export default function Navbar() {
 </div>
 
           {/* 2. DESKTOP LINKS */}
-          <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-2 w-max z-10">
+          <div className="hidden lg:flex justify-center items-center gap-2">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (

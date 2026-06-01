@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from "react";
 import Image from "next/image";
 import { professors, sectionTitle } from "@/data/goodwillData";
-import type { ProfessorData } from "@/data/goodwillData";
+import type { ProfessorData } from "@/types/goodwill";
 import DecryptedText from "@/components/ui/DecryptedText";
 import styles from "./GoodwillMessage.module.css";
 
