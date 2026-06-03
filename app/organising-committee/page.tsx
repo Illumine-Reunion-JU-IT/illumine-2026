@@ -7,6 +7,7 @@ import BigCircle from '@/components/ui/BigCircle';
 import BlueCircle from '@/components/ui/BlueCircle';
 import Plus from '@/components/ui/Plus';
 import DecryptedText from '@/components/ui/DecryptedText';
+import ComingSoon from '@/components/ui/ComingSoon';
 
 export const metadata: Metadata = {
   title: 'Organising Committee | Illumine 2026',
@@ -37,20 +38,22 @@ export default function OrganisingCommitteePage() {
   const departments = getDepartmentsFromMembers(members);
 
   return (
-    <main className="relative min-h-screen bg-[#070707] text-[#d9fff6] pt-28 pb-20 overflow-x-hidden font-tt-lakes">
+    <ComingSoon></ComingSoon>
+  );
+     {/* <main className="relative min-h-screen bg-[#070707] text-[#d9fff6] pt-28 pb-20 overflow-x-hidden font-tt-lakes">
       
-      {/* ── BACKGROUND HUD DECORATIONS ── */}
+    
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
-        {/* Subtle grid */}
-        <div 
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(100,255,218,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(100,255,218,0.05) 1px, transparent 1px)',
-            backgroundSize: '40px 40px',
-          }}
+      
+      <div 
+       className="absolute inset-0 opacity-10"
+         style={{
+          backgroundImage: 'linear-gradient(rgba(100,255,218,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(100,255,218,0.05) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+         }}
         />
         
-        {/* Glowing concentric HUD elements */}
+        
         <div className="absolute top-[15%] left-[-120px] opacity-40">
           <ArcReactor size={350} accentColor="teal" className="opacity-35" />
         </div>
@@ -58,19 +61,19 @@ export default function OrganisingCommitteePage() {
           <ArcReactor size={400} accentColor="purple" className="opacity-35" />
         </div>
 
-        {/* Plus indicators */}
+        
         <Plus className="top-[18%] left-[12%]" delay={0.3} />
         <Plus className="top-[48%] right-[18%]" delay={0.7} />
         <Plus className="bottom-[22%] left-[28%]" delay={1.1} />
 
-        {/* HUD circles */}
+       
         <BigCircle className="right-[12%] top-[10%] scale-90 opacity-40" />
         <BlueCircle className="left-[6%] bottom-[12%] rotate-45 opacity-40" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         
-        {/* ── SECTION 1: HERO ── */}
+        
         <div className="flex flex-col items-center text-center mb-16 relative">
           <p className="text-[10px] md:text-xs font-mono tracking-[0.4em] text-[#64ffda] uppercase mb-3">
             System // Live_Directory_Channels
@@ -92,10 +95,10 @@ export default function OrganisingCommitteePage() {
           </p>
         </div>
 
-        {/* ── DIRECTORY EXPLORER (SEARCH + FILTERS + GRID) ── */}
+        {
         <CommitteeExplorer members={members} departments={departments} />
 
       </div>
-    </main>
-  );
+    </main> 
+  ); */}
 }
