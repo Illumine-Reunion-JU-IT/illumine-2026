@@ -93,6 +93,12 @@ async function processFile(filename, batchYear, colMap) {
 }
 
 async function run() {
+  await processFile('IT_26.xlsx', 'IT26', {
+    name: 'NAME',
+    email: 'EMAIL ID',
+    phone: 'MOBILE NO'
+  });
+
   await processFile('IT_27.xlsx', 'IT27', {
     name: 'NAME',
     email: 'EMAIL ID',

@@ -71,7 +71,7 @@ export default function AdminDashboard() {
           <Mail size={20} /> Secure Contact Requests Queue
         </h2>
         
-        <div className="bg-black/40 border border-[#BEF3DF]/15 rounded-sm overflow-hidden">
+        <div className="bg-black/40 border border-[#BEF3DF]/15 rounded-sm overflow-hidden mb-8">
           {reqLoading ? (
             <div className="p-8 text-center text-gray-500 flex flex-col items-center justify-center gap-2">
               <Loader2 className="animate-spin text-[#BEF3DF]" size={20} />
@@ -128,6 +128,41 @@ export default function AdminDashboard() {
               </table>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Admin Panel Guide */}
+      <div className="space-y-4 pt-6 border-t border-white/10">
+        <h2 className="text-xl font-bold text-[#BEF3DF] uppercase tracking-wider flex items-center gap-2">
+          Admin Panel Guide
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+          <div className="bg-black/40 border border-white/10 p-6 rounded-sm space-y-3">
+            <h3 className="text-white font-bold tracking-wider uppercase border-b border-white/10 pb-2">1. Manage Alumni Data</h3>
+            <p className="text-gray-400 leading-relaxed">
+              Navigate to the <span className="text-[#BEF3DF] font-bold">Manage Alumni</span> tab on the left. This is your primary database view. 
+              Here you can see all alumni records from every batch (e.g., IT26, IT27, IT28). 
+            </p>
+            <ul className="list-disc list-inside text-gray-400 space-y-1 ml-2">
+              <li>Use the search bar to find students by name, email, or company.</li>
+              <li>Click the pencil icon to edit any student's phone number, email, company, or LinkedIn.</li>
+              <li>Click the trash icon to remove a record entirely.</li>
+              <li>Click "Add Record" to manually insert a new alumnus.</li>
+            </ul>
+          </div>
+
+          <div className="bg-black/40 border border-white/10 p-6 rounded-sm space-y-3">
+            <h3 className="text-white font-bold tracking-wider uppercase border-b border-white/10 pb-2">2. Bulk Import Data</h3>
+            <p className="text-gray-400 leading-relaxed">
+              Navigate to the <span className="text-[#BEF3DF] font-bold">Import Data</span> tab on the left. If you have a large Excel file containing new alumni (e.g., the next graduating batch), you can upload it here.
+            </p>
+            <ul className="list-disc list-inside text-gray-400 space-y-1 ml-2">
+              <li>Ensure your Excel file has columns: <strong className="text-white">Name, Batch, Department, Company, LinkedIn, Email, Phone</strong>.</li>
+              <li>Drag and drop the file, and the database will automatically update.</li>
+              <li>Existing records will be updated if the email matches.</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
