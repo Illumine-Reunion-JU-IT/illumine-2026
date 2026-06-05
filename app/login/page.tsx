@@ -30,15 +30,13 @@ export default function LoginPage() {
       // Fetch session to determine role
       const sessionRes = await fetch('/api/auth/session');
       const session = await sessionRes.json();
-      
-      const searchParams = new URLSearchParams(window.location.search);
-      const callbackUrl = searchParams.get('callbackUrl');
 
       if (session?.user?.role === 'admin') {
-        router.push(callbackUrl || '/admin');
+        router.push('/admin');
       } else {
-        router.push(callbackUrl || '/alumni');
+        router.push('/alumni');
       }
+      
       router.refresh();
     }
   };
