@@ -48,6 +48,7 @@ export default function ArcReactor({
   // Derive a glow-safe rgba for filter-less fills
   const accentFaint  = hexToRgba(accent, 0.22);
 
+  const [mounted, setMounted] = useState(false);
   const [powered, setPowered] = useState(false);
   const [tick,    setTick]    = useState(0);
   const rafRef   = useRef<number>(0);
@@ -55,6 +56,7 @@ export default function ArcReactor({
   const tiltRef  = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setMounted(true);
     const id = setTimeout(() => setPowered(true), 80);
     return () => clearTimeout(id);
   }, []);
@@ -167,6 +169,15 @@ export default function ArcReactor({
   });
 
   // ── Render ────────────────────────────────────────────────────────────────
+  if (!mounted) {
+    return (
+      <div
+        className={className}
+        style={{ display: "inline-block", position: "relative", width: size, height: size }}
+      />
+    );
+  }
+
   return (
     <div
       className={className}
