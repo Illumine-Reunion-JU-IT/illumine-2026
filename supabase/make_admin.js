@@ -65,8 +65,7 @@ async function makeAdmin(email, phone) {
 }
 
 async function run() {
-  await makeAdmin('aritramondal503@gmail.com', '7365911452');
-  await makeAdmin('krish5932n@gmail.com', '7866010143');
+  await makeAdmin('rajdeepdasyear2006@gmail.com', '7439121680');
 }
 
 run();
