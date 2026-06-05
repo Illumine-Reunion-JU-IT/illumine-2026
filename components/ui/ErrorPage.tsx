@@ -59,8 +59,11 @@ const WarnTriangle = ({ style }: { style?: React.CSSProperties }) => (
 // ─── Glitching ERROR:404 heading ───────────────────────────────────────────────
 const GlitchHeading = () => {
   const [glitch, setGlitch] = useState(false);
+  const [glitchOffset, setGlitchOffset] = useState(0);
+
   useEffect(() => {
     const interval = setInterval(() => {
+      setGlitchOffset(Math.random() > 0.5 ? 2 : -2);
       setGlitch(true);
       setTimeout(() => setGlitch(false), 300);
     }, 3500);
@@ -77,7 +80,7 @@ const GlitchHeading = () => {
         textShadow: glitch
           ? '-3px 0 #00ffff, 3px 0 #ff0066, 0 0 30px rgba(200,50,50,0.6)'
           : '0 0 30px rgba(200,50,50,0.45), 0 0 60px rgba(200,50,50,0.2)',
-        transform: glitch ? `translateX(${Math.random() > 0.5 ? 2 : -2}px)` : 'none',
+        transform: glitch ? `translateX(${glitchOffset}px)` : 'none',
         transition: 'transform 0.05s, text-shadow 0.05s',
         letterSpacing: '0.06em',
       }}

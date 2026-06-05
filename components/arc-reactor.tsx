@@ -47,7 +47,6 @@ export default function ArcReactor({
 
   // Derive a glow-safe rgba for filter-less fills
   const accentFaint  = hexToRgba(accent, 0.22);
-  const accentGlow   = hexToRgba(accent, 0.55);
 
   const [powered, setPowered] = useState(false);
   const [tick,    setTick]    = useState(0);

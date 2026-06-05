@@ -5,7 +5,7 @@ import { svgPaths } from '../../data/aboutilluminepaths';
 
 export default function AboutIllumine() {
   return (
-    <div id='about-illumine'  className="relative min-h-screen w-full bg-[#0a0a0a] overflow-hidden flex items-center justify-center p-2 md:p-6 font-mono">
+    <div id='about-illumine'  className="relative min-h-screen w-full bg-[#070707] overflow-hidden flex items-center justify-center p-2 md:p-6 font-mono">
       <div className="relative z-10 w-full max-w-7xl h-[92vh] md:h-[95vh] flex flex-col transition-all duration-500">
         <div className="w-full flex flex-col items-center shrink-0 mb-4">
           <div className="relative z-30 -mb-4 md:-mb-6">
@@ -20,9 +20,11 @@ export default function AboutIllumine() {
             </div>
           </div>
 
-          <img
+          <Image
             src={svgPaths.upperBorder}
             alt="HUD Top"
+            width={1200}
+            height={40}
             className="w-full h-auto drop-shadow-[0_0_20px_rgba(165,180,252,0.5)]"
           />
         </div>
@@ -39,7 +41,7 @@ export default function AboutIllumine() {
           </video>
 
           <div className="absolute inset-0 z-10 pointer-events-none shadow-[inset_0_0_1px_rgba(0,0,0,1)]" />
-          <div className="absolute inset-0 z-10 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_20%,#0a0a0a_100%)]" />
+          <div className="absolute inset-0 z-10 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_20%,#070707_100%)]" />
 
           {/* HUD Overlay Content */}
           <div className="absolute inset-0 z-20 p-6 md:p-12 pointer-events-none">
@@ -96,7 +98,7 @@ export default function AboutIllumine() {
 
             <div className="max-w-2xl text-right pointer-events-auto">
               <h3 className="text-[11px] uppercase tracking-[0.7em] text-indigo-400 font-black mb-3 drop-shadow-lg">
-                // DEPARTMENT_PROFILE
+                {"// DEPARTMENT_PROFILE"}
               </h3>
               <p className="text-[13px] md:text-[16px] leading-relaxed text-white font-medium text-justify md:text-right drop-shadow-[0_4px_6px_rgba(0,0,0,0.9)]">
                 Illumine is a biennial reunion event organized by the <span className="text-indigo-300 font-bold">Department of Information Technology</span> at Jadavpur University.
@@ -105,9 +107,11 @@ export default function AboutIllumine() {
             </div>
           </div>
 
-          <img
+          <Image
             src={svgPaths.lowerBorder}
             alt="HUD Bottom"
+            width={1200}
+            height={40}
             className="w-full h-auto drop-shadow-[0_0_20px_rgba(165,180,252,0.5)]"
           />
 

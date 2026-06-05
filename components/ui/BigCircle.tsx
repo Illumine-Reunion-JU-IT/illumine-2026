@@ -11,52 +11,6 @@ type BigCircleProps = {
 const CX = 68.17
 const CY = 77.25
 
-/**
- * Runs a looping opacity pulse on a DOM element after a delay.
- * Uses the same animate() from Framer so it integrates cleanly.
- *
- * min / max   — fillOpacity range
- * duration    — one full breath cycle in seconds
- * startDelay  — seconds before the pulse begins (after entry finishes)
- */
-function startPulse(
-    el: Element | null,
-    attribute: 'opacity' | 'fill-opacity',
-    min: number,
-    max: number,
-    duration: number,
-    startDelay: number,
-) {
-    if (!el) return
-    const mv = useMotionValue(max) // won't actually call a hook here — see note below
-
-    // We can't call hooks inside a plain function, so we drive this with
-    // a raw recursive rAF loop — simple and zero-dependency.
-    let rafId: number
-    let start: number | null = null
-    let cancelled = false
-
-    const tick = (ts: number) => {
-        if (cancelled) return
-        if (start === null) start = ts
-        const elapsed = (ts - start) / 1000
-        // Sine wave between min and max
-        const t = 0.5 + 0.5 * Math.sin((elapsed / duration) * 2 * Math.PI)
-        const val = min + t * (max - min)
-            ; (el as SVGElement).setAttribute(attribute, String(+val.toFixed(4)))
-        rafId = requestAnimationFrame(tick)
-    }
-
-    const timer = setTimeout(() => {
-        rafId = requestAnimationFrame(tick)
-    }, startDelay * 1000)
-
-    return () => {
-        cancelled = true
-        clearTimeout(timer)
-        cancelAnimationFrame(rafId)
-    }
-}
 
 /**
  * RingGroup
@@ -158,6 +112,7 @@ function RingGroup({
             unsubO()
             cancelPulse?.()
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useLayoutEffect(() => {
@@ -168,6 +123,7 @@ function RingGroup({
             )
             ref.current.setAttribute('opacity', '0')
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return <g ref={ref}>{children}</g>
@@ -254,6 +210,7 @@ function CenterDot({
             unsubT()
             unsubO()
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useLayoutEffect(() => {
@@ -262,6 +219,7 @@ function CenterDot({
             `rotate(${direction * 540}, ${CX}, ${CY}) scale(0.5)`,
         )
         groupRef.current?.setAttribute('opacity', '0')
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return (

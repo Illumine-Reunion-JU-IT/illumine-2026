@@ -1,5 +1,6 @@
 import React from 'react';
 import localFont from 'next/font/local';
+import Link from 'next/link';
 
 // Removed Plus and GlitchLogo, kept the others
 import TerminalText from '../ui/TerminalText';
@@ -21,19 +22,16 @@ const ttLakes = localFont({
 
 const Footer = () => {
   return (
-    <footer id="footer" className={`relative w-full bg-black/60 backdrop-blur-xl text-white border-t border-white/10 overflow-hidden ${ttLakes.className}`}>
+    <footer id="footer" className={`relative z-30 w-full bg-[#030303] text-white border-t border-white/10 overflow-hidden ${ttLakes.className}`}>
       
-      {/* Subtle top gradient fade */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#111111]/30 to-black/80 pointer-events-none -z-10"></div>
-
       {/* Responsive Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
         
         {/* Column 1: System Identity */}
         <div className="flex flex-col space-y-4 border-b border-white/10 pb-6 md:border-b-0 md:pb-0 lg:border-r lg:border-white/5 lg:pr-4">
           
           {/* Restored pure text logo with Mechsuit */}
-          <h2 className={`text-3xl sm:text-2xl tracking-wider text-[#FFFFFF] ${mechsuit.className}`}>
+          <h2 className={`text-3xl sm:text-2xl tracking-wider text-white ${mechsuit.className}`}>
             ILLUMINE
           </h2>
           
@@ -58,15 +56,16 @@ const Footer = () => {
           
           <TerminalText 
             text=">> /root/nav_links"
-            className="!relative !block !text-[#555555] tracking-widest uppercase"
+            className="!relative !block !text-[#7B61FF] tracking-widest uppercase"
           />
           
           <ul className="flex flex-col space-y-2 text-sm text-[#CCCCCC]">
-            <li><a href="/" className="hover:text-[#7B61FF] transition-colors duration-300 flex items-center gap-2"><span className="text-[#555555]">[ ]</span> Home</a></li>
-            <li><a href="/about" className="hover:text-[#7B61FF] transition-colors duration-300 flex items-center gap-2"><span className="text-[#555555]">[ ]</span> About</a></li>
-            <li><a href="/" className="hover:text-[#7B61FF] transition-colors duration-300 flex items-center gap-2"><span className="text-[#555555]">[ ]</span> Events</a></li>
-            <li><a href="/alumni" className="hover:text-[#7B61FF] transition-colors duration-300 flex items-center gap-2"><span className="text-[#555555]">[ ]</span> Alumni</a></li>
-            <li><a href="/magazine" className="hover:text-[#7B61FF] transition-colors duration-300 flex items-center gap-2"><span className="text-[#555555]">[ ]</span> Magazine</a></li>
+            <li><Link href="/" className="hover:text-[#7B61FF] transition-colors duration-300 flex items-center gap-2"><span className="text-[#555555]">[ ]</span> Home</Link></li>
+            <li><Link href="/about" className="hover:text-[#7B61FF] transition-colors duration-300 flex items-center gap-2"><span className="text-[#555555]">[ ]</span> About</Link></li>
+            <li><Link href="/events" className="hover:text-[#7B61FF] transition-colors duration-300 flex items-center gap-2"><span className="text-[#555555]">[ ]</span> Events</Link></li>
+            <li><Link href="/organising-committee" className="hover:text-[#7B61FF] transition-colors duration-300 flex items-center gap-2"><span className="text-[#555555]">[ ]</span> Committee</Link></li>
+            <li><Link href="/alumni" className="hover:text-[#7B61FF] transition-colors duration-300 flex items-center gap-2"><span className="text-[#555555]">[ ]</span> Alumni</Link></li>
+            <li><Link href="/magazine" className="hover:text-[#7B61FF] transition-colors duration-300 flex items-center gap-2"><span className="text-[#555555]">[ ]</span> Magazine</Link></li>
           </ul>
         </div>
 
@@ -75,7 +74,7 @@ const Footer = () => {
           
           <TerminalText 
             text=">> /network/comm_link"
-            className="!relative !block !text-[#555555] tracking-widest uppercase"
+            className="!relative !block !text-[#7B61FF] tracking-widest uppercase"
           />
           
           <div className="flex flex-col space-y-2 text-sm text-[#CCCCCC] font-light">
@@ -96,22 +95,22 @@ const Footer = () => {
           
           <TerminalText 
             text=">> /social_protocols"
-            className="!relative !block !text-[#555555] tracking-widest uppercase"
+            className="!relative !block !text-[#7B61FF] tracking-widest uppercase"
           />
           
           <div className="flex flex-wrap gap-3 text-xs sm:text-sm text-[#CCCCCC]">
-            <a href="https://www.instagram.com/illumine_ju_it?igsh=MXczemN2azl0eTRpNQ==" className="hover:text-[#7B61FF] hover:border-[#7B61FF] border border-[#333333] px-3 py-2 transition-all duration-300 w-[calc(50%-6px)] sm:w-auto text-center flex-grow">INSTAGRAM</a>
-            <a href="https://www.facebook.com/share/g/1KdTjTvRDw/" className="hover:text-[#7B61FF] hover:border-[#7B61FF] border border-[#333333] px-3 py-2 transition-all duration-300 w-[calc(50%-6px)] sm:w-auto text-center flex-grow">FACEBOOK</a>
-            <a href="mailto:illumine.reunion.ju.it@gmail.com" className="hover:text-[#7B61FF] hover:border-[#7B61FF] border border-[#333333] px-3 py-2 transition-all duration-300 w-[calc(50%-6px)] sm:w-auto text-center flex-grow">MAIL</a>
-            <a href="https://www.linkedin.com/in/ju-it" className="hover:text-[#7B61FF] hover:border-[#7B61FF] border border-[#333333] px-3 py-2 transition-all duration-300 w-[calc(50%-6px)] sm:w-auto text-center flex-grow">LINKEDIN</a>
+            <a href="https://www.instagram.com/illumine_ju_it?igsh=MXczemN2azl0eTRpNQ==" className="hover:text-[#7B61FF] hover:border-[#7B61FF] border border-white/10 px-3 py-2 transition-all duration-300 w-[calc(50%-6px)] sm:w-auto text-center flex-grow">INSTAGRAM</a>
+            <a href="https://www.facebook.com/share/g/1KdTjTvRDw/" className="hover:text-[#7B61FF] hover:border-[#7B61FF] border border-white/10 px-3 py-2 transition-all duration-300 w-[calc(50%-6px)] sm:w-auto text-center flex-grow">FACEBOOK</a>
+            <a href="mailto:illumine.reunion.ju.it@gmail.com" className="hover:text-[#7B61FF] hover:border-[#7B61FF] border border-white/10 px-3 py-2 transition-all duration-300 w-[calc(50%-6px)] sm:w-auto text-center flex-grow">MAIL</a>
+            <a href="https://www.linkedin.com/in/ju-it" className="hover:text-[#7B61FF] hover:border-[#7B61FF] border border-white/10 px-3 py-2 transition-all duration-300 w-[calc(50%-6px)] sm:w-auto text-center flex-grow">LINKEDIN</a>
           </div>
         </div>
 
       </div>
 
       {/* Bottom Sign-off */}
-      <div className="border-t border-white/5 bg-black/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col lg:flex-row justify-between items-center text-[10px] sm:text-xs tracking-widest text-[#555555] gap-4 lg:gap-0">
+      <div className="border-t border-white/5 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col lg:flex-row justify-between items-center text-[10px] sm:text-xs tracking-widest text-gray-500 gap-4 lg:gap-0">
           <p className="text-center lg:text-left uppercase leading-relaxed">
             Copyright © Illumine 2026 OC<br className="lg:hidden" />
             <span className="hidden lg:inline">, </span>

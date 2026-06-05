@@ -2,12 +2,14 @@ import Hero from "./sections/Hero";
 import AboutIllumine from "../components/about/AboutIllumine";
 import AboutDepartment from "@/components/about/AboutDepartment";
 import GoodwillMessage from "./sections/GoodwillMessage";
+import Footer from "./sections/Footer";
+import EventSection from "./sections/EventSection";
 
 /**
  * MODULE: Home Route (/)
  * * DESCRIPTION:
- * This is the root page for the Illumine 2026 application. 
- */
+ * This is the root page for the Illumine 2026 application.
+ **/
 export default function Home() {
   return (
     <div className="flex flex-col">
@@ -15,6 +17,8 @@ export default function Home() {
       <AboutIllumine />
       <AboutDepartment />
       <GoodwillMessage />
+      {/* <EventSection /> */}
+      <Footer />
     </div>
   );
 }
