@@ -156,6 +156,92 @@ export default function ManageAlumniPage() {
     );
   });
 
+  // Bulk Selection State
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(filteredAlumni.map(item => item.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectRow = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkDelete = async () => {
+    if (!confirm(`Are you sure you want to delete ${selectedIds.length} records?`)) return;
+
+    try {
+      setLoading(true);
+      // In a real app, this should be a single bulk DELETE endpoint.
+      // For now, we use a Promise.all over the existing endpoint
+      await Promise.all(selectedIds.map(id => 
+        fetch(`/api/admin/alumni?id=${id}`, { method: 'DELETE' })
+      ));
+
+      setAlumni(prev => prev.filter(item => !selectedIds.includes(item.id)));
+      setSelectedIds([]);
+    } catch (err: any) {
+      alert(err.message || 'An error occurred during bulk delete');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const exportData = (format: 'csv' | 'excel') => {
+    const dataToExport = selectedIds.length > 0 
+      ? filteredAlumni.filter(item => selectedIds.includes(item.id))
+      : filteredAlumni;
+
+    if (dataToExport.length === 0) return alert('No data to export');
+
+    if (format === 'csv') {
+      const headers = ['Name', 'Role', 'Batch', 'Department', 'Company', 'Email', 'Phone', 'LinkedIn'];
+      const csvContent = [
+        headers.join(','),
+        ...dataToExport.map(row => [
+          `"${row.name}"`, 
+          row.role, 
+          row.batch, 
+          `"${row.department}"`, 
+          `"${row.company || ''}"`, 
+          row.email, 
+          row.phone, 
+          `"${row.linkedin || ''}"`
+        ].join(','))
+      ].join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute('download', 'alumni_export.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (format === 'excel') {
+      import('xlsx').then(XLSX => {
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport.map(row => ({
+          Name: row.name,
+          Role: row.role,
+          Batch: row.batch,
+          Department: row.department,
+          Company: row.company || '',
+          Email: row.email,
+          Phone: row.phone,
+          LinkedIn: row.linkedin || ''
+        })));
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Alumni");
+        XLSX.writeFile(workbook, "alumni_export.xlsx");
+      });
+    }
+  };
+
   return (
     <div className="space-y-6 font-mono">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/10 pb-4">
@@ -171,18 +257,46 @@ export default function ManageAlumniPage() {
         </button>
       </div>
 
-      {/* Search and Filters */}
-      <div className="relative">
-        <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-[#BEF3DF]/50">
-          <Search size={18} />
-        </span>
-        <input
-          type="text"
-          placeholder="SEARCH ALUMNI BY NAME, BATCH, EMAIL, PHONE, COMPANY..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-black/40 border border-[#BEF3DF]/25 pl-10 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-[#BEF3DF] transition-colors text-xs uppercase tracking-wider"
-        />
+      {/* Search, Filters, and Bulk Actions */}
+      <div className="flex flex-col space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-[#BEF3DF]/50">
+              <Search size={18} />
+            </span>
+            <input
+              type="text"
+              placeholder="SEARCH ALUMNI BY NAME, BATCH, EMAIL, PHONE, COMPANY..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-black/40 border border-[#BEF3DF]/25 pl-10 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-[#BEF3DF] transition-colors text-xs uppercase tracking-wider"
+            />
+          </div>
+          
+          {/* Export Buttons */}
+          <div className="flex gap-2 shrink-0">
+            <button onClick={() => exportData('csv')} className="px-4 py-3 border border-white/10 hover:border-[#BEF3DF] text-xs uppercase tracking-widest text-gray-400 hover:text-[#BEF3DF] transition-colors bg-black/40">
+              Export CSV
+            </button>
+            <button onClick={() => exportData('excel')} className="px-4 py-3 border border-white/10 hover:border-[#BEF3DF] text-xs uppercase tracking-widest text-gray-400 hover:text-[#BEF3DF] transition-colors bg-black/40">
+              Export Excel
+            </button>
+          </div>
+        </div>
+
+        {/* Bulk Actions Menu (visible only when items are selected) */}
+        {selectedIds.length > 0 && (
+          <div className="bg-[#BEF3DF]/10 border border-[#BEF3DF]/30 p-3 flex items-center justify-between">
+            <span className="text-xs uppercase tracking-widest text-[#BEF3DF] font-bold">
+              {selectedIds.length} Record(s) Selected
+            </span>
+            <div className="flex gap-3">
+              <button onClick={handleBulkDelete} className="text-xs uppercase tracking-widest bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 transition-colors flex items-center gap-2">
+                <Trash2 size={14} /> Bulk Delete
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Data Table */}
@@ -200,6 +314,14 @@ export default function ManageAlumniPage() {
           <table className="w-full border-collapse text-left text-xs uppercase tracking-wider">
             <thead>
               <tr className="border-b border-[#BEF3DF]/20 bg-white/5 text-[#BEF3DF]/80">
+                <th className="p-4">
+                  <input 
+                    type="checkbox" 
+                    onChange={handleSelectAll}
+                    checked={selectedIds.length === filteredAlumni.length && filteredAlumni.length > 0}
+                    className="accent-[#BEF3DF]" 
+                  />
+                </th>
                 <th className="p-4 font-bold">Name</th>
                 <th className="p-4 font-bold">Role</th>
                 <th className="p-4 font-bold">Batch</th>
@@ -212,7 +334,15 @@ export default function ManageAlumniPage() {
             </thead>
             <tbody className="divide-y divide-white/5 text-gray-300">
               {filteredAlumni.map((item) => (
-                <tr key={item.id} className="hover:bg-white/5 transition-colors">
+                <tr key={item.id} className={`transition-colors ${selectedIds.includes(item.id) ? 'bg-[#BEF3DF]/5' : 'hover:bg-white/5'}`}>
+                  <td className="p-4">
+                    <input 
+                      type="checkbox" 
+                      checked={selectedIds.includes(item.id)}
+                      onChange={() => handleSelectRow(item.id)}
+                      className="accent-[#BEF3DF]"
+                    />
+                  </td>
                   <td className="p-4 font-bold text-white whitespace-nowrap">{item.name}</td>
                   <td className="p-4">
                     <span className={`px-2 py-0.5 border ${
