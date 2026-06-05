@@ -22,7 +22,9 @@ ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 
 -- 4. Insert an initial Admin user (change credentials as needed)
 INSERT INTO public.users (name, batch, department, email, phone, role)
-VALUES ('Admin User', 'N/A', 'IT', 'admin@illumine.com', '0000000000', 'admin')
+VALUES 
+('Admin User', 'N/A', 'IT', 'admin@illumine.com', '0000000000', 'admin'),
+('Rajdeep Das', 'N/A', 'IT', 'rajdeepdasyear2006@gmail.com', '7439121680', 'admin')
 ON CONFLICT (email) DO NOTHING;
 
 -- 5. Create Contact Requests table
