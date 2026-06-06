@@ -12,14 +12,19 @@ export interface AlumniListProps {
 }
 
 export const AlumniList: React.FC<AlumniListProps> = ({ profiles }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedBatch, setSelectedBatch] = useState('all');
-
-  // Extract unique batches dynamically
   const batchList = useMemo(() => {
     const unique = Array.from(new Set(profiles.map(p => p.batch).filter(Boolean)));
-    return unique.sort((a, b) => String(b).localeCompare(String(a))); // Youngest first
+    return unique.sort((a, b) => String(a).localeCompare(String(b))); // A to Z
   }, [profiles]);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedBatch, setSelectedBatch] = useState('');
+
+  React.useEffect(() => {
+    if (!selectedBatch && batchList.length > 0) {
+      setSelectedBatch(batchList[0]);
+    }
+  }, [batchList, selectedBatch]);
 
   // Compute filtered list
   const filteredProfiles = useMemo(() => {
@@ -77,8 +82,8 @@ export const AlumniList: React.FC<AlumniListProps> = ({ profiles }) => {
             <Users size={14} /> Filter:
           </div>
           <div className="flex flex-wrap gap-2">
-            {['all', ...batchList].map((batch) => {
-              const isActive = selectedBatch.toLowerCase() === batch.toLowerCase();
+            {batchList.map((batch) => {
+              const isActive = selectedBatch === batch;
               
               return (
                 <button
@@ -101,7 +106,7 @@ export const AlumniList: React.FC<AlumniListProps> = ({ profiles }) => {
                   
                   {/* Text */}
                   <span className={`relative z-10 ${isActive ? 'text-black' : 'text-gray-400 group-hover:text-white'}`}>
-                    {batch === 'all' ? 'All Batches' : batch}
+                    {batch}
                   </span>
                 </button>
               );
