@@ -1,35 +1,65 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AlumniProfile } from '@/types/alumni';
-import { getFilteredAlumni } from '@/data/alumniData';
 import AlumniCard from './AlumniCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, FilterX, Users } from 'lucide-react';
 
-export interface AlumniListProps {
-  profiles: AlumniProfile[];
-}
-
-export const AlumniList: React.FC<AlumniListProps> = ({ profiles }) => {
-  const batchList = useMemo(() => {
-    const unique = Array.from(new Set(profiles.map(p => p.batch).filter(Boolean)));
-    return unique.sort((a, b) => String(a).localeCompare(String(b))); // A to Z
-  }, [profiles]);
-
+export const AlumniList: React.FC = () => {
+  const batchList = Array.from({ length: 25 }, (_, i) => `IT ${String(i + 4).padStart(2, '0')}`);
+  
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedBatch, setSelectedBatch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [selectedBatch, setSelectedBatch] = useState(batchList[0]);
+  
+  const [profiles, setProfiles] = useState<AlumniProfile[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  React.useEffect(() => {
-    if (!selectedBatch && batchList.length > 0) {
-      setSelectedBatch(batchList[0]);
-    }
-  }, [batchList, selectedBatch]);
+  // Debounce search
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery.trim());
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
 
-  // Compute filtered list
-  const filteredProfiles = useMemo(() => {
-    return getFilteredAlumni(profiles, searchQuery, selectedBatch);
-  }, [profiles, searchQuery, selectedBatch]);
+  // Fetch data from API
+  useEffect(() => {
+    let isMounted = true;
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        let url = '';
+        if (debouncedSearch && debouncedSearch.length >= 2) {
+          url = `/api/alumni/search?q=${encodeURIComponent(debouncedSearch)}`;
+        } else {
+          url = `/api/alumni/batch?batch=${encodeURIComponent(selectedBatch)}`;
+        }
+        
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = await res.json();
+        
+        if (isMounted) {
+          setProfiles(data.profiles || []);
+        }
+      } catch (error) {
+        console.error(error);
+        if (isMounted) setProfiles([]);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    fetchData();
+    return () => { isMounted = false; };
+  }, [selectedBatch, debouncedSearch]);
+
+  const handleBatchClick = (batch: string) => {
+    setSelectedBatch(batch);
+    setSearchQuery(''); // Reset search when clicking a batch
+  };
 
   // Framer Motion variants for staggered grid
   const containerVariants = {
@@ -61,7 +91,7 @@ export const AlumniList: React.FC<AlumniListProps> = ({ profiles }) => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search alumni by name, role, or company..."
+              placeholder="Search alumni globally..."
               aria-label="Search alumni registry"
               className="w-full bg-transparent border-0 text-white placeholder-gray-500 text-sm tracking-wide px-4 py-3.5 focus:outline-none focus:ring-0 font-tt-lakes"
             />
@@ -74,6 +104,11 @@ export const AlumniList: React.FC<AlumniListProps> = ({ profiles }) => {
               </button>
             )}
           </div>
+          {debouncedSearch.length >= 2 && (
+             <div className="absolute -bottom-6 left-2 text-[10px] text-[#BEF3DF] tracking-widest uppercase">
+               Searching all batches...
+             </div>
+          )}
         </div>
 
         {/* Batch Filter Pills */}
@@ -83,12 +118,12 @@ export const AlumniList: React.FC<AlumniListProps> = ({ profiles }) => {
           </div>
           <div className="flex flex-wrap gap-2">
             {batchList.map((batch) => {
-              const isActive = selectedBatch === batch;
+              const isActive = selectedBatch === batch && debouncedSearch.length < 2;
               
               return (
                 <button
                   key={batch}
-                  onClick={() => setSelectedBatch(batch)}
+                  onClick={() => handleBatchClick(batch)}
                   aria-pressed={isActive}
                   className="relative px-4 py-1.5 rounded-full text-xs tracking-wider transition-all duration-300 uppercase font-bold overflow-hidden group"
                 >
@@ -117,7 +152,30 @@ export const AlumniList: React.FC<AlumniListProps> = ({ profiles }) => {
 
       {/* ── ALUMNI CARD GRID ── */}
       <AnimatePresence mode="wait">
-        {filteredProfiles.length === 0 ? (
+        {isLoading ? (
+          <motion.div 
+            key="loading-state"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full justify-items-center"
+          >
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="w-full max-w-[300px] h-[360px] bg-[#0c0f1d]/50 backdrop-blur-sm border border-white/5 rounded-2xl flex flex-col p-6 gap-4 animate-pulse">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-full bg-white/10 shrink-0" />
+                  <div className="flex flex-col gap-2 w-full">
+                    <div className="h-4 bg-white/10 rounded w-3/4" />
+                    <div className="h-3 bg-white/5 rounded w-1/2" />
+                  </div>
+                </div>
+                <div className="h-10 bg-white/5 rounded-lg mt-auto w-full" />
+                <div className="h-10 bg-white/5 rounded-lg w-full" />
+                <div className="h-10 bg-white/5 rounded-lg mt-2 w-full" />
+              </div>
+            ))}
+          </motion.div>
+        ) : profiles.length === 0 ? (
           <motion.div 
             key="empty-state"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -140,7 +198,7 @@ export const AlumniList: React.FC<AlumniListProps> = ({ profiles }) => {
             animate="show"
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full justify-items-center"
           >
-            {filteredProfiles.map((alumnus, i) => (
+            {profiles.map((alumnus, i) => (
               <AlumniCard key={alumnus.id} profile={alumnus} index={i} />
             ))}
           </motion.div>

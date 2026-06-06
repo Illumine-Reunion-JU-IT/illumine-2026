@@ -50,69 +50,6 @@ export default async function AlumniPage() {
   const session = await getServerSession(authOptions);
   const isVerified = !!session?.user;
 
-  let allData: any[] = [];
-  const step = 1000;
-  const numChunks = 4; // Fetch up to 4000 records concurrently
-
-  const promises = [];
-  for (let i = 0; i < numChunks; i++) {
-    const from = i * step;
-    promises.push(
-      supabaseAdmin
-        .from('users')
-        .select('id, name, batch, department, company, email, phone, linkedin')
-        .eq('role', 'internal')
-        .order('batch', { ascending: false })
-        .range(from, from + step - 1)
-    );
-  }
-
-  const results = await Promise.all(promises);
-  for (const { data, error } of results) {
-    if (error) {
-      console.error('Error fetching alumni:', error);
-    } else if (data) {
-      allData = [...allData, ...data];
-    }
-  }
-
-  let profiles: AlumniProfile[] = [];
-
-  if (allData.length > 0) {
-    profiles = allData.map((user: any) => {
-      // Fix IT 2015 -> IT 15 formatting
-      let formattedBatch = user.batch || '';
-      if (/^IT 20(\d{2})$/i.test(formattedBatch)) {
-        formattedBatch = formattedBatch.replace(/^IT 20(\d{2})$/i, 'IT $1');
-      }
-
-      // Hide "Not Specified"
-      const company = user.company === 'Not Specified' ? '' : user.company;
-
-      const emailVal = user.email || '';
-      const emailToUse = isVerified ? (emailVal.toLowerCase().startsWith('no-email') ? '' : emailVal) : maskEmail(emailVal);
-      
-      const phoneVal = user.phone || '';
-      const phoneToUse = isVerified ? (phoneVal.toLowerCase().startsWith('no-phone') ? '' : phoneVal) : maskPhone(phoneVal);
-
-      return {
-        id: user.id,
-        name: user.name,
-        batch: formattedBatch.toUpperCase(),
-        department: user.department,
-        company: company,
-        designation: 'Alumni',
-        email: emailToUse,
-        phone: phoneToUse,
-        linkedin: user.linkedin || '#',
-        image: '/default-avatar.png',
-        isVerified: true
-      };
-    });
-
-    profiles.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-  }
-
   return (
     <main className="relative min-h-screen bg-[#070707] text-[#d9fff6] pt-28 pb-20 overflow-hidden font-tt-lakes">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 flex flex-col gap-6">
@@ -125,7 +62,7 @@ export default async function AlumniPage() {
             </a>
           </div>
         )}
-        <AlumniList profiles={profiles} />
+        <AlumniList />
       </div>
     </main>
   );
