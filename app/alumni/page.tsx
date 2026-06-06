@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 };
 
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase';
 import { AlumniProfile } from '@/types/alumni';
 
