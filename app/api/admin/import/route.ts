@@ -94,12 +94,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, inserted: insertedCount });
 
-    if (error) {
-      console.error("Supabase upsert error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
 
-    return NextResponse.json({ success: true, inserted: insertedData?.length || formattedData.length });
   } catch (error: any) {
     console.error("Import API error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
