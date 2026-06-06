@@ -76,8 +76,8 @@ export default function ManageAlumniPage() {
       department: alumnus.department,
       company: alumnus.company || '',
       linkedin: alumnus.linkedin || '',
-      email: alumnus.email,
-      phone: alumnus.phone,
+      email: (alumnus.email || '').startsWith('no-email-') ? '' : (alumnus.email || ''),
+      phone: (alumnus.phone || '').startsWith('NO-PHONE-') ? '' : (alumnus.phone || ''),
       role: alumnus.role
     });
     setShowModal(true);
@@ -363,8 +363,8 @@ export default function ManageAlumniPage() {
                   <td className="p-4 whitespace-nowrap truncate max-w-[150px]" title={item.company || '-'}>
                     {item.company || '-'}
                   </td>
-                  <td className="p-4 lowercase whitespace-nowrap">{item.email}</td>
-                  <td className="p-4 whitespace-nowrap">{item.phone}</td>
+                  <td className="p-4 lowercase whitespace-nowrap">{(item.email || '').startsWith('no-email-') ? '' : item.email}</td>
+                  <td className="p-4 whitespace-nowrap">{(item.phone || '').startsWith('NO-PHONE-') ? '' : item.phone}</td>
                   <td className="p-4 text-right whitespace-nowrap">
                     <div className="flex justify-end gap-3">
                       <button

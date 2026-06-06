@@ -47,8 +47,8 @@ export async function POST(req: Request) {
         department: department || 'IT',
         company: company || null,
         linkedin: linkedin || null,
-        email: email ? email.toLowerCase() : null,
-        phone: phone || null,
+        email: email ? email.toLowerCase() : `NO-EMAIL-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        phone: phone || `NO-PHONE-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
         role: role || 'internal'
       }])
       .select()
@@ -85,8 +85,8 @@ export async function PUT(req: Request) {
         department,
         company: company || null,
         linkedin: linkedin || null,
-        email: email ? email.toLowerCase() : null,
-        phone: phone || null,
+        email: email ? email.toLowerCase() : `NO-EMAIL-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        phone: phone || `NO-PHONE-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
         role
       })
       .eq('id', id)

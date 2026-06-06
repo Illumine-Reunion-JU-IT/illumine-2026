@@ -63,8 +63,8 @@ export async function POST(req: Request) {
         department: department || 'IT',
         company: company || null,
         linkedin: linkedin || null,
-        email: email || null,
-        phone: phone || null,
+        email: email || `NO-EMAIL-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        phone: phone || `NO-PHONE-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
         role: 'internal'
       };
     }).filter(row => row.name); // Only require a name! Allow missing email/phone

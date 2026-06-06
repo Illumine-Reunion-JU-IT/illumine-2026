@@ -35,14 +35,14 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { AlumniProfile } from '@/types/alumni';
 
 function maskEmail(email: string) {
-  if (!email) return '';
+  if (!email || email.startsWith('NO-EMAIL-') || email.startsWith('no-email-')) return '';
   const [local, domain] = email.split('@');
   if (!domain) return email;
   return `${local.substring(0, Math.min(5, local.length))}*****@${domain}`;
 }
 
 function maskPhone(phone: string) {
-  if (!phone) return '';
+  if (!phone || phone.startsWith('NO-PHONE-')) return '';
   return `${phone.substring(0, 5)}*****`;
 }
 
@@ -66,8 +66,8 @@ export default async function AlumniPage() {
       department: user.department,
       company: user.company || 'Not Specified',
       designation: 'Alumni', // Or from DB if added
-      email: isVerified ? user.email : maskEmail(user.email),
-      phone: isVerified ? user.phone : maskPhone(user.phone),
+      email: isVerified ? ((user.email || '').startsWith('no-email-') ? '' : user.email) : maskEmail(user.email),
+      phone: isVerified ? ((user.phone || '').startsWith('NO-PHONE-') ? '' : user.phone) : maskPhone(user.phone),
       linkedin: user.linkedin || '#',
       image: '/default-avatar.png', // Fallback
       isVerified: true
