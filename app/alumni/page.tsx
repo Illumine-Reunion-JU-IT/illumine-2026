@@ -35,14 +35,14 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { AlumniProfile } from '@/types/alumni';
 
 function maskEmail(email: string) {
-  if (!email || email.startsWith('NO-EMAIL-') || email.startsWith('no-email-')) return '';
+  if (!email || email.toLowerCase().startsWith('no-email')) return '';
   const [local, domain] = email.split('@');
   if (!domain) return email;
   return `${local.substring(0, Math.min(5, local.length))}*****@${domain}`;
 }
 
 function maskPhone(phone: string) {
-  if (!phone || phone.startsWith('NO-PHONE-')) return '';
+  if (!phone || phone.toLowerCase().startsWith('no-phone')) return '';
   return `${phone.substring(0, 5)}*****`;
 }
 
@@ -50,28 +50,68 @@ export default async function AlumniPage() {
   const session = await getServerSession(authOptions);
   const isVerified = !!session?.user;
 
-  const { data, error } = await supabaseAdmin
-    .from('users')
-    .select('*')
-    .eq('role', 'internal')
-    .order('batch', { ascending: false });
+  let allData: any[] = [];
+  let from = 0;
+  const step = 1000;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data, error } = await supabaseAdmin
+      .from('users')
+      .select('*')
+      .eq('role', 'internal')
+      .order('batch', { ascending: false })
+      .range(from, from + step - 1);
+
+    if (error) {
+      console.error('Error fetching alumni:', error);
+      break;
+    }
+
+    if (data && data.length > 0) {
+      allData = [...allData, ...data];
+      from += step;
+      if (data.length < step) {
+        hasMore = false;
+      }
+    } else {
+      hasMore = false;
+    }
+  }
 
   let profiles: AlumniProfile[] = [];
 
-  if (!error && data) {
-    profiles = data.map((user: any) => ({
-      id: user.id,
-      name: user.name,
-      batch: user.batch,
-      department: user.department,
-      company: user.company || 'Not Specified',
-      designation: 'Alumni', // Or from DB if added
-      email: isVerified ? ((user.email || '').startsWith('no-email-') ? '' : user.email) : maskEmail(user.email),
-      phone: isVerified ? ((user.phone || '').startsWith('NO-PHONE-') ? '' : user.phone) : maskPhone(user.phone),
-      linkedin: user.linkedin || '#',
-      image: '/default-avatar.png', // Fallback
-      isVerified: true
-    }));
+  if (allData.length > 0) {
+    profiles = allData.map((user: any) => {
+      // Fix IT 2015 -> IT 15 formatting
+      let formattedBatch = user.batch || '';
+      if (/^IT 20(\d{2})$/i.test(formattedBatch)) {
+        formattedBatch = formattedBatch.replace(/^IT 20(\d{2})$/i, 'IT $1');
+      }
+
+      // Hide "Not Specified"
+      const company = user.company === 'Not Specified' ? '' : user.company;
+
+      const emailVal = user.email || '';
+      const emailToUse = isVerified ? (emailVal.toLowerCase().startsWith('no-email') ? '' : emailVal) : maskEmail(emailVal);
+      
+      const phoneVal = user.phone || '';
+      const phoneToUse = isVerified ? (phoneVal.toLowerCase().startsWith('no-phone') ? '' : phoneVal) : maskPhone(phoneVal);
+
+      return {
+        id: user.id,
+        name: user.name,
+        batch: formattedBatch.toUpperCase(),
+        department: user.department,
+        company: company,
+        designation: 'Alumni',
+        email: emailToUse,
+        phone: phoneToUse,
+        linkedin: user.linkedin || '#',
+        image: '/default-avatar.png',
+        isVerified: true
+      };
+    });
   }
 
   return (
