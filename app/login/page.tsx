@@ -10,6 +10,7 @@ function LoginForm() {
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [debugLog, setDebugLog] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/alumni';
@@ -18,34 +19,57 @@ function LoginForm() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setDebugLog('1. Initiating sign in...');
 
-    const res = await signIn('credentials', {
-      redirect: false,
-      email,
-      phone,
-    });
+    try {
+      const res = await signIn('credentials', {
+        redirect: false,
+        email,
+        phone,
+      });
 
-    if (res?.error) {
-      setError(res.error);
+      if (res?.error) {
+        setError(res.error);
+        setDebugLog('Sign in failed: ' + res.error);
+        setLoading(false);
+        return;
+      }
+
+      setDebugLog('2. Sign in successful. Fetching session...');
+
+      // Fetch session to determine role using NextAuth's built-in getSession
+      const session = await getSession();
+
+      if (!session) {
+        setError('Session could not be retrieved. Check Vercel NEXTAUTH_SECRET.');
+        setDebugLog('Session fetch returned null.');
+        setLoading(false);
+        return;
+      }
+
+      setDebugLog(`3. Session retrieved. Role: ${session?.user?.role}. Redirecting...`);
+
+      if (session?.user?.role === 'admin') {
+        const destination = callbackUrl.startsWith('/') ? callbackUrl : '/admin';
+        // Hard redirect to avoid Next.js caching or silent middleware bounces
+        window.location.href = destination;
+      } else {
+        window.location.href = '/alumni';
+      }
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred.');
       setLoading(false);
-      return;
     }
-
-    // Fetch session to determine role using NextAuth's built-in getSession
-    const session = await getSession();
-
-    if (session?.user?.role === 'admin') {
-      const destination = callbackUrl.startsWith('/') ? callbackUrl : '/admin';
-      router.push(destination);
-    } else {
-      router.push('/alumni');
-    }
-    
-    router.refresh();
   };
 
   return (
     <>
+        {debugLog && (
+          <div className="mb-4 p-2 bg-blue-900/30 border border-blue-500/50 text-blue-300 text-xs tracking-wider font-mono break-words">
+            {debugLog}
+          </div>
+        )}
+
         {error && (
           <div className="mb-4 p-3 bg-red-500/10 border border-red-500/50 text-red-400 text-xs uppercase tracking-wider">
             {error}
