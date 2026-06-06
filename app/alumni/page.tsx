@@ -51,31 +51,28 @@ export default async function AlumniPage() {
   const isVerified = !!session?.user;
 
   let allData: any[] = [];
-  let from = 0;
   const step = 1000;
-  let hasMore = true;
+  const numChunks = 4; // Fetch up to 4000 records concurrently
 
-  while (hasMore) {
-    const { data, error } = await supabaseAdmin
-      .from('users')
-      .select('*')
-      .eq('role', 'internal')
-      .order('batch', { ascending: false })
-      .range(from, from + step - 1);
+  const promises = [];
+  for (let i = 0; i < numChunks; i++) {
+    const from = i * step;
+    promises.push(
+      supabaseAdmin
+        .from('users')
+        .select('id, name, batch, department, company, email, phone, linkedin')
+        .eq('role', 'internal')
+        .order('batch', { ascending: false })
+        .range(from, from + step - 1)
+    );
+  }
 
+  const results = await Promise.all(promises);
+  for (const { data, error } of results) {
     if (error) {
       console.error('Error fetching alumni:', error);
-      break;
-    }
-
-    if (data && data.length > 0) {
+    } else if (data) {
       allData = [...allData, ...data];
-      from += step;
-      if (data.length < step) {
-        hasMore = false;
-      }
-    } else {
-      hasMore = false;
     }
   }
 
