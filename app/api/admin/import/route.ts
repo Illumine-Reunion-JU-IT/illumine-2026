@@ -17,27 +17,82 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No data provided' }, { status: 400 });
     }
 
+    const getValue = (row: any, keys: string[]) => {
+      for (const key of keys) {
+        if (row[key] !== undefined && row[key] !== null) {
+          return row[key];
+        }
+      }
+      return '';
+    };
+
+    const normalizePhone = (value: any) => {
+      if (value === undefined || value === null) return '';
+      return String(value).trim().replace(/[^0-9+]/g, '');
+    };
+
+    const normalizeString = (value: any) => {
+      if (value === undefined || value === null) return '';
+      return String(value).trim();
+    };
+
     // Map Excel columns to our DB schema
-    const formattedData = data.map((row: any) => ({
-      name: row.Name?.toString().trim(),
-      batch: row.Batch?.toString().trim(),
-      department: row.Department?.toString().trim() || 'IT',
-      company: row.Company?.toString().trim() || null,
-      linkedin: row.LinkedIn?.toString().trim() || null,
-      email: row.Email?.toString().trim().toLowerCase(),
-      phone: row.Phone?.toString().trim(),
-      role: 'internal'
-    })).filter(row => row.name && row.email && row.phone); // Require name, email, phone
+    const formattedData = data.map((row: any) => {
+      const name = normalizeString(getValue(row, ['Name', 'name', 'NAME', 'Student Name', 'Full Name']));
+      const batch = normalizeString(getValue(row, ['Batch', 'batch', 'BATCH', 'Batch Name', 'Graduation Batch', 'Batch/Grad Year']));
+      const department = normalizeString(getValue(row, ['Department', 'department', 'DEPARTMENT', 'Dept', 'DEPT', 'Branch']));
+      const company = normalizeString(getValue(row, ['Company', 'company', 'COMPANY', 'Organisation', 'Organization', 'Employer']));
+      const linkedin = normalizeString(getValue(row, ['LinkedIn', 'linkedin', 'LINKEDIN PROFILE', 'LinkedIn URL', 'LinkedIn Profile', 'Linkedin']));
+      const email = normalizeString(getValue(row, ['Email', 'email', 'EMAIL', 'Email Address', 'EMAIL ID', 'E-mail', 'EmailAddress'])).toLowerCase();
+      const phone = normalizePhone(getValue(row, ['Phone', 'phone', 'PHONE', 'Mobile', 'Mobile Number', 'Mobile No', 'MobileNumber', 'Contact', 'Contact Number', 'Phone number', 'Phone No', 'MOBILE NO', 'CONTACT']));
+
+      return {
+        name,
+        batch: batch || 'N/A',
+        department: department || 'IT',
+        company: company || null,
+        linkedin: linkedin || null,
+        email: email || null,
+        phone: phone || null,
+        role: 'internal'
+      };
+    }).filter(row => row.name && (row.email || row.phone));
 
     if (formattedData.length === 0) {
-      return NextResponse.json({ error: 'No valid rows found. Ensure Name, Email, and Phone columns exist and have data.' }, { status: 400 });
+      return NextResponse.json({ error: 'No valid rows found. Ensure Name and at least one of Email or Phone are provided.' }, { status: 400 });
     }
 
-    // Upsert into Supabase (insert, or update if email matches)
-    const { data: insertedData, error } = await supabaseAdmin
-      .from('users')
-      .upsert(formattedData, { onConflict: 'email' })
-      .select();
+    const rowsWithEmail = formattedData.filter(row => row.email);
+    const rowsWithoutEmail = formattedData.filter(row => !row.email);
+
+    let insertedCount = 0;
+    if (rowsWithEmail.length > 0) {
+      const { data: insertedData, error } = await supabaseAdmin
+        .from('users')
+        .upsert(rowsWithEmail, { onConflict: 'email' })
+        .select();
+
+      if (error) {
+        console.error('Supabase upsert error:', error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+      insertedCount += insertedData?.length || rowsWithEmail.length;
+    }
+
+    if (rowsWithoutEmail.length > 0) {
+      const { data: insertedData, error } = await supabaseAdmin
+        .from('users')
+        .insert(rowsWithoutEmail)
+        .select();
+
+      if (error) {
+        console.error('Supabase insert error:', error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+      insertedCount += insertedData?.length || rowsWithoutEmail.length;
+    }
+
+    return NextResponse.json({ success: true, inserted: insertedCount });
 
     if (error) {
       console.error("Supabase upsert error:", error);

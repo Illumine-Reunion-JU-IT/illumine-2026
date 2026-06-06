@@ -111,6 +111,11 @@ export default function ManageAlumniPage() {
     e.preventDefault();
     setError('');
 
+    if (!formData.name.trim() || (!formData.email.trim() && !formData.phone.trim())) {
+      setError('Name and at least one of Email or Phone are required.');
+      return;
+    }
+
     try {
       const isEditing = !!editingAlumnus;
       const url = '/api/admin/alumni';
@@ -461,20 +466,18 @@ export default function ManageAlumniPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[#BEF3DF]/70 mb-1 uppercase tracking-wider">Email Address *</label>
+                  <label className="block text-[#BEF3DF]/70 mb-1 uppercase tracking-wider">Email Address</label>
                   <input
                     type="email"
-                    required
                     value={formData.email}
                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                     className="w-full bg-black border border-white/10 px-3 py-2 text-white focus:outline-none focus:border-[#BEF3DF]"
                   />
                 </div>
                 <div>
-                  <label className="block text-[#BEF3DF]/70 mb-1 uppercase tracking-wider">Phone Number *</label>
+                  <label className="block text-[#BEF3DF]/70 mb-1 uppercase tracking-wider">Phone Number</label>
                   <input
                     type="text"
-                    required
                     value={formData.phone}
                     onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                     className="w-full bg-black border border-white/10 px-3 py-2 text-white focus:outline-none focus:border-[#BEF3DF]"
@@ -503,6 +506,9 @@ export default function ManageAlumniPage() {
                 </div>
               </div>
 
+              <div className="text-[10px] uppercase tracking-widest text-gray-400 mb-1">
+                Email or Phone must be provided for each record.
+              </div>
               <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
                 <button
                   type="button"

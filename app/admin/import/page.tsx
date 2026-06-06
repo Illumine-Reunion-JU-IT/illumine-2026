@@ -27,40 +27,86 @@ export default function ImportDataPage() {
       
       const rawJson = XLSX.utils.sheet_to_json(worksheet);
       
-      const formatted = rawJson.map((row: any, index: number) => {
-        // Try to guess columns based on user's generic file
-        const name = row['Name'] || row['NAME'] || row['Name '] || '';
-        const email = row['Email'] || row['E-mail'] || row['EMAIL ID'] || '';
-        const phone = row['Phone'] || row['Phone number'] || row['MOBILE NO'] || row['CONTACT'] || '';
-        const batch = row['Batch'] || row['BATCH'] || 'Unknown';
-        const department = row['Department'] || row['DEPARTMENT'] || 'IT';
-        const company = row['Company'] || row['COMPANY'] || '';
-        const linkedin = row['LinkedIn'] || row['LINKEDIN PROFILE'] || '';
+      const normalizeCell = (row: any, candidates: string[]) => {
+        for (const key of Object.keys(row)) {
+          const normalized = key.toString().trim().toLowerCase();
+          if (candidates.some(candidate => candidate.toLowerCase() === normalized)) {
+            return row[key];
+          }
+        }
+        return undefined;
+      };
 
-        return { _id: index, name, email, phone, batch, department, company, linkedin, role: 'internal' };
+      const normalizePhone = (value: any) => {
+        if (value === undefined || value === null) return '';
+        const str = String(value).trim();
+        return str.replace(/[^0-9+]/g, '');
+      };
+
+      const formatted = rawJson.map((row: any, index: number) => {
+        // Try to guess columns based on common CSV/Excel headers
+        const name = String(normalizeCell(row, ['Name', 'NAME', 'Student Name', 'Full Name', 'name']) || '').trim();
+        const email = String(normalizeCell(row, ['Email', 'EMAIL', 'E-mail', 'EMAIL ID', 'Email Address', 'email', 'EmailAddress']) || '').trim();
+        const phone = normalizePhone(normalizeCell(row, ['Phone', 'phone', 'PHONE', 'Mobile', 'Mobile Number', 'Mobile No', 'MobileNumber', 'Contact', 'Contact Number', 'Phone number', 'Phone No', 'MOBILE NO', 'CONTACT']));
+        const batch = String(normalizeCell(row, ['Batch', 'BATCH', 'Batch Name', 'Graduation Batch', 'Batch/Grad Year']) || 'Unknown').trim();
+        const department = String(normalizeCell(row, ['Department', 'DEPARTMENT', 'Dept', 'DEPT', 'Branch']) || 'IT').trim();
+        const company = String(normalizeCell(row, ['Company', 'COMPANY', 'Organisation', 'Organization', 'Employer']) || '').trim();
+        const linkedin = String(normalizeCell(row, ['LinkedIn', 'LINKEDIN PROFILE', 'LinkedIn URL', 'LinkedIn Profile', 'LinkedInId', 'LinkedIn ID']) || '').trim();
+
+        return {
+          _id: index,
+          name,
+          email,
+          phone,
+          batch,
+          department,
+          company,
+          linkedin,
+          role: 'internal'
+        };
       });
 
       // Validation
-      const errors = [];
-      const seenEmails = new Set();
-      const seenPhones = new Set();
+      const errors: string[] = [];
+      const warnings: string[] = [];
+      const seenEmails = new Set<string>();
+      const seenPhones = new Set<string>();
 
       for (const row of formatted) {
-        if (!row.name) errors.push(`Row ${row._id + 1}: Missing Name`);
-        if (!row.email) errors.push(`Row ${row._id + 1}: Missing Email for ${row.name}`);
-        else if (!row.email.includes('@')) errors.push(`Row ${row._id + 1}: Invalid Email format for ${row.name}`);
-        
-        if (!row.phone) errors.push(`Row ${row._id + 1}: Missing Phone for ${row.name}`);
+        if (!row.name) {
+          errors.push(`Row ${row._id + 1}: Missing Name`);
+          continue;
+        }
 
-        if (row.email && seenEmails.has(row.email.toLowerCase())) errors.push(`Row ${row._id + 1}: Duplicate Email in file (${row.email})`);
-        if (row.phone && seenPhones.has(row.phone)) errors.push(`Row ${row._id + 1}: Duplicate Phone in file (${row.phone})`);
-        
+        if (!row.email && !row.phone) {
+          errors.push(`Row ${row._id + 1}: Missing both Email and Phone for ${row.name}`);
+          continue;
+        }
+
+        if (row.email) {
+          if (!row.email.includes('@')) {
+            errors.push(`Row ${row._id + 1}: Invalid Email format for ${row.name}`);
+          } else if (seenEmails.has(row.email.toLowerCase())) {
+            errors.push(`Row ${row._id + 1}: Duplicate Email in file (${row.email})`);
+          }
+        } else {
+          warnings.push(`Row ${row._id + 1}: Missing Email for ${row.name}`);
+        }
+
+        if (row.phone) {
+          if (seenPhones.has(row.phone)) {
+            errors.push(`Row ${row._id + 1}: Duplicate Phone in file (${row.phone})`);
+          }
+        } else {
+          warnings.push(`Row ${row._id + 1}: Missing Phone for ${row.name}`);
+        }
+
         if (row.email) seenEmails.add(row.email.toLowerCase());
         if (row.phone) seenPhones.add(row.phone);
       }
 
       setParsedData(formatted);
-      setValidationErrors(errors);
+      setValidationErrors([...errors, ...warnings]);
       setStep(2);
     } catch (error: any) {
       setMessage({ type: 'error', text: 'Failed to parse file. ' + error.message });
@@ -75,7 +121,7 @@ export default function ImportDataPage() {
     setMessage(null);
     try {
       // Filter out obvious bad rows before sending to backend
-      const validData = parsedData.filter(row => row.name && row.email && row.email.includes('@') && row.phone);
+      const validData = parsedData.filter(row => row.name && (row.email || row.phone));
 
       // Backend will handle duplicate checking against DB
       const res = await fetch('/api/admin/import', {

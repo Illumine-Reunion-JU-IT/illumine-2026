@@ -35,8 +35,8 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { name, batch, department, company, linkedin, email, phone, role } = body;
 
-    if (!name || !email || !phone) {
-      return NextResponse.json({ error: 'Name, email, and phone are required' }, { status: 400 });
+    if (!name || (!email && !phone)) {
+      return NextResponse.json({ error: 'Name and at least one of email or phone are required' }, { status: 400 });
     }
 
     const { data, error } = await supabaseAdmin
@@ -47,8 +47,8 @@ export async function POST(req: Request) {
         department: department || 'IT',
         company: company || null,
         linkedin: linkedin || null,
-        email: email.toLowerCase(),
-        phone,
+        email: email ? email.toLowerCase() : null,
+        phone: phone || null,
         role: role || 'internal'
       }])
       .select()
@@ -73,8 +73,8 @@ export async function PUT(req: Request) {
     const body = await req.json();
     const { id, name, batch, department, company, linkedin, email, phone, role } = body;
 
-    if (!id || !name || !email || !phone) {
-      return NextResponse.json({ error: 'ID, Name, email, and phone are required' }, { status: 400 });
+    if (!id || !name || (!email && !phone)) {
+      return NextResponse.json({ error: 'ID, Name, and at least one of email or phone are required' }, { status: 400 });
     }
 
     const { data, error } = await supabaseAdmin
@@ -85,8 +85,8 @@ export async function PUT(req: Request) {
         department,
         company: company || null,
         linkedin: linkedin || null,
-        email: email.toLowerCase(),
-        phone,
+        email: email ? email.toLowerCase() : null,
+        phone: phone || null,
         role
       })
       .eq('id', id)

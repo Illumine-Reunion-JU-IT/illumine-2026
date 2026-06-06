@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { signIn, getSession } from 'next-auth/react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 
 export default function LoginPage() {
@@ -11,6 +11,8 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') ?? '/admin';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,18 +28,17 @@ export default function LoginPage() {
     if (res?.error) {
       setError(res.error);
       setLoading(false);
-    } else {
-      // Fetch session to determine role
-      const sessionRes = await fetch('/api/auth/session');
-      const session = await sessionRes.json();
+      return;
+    }
 
-      if (session?.user?.role === 'admin') {
-        router.push('/admin');
-      } else {
-        router.push('/alumni');
-      }
-      
-      router.refresh();
+    // Fetch session to determine role using NextAuth's built-in getSession
+    const session = await getSession();
+
+    if (session?.user?.role === 'admin') {
+      const destination = callbackUrl.startsWith('/') ? callbackUrl : '/admin';
+      router.push(destination);
+    } else {
+      router.push('/alumni');
     }
   };
 
