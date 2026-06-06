@@ -36,7 +36,7 @@ export default function ImportDataPage() {
 
           for (const keyword of keywords) {
             const normalizedKeyword = keyword.toLowerCase().replace(/[^a-z0-9]/g, '');
-            if (cleanKey === normalizedKeyword || cleanKey.includes(normalizedKeyword) || normalizedKeyword.includes(cleanKey)) {
+            if (cleanKey === normalizedKeyword || cleanKey.includes(normalizedKeyword)) {
               return row[key];
             }
           }
