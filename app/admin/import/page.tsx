@@ -27,11 +27,18 @@ export default function ImportDataPage() {
       
       const rawJson = XLSX.utils.sheet_to_json(worksheet);
       
-      const normalizeCell = (row: any, candidates: string[]) => {
+      const normalizeCell = (row: any, keywords: string[]) => {
         for (const key of Object.keys(row)) {
           const normalized = key.toString().trim().toLowerCase();
-          if (candidates.some(candidate => candidate.toLowerCase() === normalized)) {
-            return row[key];
+          const cleanKey = normalized.replace(/[^a-z0-9]/g, '');
+          
+          if (!cleanKey) continue; // CRITICAL FIX: prevent empty strings from matching everything
+
+          for (const keyword of keywords) {
+            const normalizedKeyword = keyword.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (cleanKey === normalizedKeyword || cleanKey.includes(normalizedKeyword) || normalizedKeyword.includes(cleanKey)) {
+              return row[key];
+            }
           }
         }
         return undefined;
@@ -45,13 +52,13 @@ export default function ImportDataPage() {
 
       const formatted = rawJson.map((row: any, index: number) => {
         // Try to guess columns based on common CSV/Excel headers
-        const name = String(normalizeCell(row, ['Name', 'NAME', 'Student Name', 'Full Name', 'name']) || '').trim();
-        const email = String(normalizeCell(row, ['Email', 'EMAIL', 'E-mail', 'EMAIL ID', 'Email Address', 'email', 'EmailAddress']) || '').trim();
-        const phone = normalizePhone(normalizeCell(row, ['Phone', 'phone', 'PHONE', 'Mobile', 'Mobile Number', 'Mobile No', 'MobileNumber', 'Contact', 'Contact Number', 'Phone number', 'Phone No', 'MOBILE NO', 'CONTACT']));
-        const batch = String(normalizeCell(row, ['Batch', 'BATCH', 'Batch Name', 'Graduation Batch', 'Batch/Grad Year']) || 'Unknown').trim();
-        const department = String(normalizeCell(row, ['Department', 'DEPARTMENT', 'Dept', 'DEPT', 'Branch']) || 'IT').trim();
-        const company = String(normalizeCell(row, ['Company', 'COMPANY', 'Organisation', 'Organization', 'Employer']) || '').trim();
-        const linkedin = String(normalizeCell(row, ['LinkedIn', 'LINKEDIN PROFILE', 'LinkedIn URL', 'LinkedIn Profile', 'LinkedInId', 'LinkedIn ID']) || '').trim();
+        const name = String(normalizeCell(row, ['Name', 'Student Name', 'Full Name']) || '').trim();
+        const email = String(normalizeCell(row, ['Email', 'E-mail', 'Email Address', 'EmailId', 'Email Id', 'EMAIL ID']) || '').trim().toLowerCase();
+        const phone = normalizePhone(normalizeCell(row, ['Phone', 'Mobile', 'Mobile Number', 'Mobile No', 'Contact', 'Contact Number', 'Phone number', 'Phone No', 'ph no']));
+        const batch = String(normalizeCell(row, ['Batch', 'Batch Name', 'Graduation Batch', 'Batch/Grad Year', 'Batch / Grad Year']) || 'Unknown').trim();
+        const department = String(normalizeCell(row, ['Department', 'Dept', 'Branch']) || 'IT').trim();
+        const company = String(normalizeCell(row, ['Company', 'Organisation', 'Organization', 'Employer']) || '').trim();
+        const linkedin = String(normalizeCell(row, ['LinkedIn', 'LinkedIn URL', 'LinkedIn Profile', 'Linkedin']) || '').trim();
 
         return {
           _id: index,
@@ -74,34 +81,29 @@ export default function ImportDataPage() {
 
       for (const row of formatted) {
         if (!row.name) {
-          errors.push(`Row ${row._id + 1}: Missing Name`);
-          continue;
-        }
-
-        if (!row.email && !row.phone) {
-          errors.push(`Row ${row._id + 1}: Missing both Email and Phone for ${row.name}`);
+          errors.push(`Row ${row._id + 1}: Missing Name (Row will be skipped)`);
           continue;
         }
 
         if (row.email) {
           if (!row.email.includes('@')) {
             errors.push(`Row ${row._id + 1}: Invalid Email format for ${row.name}`);
-          } else if (seenEmails.has(row.email.toLowerCase())) {
+          } else if (seenEmails.has(row.email)) {
             errors.push(`Row ${row._id + 1}: Duplicate Email in file (${row.email})`);
           }
-        } else {
-          warnings.push(`Row ${row._id + 1}: Missing Email for ${row.name}`);
         }
 
         if (row.phone) {
           if (seenPhones.has(row.phone)) {
             errors.push(`Row ${row._id + 1}: Duplicate Phone in file (${row.phone})`);
           }
-        } else {
-          warnings.push(`Row ${row._id + 1}: Missing Phone for ${row.name}`);
         }
 
-        if (row.email) seenEmails.add(row.email.toLowerCase());
+        if (!row.email && !row.phone) {
+          warnings.push(`Row ${row._id + 1}: Missing both Email and Phone for ${row.name}. (Will be imported as a name-only record)`);
+        }
+
+        if (row.email) seenEmails.add(row.email);
         if (row.phone) seenPhones.add(row.phone);
       }
 
@@ -120,8 +122,8 @@ export default function ImportDataPage() {
     setLoading(true);
     setMessage(null);
     try {
-      // Filter out obvious bad rows before sending to backend
-      const validData = parsedData.filter(row => row.name && (row.email || row.phone));
+      // Filter out obvious bad rows before sending to backend (only require name now)
+      const validData = parsedData.filter(row => row.name);
 
       // Backend will handle duplicate checking against DB
       const res = await fetch('/api/admin/import', {
