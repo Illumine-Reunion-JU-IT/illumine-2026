@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     };
 
     // Map Excel columns to our DB schema with smart aliases
-    const formattedData = data.map((row: any) => {
+    const formattedData = data.map((row: any, index: number) => {
       const name = normalizeString(getValue(row, ['name', 'student name', 'full name', 'student\'s name', 'student name ']));
       const batch = normalizeString(getValue(row, ['batch', 'batch name', 'graduation batch', 'batch/grad year']));
       const department = normalizeString(getValue(row, ['department', 'dept', 'branch']));
@@ -63,44 +63,62 @@ export async function POST(req: Request) {
         department: department || 'IT',
         company: company || null,
         linkedin: linkedin || null,
-        email: email || `NO-EMAIL-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-        phone: phone || `NO-PHONE-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        email: email || `NO-EMAIL-${index}-${crypto.randomUUID()}`,
+        phone: phone || `NO-PHONE-${index}-${crypto.randomUUID()}`,
         role: 'internal'
       };
-    }).filter(row => row.name); // Only require a name! Allow missing email/phone
+    }).filter((row: any) => row.name); // Only require a name! Allow missing email/phone
 
     if (formattedData.length === 0) {
       return NextResponse.json({ error: 'No valid rows found. Please ensure the CSV/Excel file has at least a "Name" column.' }, { status: 400 });
     }
 
-    const rowsWithEmail = formattedData.filter(row => row.email);
-    const rowsWithoutEmail = formattedData.filter(row => !row.email);
+    // Deduplicate by email and phone to prevent 'ON CONFLICT DO UPDATE COMMAND CANNOT AFFECT ROW A SECOND TIME'
+    const uniqueEmailMap = new Map();
+    const uniquePhoneMap = new Map();
+    const deduplicatedData = [];
+
+    for (const row of formattedData) {
+      // If we've seen this email or phone before in this same batch, skip it (keep the first or last, we keep the last here by overwriting, or keep first by checking)
+      // Let's keep the last occurrence by just overwriting in the map.
+      uniqueEmailMap.set(row.email, row);
+    }
+
+    // Now deduplicate by phone
+    for (const row of Array.from(uniqueEmailMap.values())) {
+      uniquePhoneMap.set(row.phone, row);
+    }
+
+    const finalData = Array.from(uniquePhoneMap.values());
+
+    const rowsWithRealEmail = finalData.filter((row: any) => !row.email.startsWith('NO-EMAIL-'));
+    const rowsWithDummyEmail = finalData.filter((row: any) => row.email.startsWith('NO-EMAIL-'));
 
     let insertedCount = 0;
-    if (rowsWithEmail.length > 0) {
+    if (rowsWithRealEmail.length > 0) {
       const { data: insertedData, error } = await supabaseAdmin
         .from('users')
-        .upsert(rowsWithEmail, { onConflict: 'email' })
+        .upsert(rowsWithRealEmail, { onConflict: 'email' })
         .select();
 
       if (error) {
         console.error('Supabase upsert error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
-      insertedCount += insertedData?.length || rowsWithEmail.length;
+      insertedCount += insertedData?.length || rowsWithRealEmail.length;
     }
 
-    if (rowsWithoutEmail.length > 0) {
+    if (rowsWithDummyEmail.length > 0) {
       const { data: insertedData, error } = await supabaseAdmin
         .from('users')
-        .insert(rowsWithoutEmail)
+        .insert(rowsWithDummyEmail)
         .select();
 
       if (error) {
         console.error('Supabase insert error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
-      insertedCount += insertedData?.length || rowsWithoutEmail.length;
+      insertedCount += insertedData?.length || rowsWithDummyEmail.length;
     }
 
     return NextResponse.json({ success: true, inserted: insertedCount });
