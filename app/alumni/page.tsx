@@ -112,6 +112,8 @@ export default async function AlumniPage() {
         isVerified: true
       };
     });
+
+    profiles.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
   }
 
   return (

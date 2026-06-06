@@ -140,10 +140,10 @@ export const AlumniCard: React.FC<AlumniCardProps> = ({ profile, index = 0 }) =>
           {/* Core Info */}
           <div className="flex flex-col flex-grow min-w-0 justify-center">
             <div className="flex items-start justify-between gap-2 w-full mb-1">
-              <h3 className="font-tt-lakes text-base sm:text-lg font-bold text-[#f5f5f5] group-hover:text-[#BEF3DF] transition-colors truncate drop-shadow-[0_0_5px_rgba(255,255,255,0.1)]">
+              <h3 className="font-tt-lakes text-base sm:text-lg font-bold text-[#f5f5f5] group-hover:text-[#BEF3DF] transition-colors break-words leading-tight drop-shadow-[0_0_5px_rgba(255,255,255,0.1)]">
                 {profile.name}
               </h3>
-              <span className="text-[10px] font-mono font-bold tracking-widest text-[#7B61FF] bg-[#7B61FF]/10 border border-[#7B61FF]/30 px-2 py-0.5 rounded-full shrink-0 uppercase whitespace-nowrap shadow-[0_0_10px_rgba(123,97,255,0.1)]">
+              <span className="text-[10px] font-mono font-bold tracking-widest text-[#7B61FF] bg-[#7B61FF]/10 border border-[#7B61FF]/30 px-2 py-0.5 rounded-full shrink-0 uppercase whitespace-nowrap shadow-[0_0_10px_rgba(123,97,255,0.1)] mt-0.5">
                 {profile.batch}
               </span>
             </div>
@@ -168,7 +168,7 @@ export const AlumniCard: React.FC<AlumniCardProps> = ({ profile, index = 0 }) =>
               <div className="bg-black/40 p-1.5 rounded-md text-gray-500 group-hover/item:text-[#BEF3DF] transition-colors shrink-0 shadow-inner">
                 <Mail size={12} />
               </div>
-              <span className="truncate group-hover/item:text-gray-200 transition-colors flex-1 text-[11px] sm:text-xs tracking-wide">
+              <span className="break-all group-hover/item:text-gray-200 transition-colors flex-1 text-[11px] sm:text-xs tracking-wide">
                 {profile.email ? profile.email : <span className="text-gray-600 italic text-[10px] uppercase tracking-widest">No email</span>}
               </span>
             </div>
@@ -176,7 +176,7 @@ export const AlumniCard: React.FC<AlumniCardProps> = ({ profile, index = 0 }) =>
               <div className="bg-black/40 p-1.5 rounded-md text-gray-500 group-hover/item:text-[#BEF3DF] transition-colors shrink-0 shadow-inner">
                 <Phone size={12} />
               </div>
-              <span className="truncate group-hover/item:text-gray-200 transition-colors flex-1 text-[11px] sm:text-xs tracking-wide">
+              <span className="break-all group-hover/item:text-gray-200 transition-colors flex-1 text-[11px] sm:text-xs tracking-wide">
                 {profile.phone ? profile.phone : <span className="text-gray-600 italic text-[10px] uppercase tracking-widest">No phone</span>}
               </span>
             </div>
