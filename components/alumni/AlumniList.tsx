@@ -72,7 +72,7 @@ export const AlumniList: React.FC<AlumniListProps> = ({ profiles }) => {
                   clipPath: 'polygon(6% 0%, 100% 0%, 94% 100%, 0% 100%)',
                 }}
               >
-                {batch === 'all' ? 'ALL_BATCHES' : `'${batch.slice(-2)}`}
+                {batch === 'all' ? 'ALL_BATCHES' : batch.toUpperCase()}
               </button>
             );
           })}
