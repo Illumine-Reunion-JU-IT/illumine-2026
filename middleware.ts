@@ -8,7 +8,11 @@ export default withAuth(
     const role = req.nextauth.token?.role;
 
     if (pathname.startsWith('/admin') && role !== 'admin') {
-      return NextResponse.redirect(new URL('/login', req.url));
+      const url = new URL('/login', req.url);
+      url.searchParams.set('callbackUrl', req.url);
+      url.searchParams.set('debugRole', String(role));
+      url.searchParams.set('hasToken', String(isAuth));
+      return NextResponse.redirect(url);
     }
   },
   {
