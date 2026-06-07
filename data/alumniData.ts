@@ -89,7 +89,7 @@ export function getFilteredAlumni(
     const query = search.toLowerCase().trim();
     filtered = filtered.filter(
       alumnus =>
-        alumnus.name.toLowerCase().includes(query) ||
+        (alumnus.name || '').toLowerCase().includes(query) ||
         (alumnus.company && alumnus.company.toLowerCase().includes(query)) ||
         (alumnus.designation && alumnus.designation.toLowerCase().includes(query))
     );

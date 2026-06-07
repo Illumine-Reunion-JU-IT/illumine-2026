@@ -161,4 +161,7 @@ Icon
 # ==========================================
 
 # Project Specific Data
+*.xlsx
+*.xls
+*.csv
 

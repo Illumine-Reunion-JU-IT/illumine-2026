@@ -20,8 +20,9 @@ function useReactorSize() {
   const [size, setSize] = useState(440);
   useEffect(() => {
     const calc = () => {
-      const w = window.innerWidth  * 0.4444;
-      const h = window.innerHeight * 0.8963;
+      const isMobile = window.innerWidth < 768;
+      const w = window.innerWidth  * (isMobile ? 0.8 : 0.4444);
+      const h = window.innerHeight * (isMobile ? 0.6 : 0.8963);
       setSize(Math.round(Math.min(w, h)));
     };
     calc();
@@ -36,7 +37,8 @@ export default function ComingSoon() {
   return (
     <div className="relative w-full h-[90vh] bg-[#0f0f0f] overflow-hidden" style={{ fontFamily: "'TT Lakes Neue Trial', sans-serif" }}>
 
-      <div className="relative w-full h-full">
+      {/* ── DESKTOP VIEW (EXACT ORIGINAL LAYOUT) ── */}
+      <div className="hidden md:block relative w-full h-full">
 
         {/* ── ARC REACTOR centered in background ── */}
         <div
@@ -143,29 +145,21 @@ export default function ComingSoon() {
         <Cross style={{ left: '24.3vw',  bottom: '11.9%' }} />
         <Cross style={{ right: '24.3vw', bottom: '11.9%' }} />
 
-    
-
-
         {/* Vector2 — top-right, slow clockwise */}
         <div className="absolute z-10 opacity-50" style={{ right: '27.08vw', top: '5.6%', width: '2.77vw' }}>
-          {/* <div style={{ animation: 'slow-spin 8s linear infinite' }}> */}
-            <Vector2 />
-          {/* </div> */}
+          <Vector2 />
         </div>
 
         {/* Vector2 — bottom-left, slow counter-clockwise */}
         <div className="absolute z-10" style={{ left: '27.08vw', bottom: '5.6%', width: '2.77vw', opacity: 1 }}>
-          {/* <div style={{ animation: 'slow-spin 8s linear infinite reverse' }}> */}
-            <Vector2 />
-          {/* </div> */}
+          <Vector2 />
         </div>
         
         <div className='h-[7%] w-[15%] absolute bottom-[0.5%] left-1/2 -translate-x-1/2 flex items-center justify-between'>
-                    <SmallCircle speedFactor={0.8} />
-                    <SmallCircle className='rotate-180' speedFactor={1} />
-                    <SmallCircle speedFactor={1.2} />
-                </div>
-
+          <SmallCircle speedFactor={0.8} />
+          <SmallCircle className='rotate-180' speedFactor={1} />
+          <SmallCircle speedFactor={1.2} />
+        </div>
 
         {/* Group93 — bottom-left gauge, clockwise */}
         <div className="absolute z-10" style={{ bottom: '9%', left: '25.3vw', width: '15vw' }}>
@@ -173,8 +167,8 @@ export default function ComingSoon() {
             <Group93 />
           </div>
         </div>
-               <BlueCircle className='hidden sm:block top-12 left-22' />
-                <BlueCircle className='hidden sm:block bottom-8 right-22 rotate-180' />
+        <BlueCircle className='hidden sm:block top-12 left-22' />
+        <BlueCircle className='hidden sm:block bottom-8 right-22 rotate-180' />
         {/* Group93 — top-right gauge, counter-clockwise */}
         <div className="absolute z-10" style={{ top: '23.8%', right: '21.52vw', width: '8vw' }}>
           <div style={{ animation: 'slow-spin 10s linear infinite reverse', transformOrigin: '43% 38.5%' }}>
@@ -183,6 +177,67 @@ export default function ComingSoon() {
         </div>
 
       </div>
+
+      {/* ── MOBILE VIEW (CLEANED UP RESPONSIVE) ── */}
+      <div className="block md:hidden relative w-full h-full">
+
+        {/* ── ARC REACTOR centered in background ── */}
+        <div
+          className="absolute flex items-center justify-center left-0 right-0 mx-auto w-full max-w-[90vw]"
+          style={{
+            top: '5.18%',
+            height: '89.63%',
+          }}
+        >
+          {/* Outer glow bloom behind the reactor */}
+          <div
+            className="absolute rounded-full pointer-events-none"
+            style={{
+              width: '55%',
+              height: '55%',
+              background: 'radial-gradient(circle, rgba(255,243,77,0.06) 0%, transparent 70%)',
+            }}
+          />
+
+          {/* The reactor itself — fills the container, scales with viewport */}
+          <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
+            <ArcReactor
+              accentColor="yellow"
+              size={reactorSize}
+              className="opacity-50"
+            />
+          </div>
+
+          {/* Foreground text overlay */}
+          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center pointer-events-none">
+            <div className="flex justify-center w-full px-4" style={{ marginTop: '5%' }}>
+              <ComingSoonText className="w-full max-w-[85vw] h-auto drop-shadow-[0_0_20px_rgba(255,243,77,0.3)]" />
+            </div>
+            <h2
+              className="text-[#fff34d] font-bold tracking-[0.2em] opacity-90 text-[10px] sm:text-xs mt-4"
+            >
+              — UNDER CONSTRUCTION —
+            </h2>
+            <Link
+              href="/"
+              className="pointer-events-auto bg-[#6265fe] text-white font-bold tracking-[0.15em] hover:brightness-110 transition-all px-4 py-2 mt-6 text-[10px]"
+              style={{
+                clipPath: 'polygon(8% 0, 100% 0, 100% 65%, 92% 100%, 0 100%, 0 35%)',
+              }}
+            >
+              BACK TO HOME
+            </Link>
+          </div>
+        </div>
+
+        <div className='h-[7%] w-[120px] absolute bottom-[0.5%] left-1/2 -translate-x-1/2 flex items-center justify-between'>
+          <SmallCircle speedFactor={0.8} />
+          <SmallCircle className='rotate-180' speedFactor={1} />
+          <SmallCircle speedFactor={1.2} />
+        </div>
+
+      </div>
+
     </div>
   );
 }
