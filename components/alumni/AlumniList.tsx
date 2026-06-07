@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { AlumniProfile } from '@/types/alumni';
 import AlumniCard from './AlumniCard';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, FilterX, Users } from 'lucide-react';
+import { Search, FilterX, Users, Edit3 } from 'lucide-react';
+import Link from 'next/link';
 
 export const AlumniList: React.FC = () => {
   const batchList = Array.from({ length: 25 }, (_, i) => `IT ${String(i + 4).padStart(2, '0')}`);
@@ -79,36 +80,48 @@ export const AlumniList: React.FC = () => {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 pb-8 border-b border-white/10 w-full relative">
         <div className="absolute bottom-0 left-0 w-1/3 h-[1px] bg-gradient-to-r from-[#BEF3DF] to-transparent pointer-events-none" />
         
-        {/* Animated Search Bar */}
-        <div className="relative w-full max-w-md group">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#BEF3DF]/20 to-[#7B61FF]/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-          
-          <div className="relative bg-[#0c0f1d]/80 backdrop-blur-md border border-white/10 group-focus-within:border-[#BEF3DF]/50 transition-all duration-300 rounded-xl overflow-hidden flex items-center shadow-lg group-focus-within:shadow-[0_0_20px_rgba(190,243,223,0.15)]">
-            <div className="pl-4 text-gray-400 group-focus-within:text-[#BEF3DF] transition-colors">
-              <Search size={18} />
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full max-w-2xl">
+          {/* Animated Search Bar */}
+          <div className="relative w-full max-w-md group">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#BEF3DF]/20 to-[#7B61FF]/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            
+            <div className="relative bg-[#0c0f1d]/80 backdrop-blur-md border border-white/10 group-focus-within:border-[#BEF3DF]/50 transition-all duration-300 rounded-xl overflow-hidden flex items-center shadow-lg group-focus-within:shadow-[0_0_20px_rgba(190,243,223,0.15)]">
+              <div className="pl-4 text-gray-400 group-focus-within:text-[#BEF3DF] transition-colors">
+                <Search size={18} />
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search alumni globally..."
+                aria-label="Search alumni registry"
+                className="w-full bg-transparent border-0 text-white placeholder-gray-500 text-sm tracking-wide px-4 py-3.5 focus:outline-none focus:ring-0 font-tt-lakes"
+              />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery('')}
+                  className="pr-4 text-gray-500 hover:text-white transition-colors"
+                >
+                  <FilterX size={16} />
+                </button>
+              )}
             </div>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search alumni globally..."
-              aria-label="Search alumni registry"
-              className="w-full bg-transparent border-0 text-white placeholder-gray-500 text-sm tracking-wide px-4 py-3.5 focus:outline-none focus:ring-0 font-tt-lakes"
-            />
-            {searchQuery && (
-              <button 
-                onClick={() => setSearchQuery('')}
-                className="pr-4 text-gray-500 hover:text-white transition-colors"
-              >
-                <FilterX size={16} />
-              </button>
+            {debouncedSearch.length >= 2 && (
+               <div className="absolute -bottom-6 left-2 text-[10px] text-[#BEF3DF] tracking-widest uppercase">
+                 Searching all batches...
+               </div>
             )}
           </div>
-          {debouncedSearch.length >= 2 && (
-             <div className="absolute -bottom-6 left-2 text-[10px] text-[#BEF3DF] tracking-widest uppercase">
-               Searching all batches...
-             </div>
-          )}
+
+          <Link href="/update-record" className="shrink-0">
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-white/5 hover:bg-[#BEF3DF]/10 border border-white/10 hover:border-[#BEF3DF]/50 text-white hover:text-[#BEF3DF] px-4 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 flex items-center gap-2 shadow-[0_0_15px_rgba(0,0,0,0.5)]"
+            >
+              <Edit3 size={14} /> Rectify Profile
+            </motion.button>
+          </Link>
         </div>
 
         {/* Batch Filter Pills */}
