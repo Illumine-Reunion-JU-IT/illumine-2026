@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
+
 import { AlumniProfile } from '@/types/alumni';
 import { useSession } from 'next-auth/react';
 import { X, Mail, Phone, MessageSquare, Send, Check, MapPin, Briefcase } from 'lucide-react';
@@ -12,29 +12,34 @@ export interface AlumniCardProps {
   index?: number;
 }
 
-const FallbackAvatar: React.FC = () => (
-  <div 
-    className="w-full h-full bg-gradient-to-br from-[#121626] to-[#0a0d18] flex items-center justify-center relative shadow-inner"
-    aria-hidden="true"
-  >
-    <svg 
-      className="w-10 h-10 opacity-30 text-[#BEF3DF] drop-shadow-[0_0_10px_rgba(190,243,223,0.5)]" 
-      fill="none" 
-      viewBox="0 0 24 24" 
-      stroke="currentColor"
-    >
-      <path 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        strokeWidth={1} 
-        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" 
-      />
-    </svg>
-  </div>
-);
+const getInitials = (name: string) => {
+  if (!name) return '?';
+  const parts = name.trim().split(' ').filter(Boolean);
+  if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
+
+const getGradientFromName = (name: string) => {
+  const gradients = [
+    'from-[#FF6B6B] to-[#FF8E53]', // Coral
+    'from-[#4FACFE] to-[#00F2FE]', // Blue
+    'from-[#43E97B] to-[#38F9D7]', // Green
+    'from-[#FA709A] to-[#FEE140]', // Pink-Yellow
+    'from-[#30CFD0] to-[#330867]', // Cyan-Purple
+    'from-[#B224EF] to-[#7579FF]', // Purple
+    'from-[#F4D03F] to-[#16A085]', // Yellow-Teal
+    'from-[#FF9A9E] to-[#FECFEF]', // Soft Pink
+    'from-[#a18cd1] to-[#fbc2eb]', // Lilac
+    'from-[#ff9a44] to-[#fc6076]', // Orange-Red
+  ];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return gradients[Math.abs(hash) % gradients.length];
+};
 
 export const AlumniCard: React.FC<AlumniCardProps> = ({ profile, index = 0 }) => {
-  const [imgError, setImgError] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const { data: session } = useSession();
 
@@ -112,23 +117,13 @@ export const AlumniCard: React.FC<AlumniCardProps> = ({ profile, index = 0 }) =>
         <div className="absolute bottom-0 left-0 w-20 h-[1px] bg-gradient-to-r from-[#7B61FF]/80 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
         <div className="p-5 flex items-start gap-4">
-          {/* Avatar Ring */}
+          {/* Avatar Ring - Personalized Initials */}
           <div className="relative shrink-0">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#BEF3DF] to-[#7B61FF] rounded-full blur-[10px] opacity-20 group-hover:opacity-60 transition-opacity duration-500" />
-            <div className="w-16 h-16 rounded-full border-2 border-white/10 group-hover:border-[#BEF3DF]/50 bg-black/40 overflow-hidden relative z-10 transition-colors duration-300">
-              {!profile.image || imgError ? (
-                <FallbackAvatar />
-              ) : (
-                <Image
-                  src={profile.image}
-                  alt={profile.name}
-                  fill
-                  sizes="64px"
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  onError={() => setImgError(true)}
-                />
-              )}
+            <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${getGradientFromName(profile.name)} flex items-center justify-center text-white font-tt-lakes font-bold text-xl shadow-[0_0_15px_rgba(0,0,0,0.3)] border-2 border-white/10 group-hover:border-white/30 group-hover:scale-110 transition-all duration-300 relative z-10`}>
+              {getInitials(profile.name)}
             </div>
+            {/* Ambient background glow for avatar */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${getGradientFromName(profile.name)} rounded-full blur-[10px] opacity-40 group-hover:opacity-80 transition-opacity duration-300`} />
             
             {profile.isVerified && (
               <div className="absolute -bottom-1 -right-1 z-20 bg-[#BEF3DF] text-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#0c0f1d] shadow-[0_0_10px_rgba(190,243,223,0.5)]" title="Verified Alumni">
