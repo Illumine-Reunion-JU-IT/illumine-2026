@@ -8,7 +8,7 @@ import { ttLakes } from './fonts';
 
 const navLinks = [
   { label: 'HOME', href: '/' },
-  { label: 'ABOUT', href: '/about' },
+  { label: 'ABOUT', href: '/#about-department' },
   { label: 'EVENTS', href: '/events' },
   { label: 'COMMITTEE', href: '/organising-committee' },
   { label: 'MAGAZINE', href: '/magazine'},
@@ -23,6 +23,19 @@ export default function Navbar() {
   const polyClass = "[clip-path:polygon(8%_0,100%_0,100%_65%,92%_100%,0_100%,0_35%)]";
   const [isVisible, setIsVisible] = useState(true);
 
+  const handleNavLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('/#')) {
+      const targetId = href.substring(2);
+      if (pathname === '/') {
+        e.preventDefault();
+        const element = document.getElementById(targetId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+  };
+
   useEffect(() => {
     let lastScrollY = window.scrollY;
     let ticking = false;
@@ -33,6 +46,11 @@ export default function Navbar() {
           const currentScrollY = Math.max(0, window.scrollY);
           
           setScrolled(currentScrollY > 20);
+
+          // Clear URL hash when the user scrolls
+          if (window.location.hash) {
+            window.history.replaceState(null, '', window.location.pathname + window.location.search);
+          }
 
           if (currentScrollY <= 60) {
             setIsVisible(true);
@@ -100,6 +118,7 @@ export default function Navbar() {
                 <Link
                   key={link.label}
                   href={link.href}
+                  onClick={(e) => handleNavLinkClick(e, link.href)}
                   className={`
                     relative px-7 py-2.5 text-[10px] font-bold tracking-[0.2em] transition-all duration-300
                     ${ttLakes.className} ${polyClass}
@@ -169,7 +188,10 @@ export default function Navbar() {
             <Link 
               key={link.label} 
               href={link.href} 
-              onClick={() => setMobileOpen(false)}
+              onClick={(e) => {
+                setMobileOpen(false);
+                handleNavLinkClick(e, link.href);
+              }}
               className="group text-right"
             >
               <span className="block text-[10px] text-[#7B61FF] font-mono tracking-widest opacity-50">SECTION_0{i+1}</span>

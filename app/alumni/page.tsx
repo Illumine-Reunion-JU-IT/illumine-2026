@@ -48,7 +48,7 @@ function maskPhone(phone: string) {
 
 export default async function AlumniPage() {
   const session = await getServerSession(authOptions);
-  const isVerified = !!session?.user;
+  const isVerified = !!session?.user && (session.user as any).role !== 'external';
 
   return (
     <main className="relative min-h-screen bg-[#070707] text-[#d9fff6] pt-28 pb-20 overflow-hidden font-tt-lakes">

@@ -61,7 +61,7 @@ const Footer = () => {
           
           <ul className="flex flex-col space-y-2 text-sm text-[#CCCCCC]">
             <li><Link href="/" className="hover:text-[#7B61FF] transition-colors duration-300 flex items-center gap-2"><span className="text-[#555555]">[ ]</span> Home</Link></li>
-            <li><Link href="/about" className="hover:text-[#7B61FF] transition-colors duration-300 flex items-center gap-2"><span className="text-[#555555]">[ ]</span> About</Link></li>
+            <li><Link href="/#about-department" className="hover:text-[#7B61FF] transition-colors duration-300 flex items-center gap-2"><span className="text-[#555555]">[ ]</span> About</Link></li>
             <li><Link href="/events" className="hover:text-[#7B61FF] transition-colors duration-300 flex items-center gap-2"><span className="text-[#555555]">[ ]</span> Events</Link></li>
             <li><Link href="/organising-committee" className="hover:text-[#7B61FF] transition-colors duration-300 flex items-center gap-2"><span className="text-[#555555]">[ ]</span> Committee</Link></li>
             <li><Link href="/alumni" className="hover:text-[#7B61FF] transition-colors duration-300 flex items-center gap-2"><span className="text-[#555555]">[ ]</span> Alumni</Link></li>

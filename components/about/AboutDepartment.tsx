@@ -26,7 +26,7 @@ const Cross = ({
 
 export default function AboutDepartment() {
   return (
-    <div className="relative w-full min-h-screen bg-[#070707] overflow-hidden flex flex-col items-center justify-center font-tt-lakes text-white py-20">
+    <div id="about-department" className="relative w-full min-h-screen bg-[#070707] overflow-hidden flex flex-col items-center justify-center font-tt-lakes text-white py-20">
 
       {/* subtle noise */}
       <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"

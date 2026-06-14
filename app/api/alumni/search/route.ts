@@ -25,7 +25,7 @@ export async function GET(request: Request) {
     }
 
     const session = await getServerSession(authOptions);
-    const isVerified = !!session?.user;
+    const isVerified = !!session?.user && (session.user as any).role !== 'external';
 
     const { data, error } = await supabaseAdmin
       .from('users')

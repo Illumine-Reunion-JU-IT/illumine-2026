@@ -25,7 +25,7 @@ export async function GET(request: Request) {
     }
 
     const session = await getServerSession(authOptions);
-    const isVerified = !!session?.user;
+    const isVerified = !!session?.user && (session.user as any).role !== 'external';
 
     // Handle standardizing DB formats (e.g., 'IT 16' could be 'IT 2016' in the database)
     const yearMatch = batch.match(/\d+/);
