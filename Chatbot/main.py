@@ -1,247 +1,116 @@
-from pathlib import Path
-from typing import Annotated, TypedDict
+"""Interactive CLI for the OKF reunion chatbot.
 
-import frontmatter
+    python main.py                 # chat
+    python main.py --ask "..."     # one-shot
+    python main.py --check         # verify environment, then exit
 
-from langchain_ollama import ChatOllama
-from langchain_core.messages import (
-    BaseMessage,
-    HumanMessage,
-    SystemMessage,
-)
-from langchain_core.tools import tool
+Programmatic use:
 
-from langgraph.graph import StateGraph, START, END
-from langgraph.graph.message import add_messages
-from langgraph.prebuilt import ToolNode
-from langgraph.checkpoint.memory import InMemorySaver
-
-
-# ============================================================
-# LLM
-# ============================================================
-
-llm = ChatOllama(
-    model="qwen3:1.7b",
-    temperature=0.2,
-)
-
-
-# ============================================================
-# System Prompt
-# ============================================================
-
-SYSTEM_PROMPT = """
-You are Illumine's AI assistant.
-
-You have access to the retrieve_okf tool, which searches the official
-Illumine knowledge base.
-
-The knowledge base contains information about:
-
-- Illumine
-- OKF
-- Jadavpur University (JU)
-- Information Technology Department
-- Faculty members and professors
-- Academic information
-- Events
-- Documentation
-- Features
-
-Rules:
-
-1. If the user's question is related to any of the above topics,
-   ALWAYS use retrieve_okf before answering.
-
-2. Never answer these questions from your own knowledge.
-
-3. Base your answer ONLY on the retrieved documentation.
-
-4. If the tool returns "No relevant document found.",
-   politely tell the user that the requested information
-   is unavailable in the knowledge base.
-
-5. For unrelated questions, answer normally using your
-   general knowledge.
+    from okf import OKFEngine
+    engine = OKFEngine()
+    print(engine.ask("How do I register?").text)
 """
 
+from __future__ import annotations
 
-# ============================================================
-# Knowledge Loader
-# ============================================================
+import argparse
+import sys
 
-def load_okf() -> list[dict]:
-    """
-    Loads all markdown documents inside the knowledge folder.
-    """
-
-    docs = []
-
-    for file in Path("knowledge").rglob("*.md"):
-        post = frontmatter.load(file)
-
-        docs.append(
-            {
-                "title": post.metadata.get("title", ""),
-                "aliases": post.metadata.get("aliases", []),
-                "tags": post.metadata.get("tags", []),
-                "path": str(file),
-            }
-        )
-
-    return docs
+from okf import OKFEngine, OllamaUnavailable
+from okf.client import OllamaClient
 
 
-# ============================================================
-# Retrieval Tool
-# ============================================================
+def _preflight(client: OllamaClient, need_embeddings: bool) -> None:
+    """Fail loudly and early with an actionable message, not a stack trace."""
+    client.ensure_model(client.chat_model)
+    if need_embeddings:
+        try:
+            client.ensure_model(client.embed_model)
+        except OllamaUnavailable as exc:
+            print(f"warning: {exc}", file=sys.stderr)
+            print(
+                "         Continuing with keyword-only retrieval.\n",
+                file=sys.stderr,
+            )
 
-DOCS = load_okf()
 
-@tool
-def retrieve_okf(query: str) -> str:
-    """
-    Search the Illumine knowledge base and return the
-    contents of the most relevant document.
-    """
+def _print_sources(answer) -> None:
+    if answer.sources:
+        print(f"\n  \033[2msources: {', '.join(answer.sources)}\033[0m")
 
-    docs = DOCS
 
-    retrieval_prompt = f"""
-You are a document retrieval assistant.
+def main() -> int:
+    parser = argparse.ArgumentParser(description="OKF — JU IT reunion chatbot")
+    parser.add_argument("--ask", metavar="QUESTION", help="ask one question and exit")
+    parser.add_argument("--model", help="override the chat model")
+    parser.add_argument("--check", action="store_true", help="run preflight and exit")
+    parser.add_argument(
+        "--no-stream", action="store_true", help="wait for the full answer"
+    )
+    args = parser.parse_args()
 
-Available documents:
+    from okf import config
 
-{docs}
+    client = OllamaClient(chat_model=args.model)
 
-User Query:
-{query}
+    try:
+        _preflight(client, need_embeddings=config.USE_EMBEDDINGS)
+        engine = OKFEngine(client=client)
+    except OllamaUnavailable as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    except (FileNotFoundError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
 
-Instructions:
-
-- Return ONLY one document title.
-- Return exactly one title from the list.
-- Do not explain anything.
-- If nothing matches, return NONE.
-"""
-
-    response = llm.invoke(retrieval_prompt)
-
-    title = (
-        response.content
-        .strip()
-        .strip('"')
-        .strip("'")
+    info = engine.describe()
+    print(
+        f"\033[1mOKF\033[0m — {info['chat_model']} · {info['retrieval_mode']} · "
+        f"{info['documents']} docs / {info['chunks']} chunks"
     )
 
-    if title.upper() == "NONE":
-        return "No relevant document found."
+    if args.check:
+        print("preflight ok")
+        return 0
 
-    for doc in docs:
-        if doc["title"].lower() == title.lower():
-            post = frontmatter.load(doc["path"])
-            return post.content
+    if args.ask:
+        answer = engine.ask(args.ask)
+        print(f"\n{answer.text}")
+        _print_sources(answer)
+        return 0
 
-    return "No relevant document found."
+    print("Ask about the reunion. Ctrl-C or 'exit' to quit.\n")
 
+    while True:
+        try:
+            query = input("\033[1m>\033[0m ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            return 0
 
-# ============================================================
-# Graph State
-# ============================================================
+        if not query:
+            continue
+        if query.lower() in {"exit", "quit", ":q"}:
+            return 0
+        if query.lower() in {"reset", "clear"}:
+            engine.reset()
+            print("  (history cleared)\n")
+            continue
 
-class ChatState(TypedDict):
-    messages: Annotated[list[BaseMessage], add_messages]
-
-
-# ============================================================
-# Bind Tools
-# ============================================================
-
-llm_with_tools = llm.bind_tools([retrieve_okf])
-
-# ============================================================
-# Chat Node
-# ============================================================
-
-def chat_node(state: ChatState):
-    messages = [
-        SystemMessage(content=SYSTEM_PROMPT),
-        *state["messages"],
-    ]
-
-    response = llm_with_tools.invoke(messages)
-
-    return {"messages": [response]}
-
-
-# ============================================================
-# Tool Node
-# ============================================================
-
-tool_node = ToolNode([retrieve_okf])
+        try:
+            if args.no_stream:
+                answer = engine.ask(query)
+                print(f"\n{answer.text}")
+                _print_sources(answer)
+            else:
+                print()
+                for token in engine.stream(query):
+                    print(token, end="", flush=True)
+                print()
+        except OllamaUnavailable as exc:
+            print(f"error: {exc}", file=sys.stderr)
+        print()
 
 
-# ============================================================
-# Routing Logic
-# ============================================================
-
-def tool_condition(state: ChatState):
-    last_message = state["messages"][-1]
-
-    if getattr(last_message, "tool_calls", None):
-        return "tool_node"
-
-    return "end"
-
-
-# ============================================================
-# Build Graph
-# ============================================================
-
-graph = StateGraph(ChatState)
-
-graph.add_node("chat_node", chat_node)
-graph.add_node("tool_node", tool_node)
-
-graph.add_edge(START, "chat_node")
-
-graph.add_conditional_edges(
-    "chat_node",
-    tool_condition,
-    {
-        "tool_node": "tool_node",
-        "end": END,
-    },
-)
-
-graph.add_edge("tool_node", "chat_node")
-
-
-# ============================================================
-# Compile Graph
-# ============================================================
-
-memory = InMemorySaver()
-
-chatbot = graph.compile(
-    checkpointer=memory
-)
-
-#Chat function to interact with the chatbot
-
-def chat(query: str, thread_id: str = "default") -> str:
-    result = chatbot.invoke(
-        {
-            "messages": [
-                HumanMessage(content=query)
-            ]
-        },
-        config={
-            "configurable": {
-                "thread_id": thread_id
-            }
-        }
-    )
-
-    return result["messages"][-1].content
+if __name__ == "__main__":
+    raise SystemExit(main())

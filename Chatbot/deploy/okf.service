@@ -1,0 +1,45 @@
+[Unit]
+Description=OKF — JU IT Reunion Chatbot API
+# Ollama must be up first: the engine embeds the whole corpus at startup and
+# would fail its preflight against a daemon that is not listening yet.
+After=network-online.target ollama.service
+Wants=network-online.target
+Requires=ollama.service
+
+[Service]
+Type=exec
+User=okf
+Group=okf
+WorkingDirectory=/opt/illumine/Chatbot
+
+Environment="OKF_NUM_THREAD=2"
+Environment="OKF_KEEP_ALIVE=30m"
+# Set this to the real site origin before going public.
+Environment="OKF_CORS_ORIGINS=https://illumine-ju-it.in"
+
+# One worker on purpose. Conversation history lives in process memory, so a
+# second worker would answer follow-ups against a different history depending
+# on which one got the request. Two vCPU has no spare capacity for a second
+# worker anyway — Ollama is the bottleneck, not the web layer.
+ExecStart=/opt/illumine/Chatbot/.venv/bin/uvicorn server:app \
+    --host 127.0.0.1 \
+    --port 8000 \
+    --workers 1 \
+    --timeout-keep-alive 75
+
+Restart=on-failure
+RestartSec=5
+
+# Startup embeds the corpus, which on 2 vCPU is slow enough to trip a shorter
+# timeout.
+TimeoutStartSec=300
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+# The embedding cache is the only thing written at runtime.
+ReadWritePaths=/opt/illumine/Chatbot/.cache
+
+[Install]
+WantedBy=multi-user.target

@@ -1,18 +1,21 @@
-langgraph>=0.6.0
-langchain>=0.3.0
-langchain-core>=0.3.0
-langchain-community>=0.3.0
-langchain-ollama>=0.3.0
+# OKF chatbot — runtime dependencies.
+#
+# Deliberately minimal. Retrieval is pure Python (see okf/retrieval.py) and all
+# inference goes through the Ollama daemon, so there is no torch, no numpy and
+# no sentence-transformers here. Everything below is pure Python or ships
+# universal wheels, which keeps `pip install` identical on ARM and x86 Ubuntu
+# and avoids multi-GB downloads on a 2 vCPU / 8 GB VM.
+#
+# NOTE: langchain/langgraph were dropped. They existed to orchestrate an
+# LLM-driven retrieval tool call; retrieval is now deterministic code, leaving
+# the graph with a single node to run. Removing them cuts ~40 transitive
+# packages and a noticeable chunk of import time on 2 vCPU.
 
 ollama>=0.6.0
-
-python-dotenv>=1.1.0
 python-frontmatter>=1.1.0
 PyYAML>=6.0
 
 fastapi>=0.116.0
 uvicorn>=0.35.0
-
 pydantic>=2.11.0
-
-Markdown>=3.8
+python-dotenv>=1.1.0

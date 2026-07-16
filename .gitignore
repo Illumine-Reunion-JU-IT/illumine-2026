@@ -165,3 +165,9 @@ Icon
 *.xls
 *.csv
 
+
+# Python / OKF chatbot
+.venv/
+venv/
+__pycache__/
+*.py[cod]
