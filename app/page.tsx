@@ -4,8 +4,6 @@ import AboutDepartment from "@/components/about/AboutDepartment";
 import GoodwillMessage from "./sections/GoodwillMessage";
 import Footer from "./sections/Footer";
 import EventSection from "./sections/EventSection";
-import AboutJubilee from "@/components/about/AboutJubilee";
-import AboutLegacy from "@/components/about/AboutLegacy";
 
 /**
  * MODULE: Home Route (/)
@@ -16,10 +14,8 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       <Hero />
-      <AboutDepartment />
       <AboutIllumine />
-      <AboutJubilee />
-      <AboutLegacy></AboutLegacy>
+      <AboutDepartment />
       <GoodwillMessage />
       {/* <EventSection /> */}
       <Footer />

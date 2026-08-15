@@ -12,9 +12,6 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    "*.js",
-    "supabase/**",
-    "backend_by_trisanjit/**",
   ]),
 ]);
 
