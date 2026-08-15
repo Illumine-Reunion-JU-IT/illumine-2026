@@ -27,12 +27,57 @@ export async function GET(request: Request) {
     const session = await getServerSession(authOptions);
     const isVerified = !!session?.user;
 
-    const { data, error } = await supabaseAdmin
+    const trimmedQuery = query.trim();
+    let textQuery = trimmedQuery;
+    let batchYear: string | null = null;
+
+    // Matches e.g. "it 28", "it-28", "it28", "it 2028", "2028", or just "28", "04", "it04"
+    const batchRegex = /(?:^|\s)(?:it\s*[-_]?\s*)?(\d{2,4})(?:\s|$)/i;
+    const match = textQuery.match(batchRegex);
+
+    if (match) {
+      const fullMatch = match[0];
+      const numStr = match[1];
+      
+      if (numStr.length === 2 || numStr.length === 4) {
+        let year = numStr;
+        if (year.length === 4) {
+          year = year.substring(2); // Normalize 4-digit to 2-digit (e.g. 2028 -> 28)
+        }
+        batchYear = year;
+        // Remove the matched batch keyword from the text query
+        textQuery = textQuery.replace(fullMatch, ' ').replace(/\s+/g, ' ').trim();
+      }
+    }
+
+    let queryBuilder = supabaseAdmin
       .from('users')
       .select('id, name, batch, department, company, email, phone, linkedin')
-      .eq('role', 'internal')
-      .or(`name.ilike.%${query}%,company.ilike.%${query}%,designation.ilike.%${query}%`)
-      .limit(100);
+      .eq('role', 'internal');
+
+    if (batchYear) {
+      const batchOrs = [
+        `batch.ilike.IT ${batchYear}`,
+        `batch.ilike.IT 20${batchYear}`,
+        `batch.eq.${batchYear}`,
+        `batch.eq.20${batchYear}`
+      ].join(',');
+
+      if (textQuery) {
+        // Both batch and name search: query by both (logical AND)
+        queryBuilder = queryBuilder
+          .or(`name.ilike.%${textQuery}%,company.ilike.%${textQuery}%`)
+          .or(batchOrs);
+      } else {
+        // Batch year search only
+        queryBuilder = queryBuilder.or(batchOrs);
+      }
+    } else {
+      // Normal search without batch year
+      queryBuilder = queryBuilder.or(`name.ilike.%${textQuery}%,company.ilike.%${textQuery}%`);
+    }
+
+    const { data, error } = await queryBuilder.limit(100);
 
     if (error) {
       console.error('Error searching alumni:', error);
