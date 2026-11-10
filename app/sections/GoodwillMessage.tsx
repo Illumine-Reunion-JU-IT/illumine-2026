@@ -8,9 +8,10 @@ import DecryptedText from "@/components/ui/DecryptedText";
 import styles from "./GoodwillMessage.module.css";
 
 /**
- * Configurable duration for each professor's message cycle (range 30-40s).
+ * Configurable duration for each professor's message cycle.
+ * Set to ~14s for brisk reading flow and optimal video capture.
  */
-export const GOODWILL_DURATION_SECONDS = 32;
+export const GOODWILL_DURATION_SECONDS = 14;
 
 const GLITCH_DURATION = 400; // ms for .systemUpdate transition
 const RING_RADIUS = 54;
@@ -21,16 +22,13 @@ const MOBILE_RING_CIRCUMFERENCE = 289.03;
 
 /**
  * Calculates display duration for a given professor.
- * Supports per-professor override via `durationSeconds`, or auto-calculates
- * based on message word count (clamped strictly between 30 and 40 seconds).
+ * Set to ~14s for smooth dynamic auto-scroll pacing.
  */
 function getProfessorDuration(prof: ProfessorData): number {
   if (typeof prof.durationSeconds === "number") {
-    return Math.max(30, Math.min(40, prof.durationSeconds));
+    return Math.max(10, Math.min(25, prof.durationSeconds));
   }
-  const wordCount = prof.message.trim().split(/\s+/).length;
-  const dynamicSeconds = Math.round(30 + ((wordCount - 150) / 200) * 10);
-  return Math.max(30, Math.min(40, dynamicSeconds || GOODWILL_DURATION_SECONDS));
+  return GOODWILL_DURATION_SECONDS;
 }
 
 const GoodwillMessage: React.FC = () => {
@@ -41,6 +39,7 @@ const GoodwillMessage: React.FC = () => {
   // References for direct 60fps SVG stroke and scroll manipulation
   const ringRef = useRef<SVGCircleElement | null>(null);
   const mobileRingRef = useRef<SVGCircleElement | null>(null);
+  const rotatingBarRef = useRef<SVGGElement | null>(null);
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
 
   const activeIndexRef = useRef(0);
@@ -48,6 +47,8 @@ const GoodwillMessage: React.FC = () => {
   const durationRef = useRef(getProfessorDuration(professors[0]) * 1000);
   const isTransitioningRef = useRef(false);
   const isTabHiddenRef = useRef(false);
+  const isUserScrollingRef = useRef(false);
+  const userScrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastTimeRef = useRef<number | null>(null);
   const rafIdRef = useRef<number | null>(null);
 
@@ -59,6 +60,9 @@ const GoodwillMessage: React.FC = () => {
     }
     if (mobileRingRef.current) {
       mobileRingRef.current.setAttribute("stroke-dashoffset", String(MOBILE_RING_CIRCUMFERENCE));
+    }
+    if (rotatingBarRef.current) {
+      rotatingBarRef.current.setAttribute("transform", "rotate(0 75.67 85.75)");
     }
     if (messageContainerRef.current) {
       messageContainerRef.current.scrollTop = 0;
@@ -97,7 +101,49 @@ const GoodwillMessage: React.FC = () => {
     advanceTo(idx);
   };
 
-  // Continuous high-performance animation loop driving countdown ring and scroll synchronization
+  // Allows user manual scrolling (wheel, trackpad, drag) while keeping loader ring in sync
+  const handleContainerScroll = () => {
+    if (isTransitioningRef.current) return;
+
+    isUserScrollingRef.current = true;
+    if (userScrollTimeoutRef.current) {
+      clearTimeout(userScrollTimeoutRef.current);
+    }
+
+    if (messageContainerRef.current) {
+      const el = messageContainerRef.current;
+      const maxScroll = el.scrollHeight - el.clientHeight;
+      if (maxScroll > 0) {
+        const ratio = Math.max(0, Math.min(1, el.scrollTop / maxScroll));
+        elapsedRef.current = ratio * durationRef.current;
+
+        // Synchronize circular loader ring
+        if (ringRef.current) {
+          const offset = RING_CIRCUMFERENCE * (1 - ratio);
+          ringRef.current.setAttribute("stroke-dashoffset", offset.toFixed(2));
+        }
+        if (mobileRingRef.current) {
+          const mobileOffset = MOBILE_RING_CIRCUMFERENCE * (1 - ratio);
+          mobileRingRef.current.setAttribute("stroke-dashoffset", mobileOffset.toFixed(2));
+        }
+
+        // Synchronize rotating bar on the circle
+        if (rotatingBarRef.current) {
+          const deg = ratio * 360;
+          rotatingBarRef.current.setAttribute("transform", `rotate(${deg.toFixed(1)} 75.67 85.75)`);
+          rotatingBarRef.current.style.transform = `rotate(${deg.toFixed(1)}deg)`;
+        }
+      }
+    }
+
+    // Resume smooth auto-scrolling 1.5s after user finishes scrolling
+    userScrollTimeoutRef.current = setTimeout(() => {
+      isUserScrollingRef.current = false;
+      lastTimeRef.current = performance.now();
+    }, 1500);
+  };
+
+  // Continuous high-performance animation loop driving countdown ring, rotating bar, and scroll synchronization
   useEffect(() => {
     activeIndexRef.current = activeIndex;
     durationRef.current = getProfessorDuration(professors[activeIndex]) * 1000;
@@ -110,7 +156,9 @@ const GoodwillMessage: React.FC = () => {
       lastTimeRef.current = now;
 
       if (!isTransitioningRef.current && !isTabHiddenRef.current) {
-        elapsedRef.current += delta;
+        if (!isUserScrollingRef.current) {
+          elapsedRef.current += delta;
+        }
         const totalDuration = durationRef.current;
         const progress = Math.min(1, Math.max(0, elapsedRef.current / totalDuration));
 
@@ -125,8 +173,15 @@ const GoodwillMessage: React.FC = () => {
           mobileRingRef.current.setAttribute("stroke-dashoffset", mobileOffset.toFixed(2));
         }
 
-        // 2. Automatically scroll message down in direct sync with the progress bar
-        if (messageContainerRef.current) {
+        // 2. Rotate the bar on the circle as scrolling progresses
+        if (rotatingBarRef.current) {
+          const deg = progress * 360;
+          rotatingBarRef.current.setAttribute("transform", `rotate(${deg.toFixed(1)} 75.67 85.75)`);
+          rotatingBarRef.current.style.transform = `rotate(${deg.toFixed(1)}deg)`;
+        }
+
+        // 3. Automatically scroll message down in direct sync with the progress bar
+        if (messageContainerRef.current && !isUserScrollingRef.current) {
           const el = messageContainerRef.current;
           const maxScroll = el.scrollHeight - el.clientHeight;
           if (maxScroll > 0) {
@@ -135,7 +190,7 @@ const GoodwillMessage: React.FC = () => {
           }
         }
 
-        // 3. When the loader circle bar completes, automatically advance to next circle/professor
+        // 4. When the loader circle bar completes, automatically advance to next circle/professor
         if (elapsedRef.current >= totalDuration) {
           elapsedRef.current = 0;
           if (professors.length > 1) {
@@ -165,6 +220,9 @@ const GoodwillMessage: React.FC = () => {
       if (rafIdRef.current) {
         cancelAnimationFrame(rafIdRef.current);
       }
+      if (userScrollTimeoutRef.current) {
+        clearTimeout(userScrollTimeoutRef.current);
+      }
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [activeIndex, advanceTo]);
@@ -173,7 +231,6 @@ const GoodwillMessage: React.FC = () => {
     <section
       id="goodwill-message"
       className={`${styles.section} ${glitching ? styles.systemUpdate : ""}`}
-      suppressHydrationWarning
     >
       {/* Screen reader live region announcing active professor */}
       <div className={styles.srOnly} aria-live="polite" aria-atomic="true">
@@ -278,7 +335,6 @@ const GoodwillMessage: React.FC = () => {
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className={styles.activeRingSvg}
-              suppressHydrationWarning
             >
               {/* Slow clockwise ambient background ring */}
               <circle
@@ -354,7 +410,7 @@ const GoodwillMessage: React.FC = () => {
                 }}
               />
 
-              {/* Deterministic tick marks around loader circle — uses pure SVG rotation transforms (zero float precision discrepancies) */}
+              {/* Deterministic tick marks around loader circle using SVG rotation transforms */}
               {Array.from({ length: 24 }).map((_, i) => (
                 <line
                   key={i}
@@ -376,10 +432,20 @@ const GoodwillMessage: React.FC = () => {
                   fillOpacity="0.15"
                 />
               </g>
-              <path
-                d="M126.993 17.0494C112.682 6.34534 94.92 0 75.6748 0V6.40416C93.4824 6.40416 109.924 12.2725 123.164 22.1793L126.993 17.0494Z"
-                fill="white"
-              />
+              {/* Dynamic rotating arc bar that orbits the circle in sync with scrolling */}
+              <g
+                ref={rotatingBarRef}
+                className={styles.rotatingArcBar}
+                transform="rotate(0 75.67 85.75)"
+              >
+                <path
+                  d="M126.993 17.0494C112.682 6.34534 94.92 0 75.6748 0V6.40416C93.4824 6.40416 109.924 12.2725 123.164 22.1793L126.993 17.0494Z"
+                  fill="white"
+                  style={{
+                    filter: "drop-shadow(0 0 6px rgba(255,255,255,0.9)) drop-shadow(0 0 12px rgba(190,243,223,0.95))",
+                  }}
+                />
+              </g>
               <g opacity="0.8">
                 <path
                   d="M75.6413 161.392C33.9291 161.392 0 127.456 0 85.7506C0 72.8508 3.30657 60.1144 9.55391 48.9201L11.2661 49.8742C5.17562 60.7809 1.96046 73.1841 1.96046 85.7506C1.96046 126.378 35.0139 159.431 75.6413 159.431C116.269 159.431 149.322 126.378 149.322 85.7506C149.322 72.8312 145.93 60.1209 139.513 48.9985L141.212 48.0183C147.799 59.4413 151.283 72.4914 151.283 85.7506C151.283 127.456 117.347 161.392 75.6413 161.392Z"
@@ -657,9 +723,16 @@ const GoodwillMessage: React.FC = () => {
           </div>
         </div>
 
-        {/* Message content — smooth continuous synchronized auto-scroll */}
+        {/* Message content — smooth continuous synchronized auto-scroll + interactive manual scroll */}
         <div
           ref={messageContainerRef}
+          onScroll={handleContainerScroll}
+          onWheel={() => {
+            isUserScrollingRef.current = true;
+          }}
+          onTouchMove={() => {
+            isUserScrollingRef.current = true;
+          }}
           className={`${styles.messageContent} ${revealing ? styles.messageRevealing : ""}`}
         >
           {activeProfessor.message.split("\n").map((paragraph, i) => (

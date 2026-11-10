@@ -178,6 +178,13 @@
 @keyframes rotateCW  { to { transform: rotate(360deg);  } }
 @keyframes rotateCCW { to { transform: rotate(-360deg); } }
 
+/* ── Rotating arc bar that orbits the circle ── */
+.rotatingArcBar {
+  transform-box: view-box;
+  transform-origin: 75.67px 85.75px;
+  will-change: transform;
+}
+
 /* ── Static Progress arc ── */
 .progressRing {
   filter: drop-shadow(0 0 3px rgba(190,243,223,0.6));
@@ -557,12 +564,7 @@
   pointer-events: none;
   transform: scaleY(-1);
 }
-.decorGraphicSvg {
-  width: 108px;
-  height: 115px;
-  transform-origin: 50.36px 57.01px;
-  animation: rotateCW 24s linear infinite;
-}
+.decorGraphicSvg { width: 108px; height: 115px; }
 
 /* ============================================================
    RESPONSIVE
