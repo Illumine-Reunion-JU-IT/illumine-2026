@@ -8,16 +8,19 @@ import ComingSoon from '@/components/ui/ComingSoon';
 export const metadata: Metadata = {
   title: 'Magazine Archives | Illumine 2026',
   description: 'Browse and download technical newsletters, reunion magazines, and editorial issues published by the JU IT Department.',
+  alternates: {
+    canonical: '/magazine',
+  },
   openGraph: {
     title: 'Magazine Archives | Illumine 2026',
     description: 'Browse and download technical newsletters, reunion magazines, and editorial issues published by the JU IT Department.',
-    url: 'https://illumine-reunion-ju-it.vercel.app/magazine',
+    url: '/magazine',
     type: 'website',
     images: [
       {
-        url: '/photos/Hero/logo.jpeg',
-        width: 800,
-        height: 800,
+        url: '/photos/Hero/hero.png',
+        width: 1440,
+        height: 714,
         alt: 'ILLUMINE 2026 Magazine Collection',
       },
     ],
@@ -26,6 +29,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Magazine Archives | Illumine 2026',
     description: 'Browse and download technical newsletters, reunion magazines, and editorial issues published by the JU IT Department.',
+    images: ['/photos/Hero/hero.png'],
   },
 };
 

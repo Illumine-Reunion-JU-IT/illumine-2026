@@ -12,16 +12,19 @@ import ComingSoon from '@/components/ui/ComingSoon';
 export const metadata: Metadata = {
   title: 'Organising Committee | Illumine 2026',
   description: 'Meet the visionaries, coordinators, and leaders behind ILLUMINE 2026—the Silver Jubilee Reunion of Jadavpur University Information Technology Department.',
+  alternates: {
+    canonical: '/organising-committee',
+  },
   openGraph: {
     title: 'Organising Committee | Illumine 2026',
     description: 'Meet the visionaries, coordinators, and leaders behind ILLUMINE 2026—the Silver Jubilee Reunion of Jadavpur University Information Technology Department.',
-    url: 'https://illumine-reunion-ju-it.vercel.app/organising-committee',
+    url: '/organising-committee',
     type: 'website',
     images: [
       {
-        url: '/photos/Hero/logo.jpeg',
-        width: 800,
-        height: 800,
+        url: '/photos/Hero/hero.png',
+        width: 1440,
+        height: 714,
         alt: 'ILLUMINE 2026 Organising Committee',
       },
     ],
@@ -30,6 +33,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Organising Committee | Illumine 2026',
     description: 'Meet the visionaries, coordinators, and leaders behind ILLUMINE 2026.',
+    images: ['/photos/Hero/hero.png'],
   },
 };
 
