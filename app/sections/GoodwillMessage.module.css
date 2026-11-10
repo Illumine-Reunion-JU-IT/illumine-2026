@@ -178,9 +178,16 @@
 @keyframes rotateCW  { to { transform: rotate(360deg);  } }
 @keyframes rotateCCW { to { transform: rotate(-360deg); } }
 
-/* ── Static Progress arc ── */
+/* ── Animated Progress arc ── */
 .progressRing {
   filter: drop-shadow(0 0 3px rgba(190,243,223,0.6));
+  animation: progressSweep 4s linear infinite;
+}
+
+/* 339.292 = 2 * PI * 54 (the ring's circumference) */
+@keyframes progressSweep {
+  from { stroke-dashoffset: 339.292; }
+  to   { stroke-dashoffset: 0; }
 }
 
 /* ── Gallery track ── */

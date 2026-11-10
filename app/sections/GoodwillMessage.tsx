@@ -183,7 +183,7 @@ const GoodwillMessage: React.FC = () => {
                 />
               </g>
 
-              {/* STATIC PROGRESS ARC */}
+              {/* PROGRESS ARC */}
               <circle
                 cx="75.67"
                 cy="85.75"
@@ -193,7 +193,6 @@ const GoodwillMessage: React.FC = () => {
                 fill="none"
                 strokeLinecap="round"
                 strokeDasharray={RING_CIRCUMFERENCE}
-                strokeDashoffset={0}
                 transform="rotate(-90 75.67 85.75)"
                 className={styles.progressRing}
                 style={{
