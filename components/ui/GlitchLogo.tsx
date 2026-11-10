@@ -73,12 +73,56 @@ const GlitchLogo: React.FC<{ className?: string }> = ({ className = "" }) => {
             { threshold: 0.3 }
         )
         if (containerRef.current) observer.observe(containerRef.current)
-        return () => observer.disconnect()
+
+        // Periodic cyber glitch flare every 6 seconds to keep the logo dynamic and alive
+        const glitchInterval = setInterval(() => {
+            if (!hasAnimated.current) return;
+            const randomIndices = [
+                Math.floor(Math.random() * paths.length),
+                Math.floor(Math.random() * paths.length)
+            ];
+            randomIndices.forEach(idx => {
+                setGlitching(prev => {
+                    const next = [...prev];
+                    next[idx] = true;
+                    return next;
+                });
+                setTimeout(() => {
+                    setGlitching(prev => {
+                        const next = [...prev];
+                        next[idx] = false;
+                        return next;
+                    });
+                }, 180);
+            });
+        }, 5500);
+
+        return () => {
+            observer.disconnect();
+            clearInterval(glitchInterval);
+        };
     }, [])
 
     return (
-        <div ref={containerRef} className={`relative z-10 text-[#B6BBFF] scale-75 sm:scale-100 lg:scale-150 ${className}`}>
+        <div 
+            ref={containerRef} 
+            className={`relative z-10 text-[#B6BBFF] scale-75 sm:scale-100 lg:scale-150 transition-transform duration-500 hover:scale-85 sm:hover:scale-105 lg:hover:scale-[1.58] ${className}`}
+            style={{
+                perspective: '1000px',
+                animation: 'logoLevitate 4.5s ease-in-out infinite',
+            }}
+        >
             <style>{`
+                @keyframes logoLevitate {
+                    0%, 100% {
+                        transform: translateY(0px) rotateX(0deg);
+                        filter: drop-shadow(0 0 14px rgba(182, 187, 255, 0.4)) drop-shadow(0 0 28px rgba(123, 97, 255, 0.25));
+                    }
+                    50% {
+                        transform: translateY(-8px) rotateX(2deg);
+                        filter: drop-shadow(0 0 22px rgba(182, 187, 255, 0.75)) drop-shadow(0 0 45px rgba(123, 97, 255, 0.5));
+                    }
+                }
                 @keyframes pathGlitch {
                     0%   { opacity: 1;   clip-path: inset(0 0 80% 0); }
                     20%  { opacity: 0.6; clip-path: inset(40% 0 20% 0); }
