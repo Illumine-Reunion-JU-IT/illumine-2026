@@ -35,9 +35,9 @@ const Footer = () => {
           {/* Illumine Logo + Text */}
           <div className="flex items-center gap-3">
             <img
-              src="/images/illumineLogo26.png"
+              src="/images/logos/light-icon.svg"
               alt="Illumine 2026"
-              className="h-12 w-12 object-contain"
+              className="h-10 w-auto object-contain"
             />
             <h2 className={`text-3xl sm:text-2xl tracking-wider text-[#FFFFFF] ${mechsuit.className}`}>
               ILLUMINE
