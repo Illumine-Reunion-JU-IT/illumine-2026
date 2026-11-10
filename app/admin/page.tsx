@@ -146,9 +146,9 @@ export default function AdminDashboard() {
             </p>
             <ul className="list-disc list-inside text-gray-400 space-y-1 ml-2">
               <li>Use the search bar to find students by name, email, or company.</li>
-              <li>Click the pencil icon to edit any student's phone number, email, company, or LinkedIn.</li>
+              <li>Click the pencil icon to edit any student&apos;s phone number, email, company, or LinkedIn.</li>
               <li>Click the trash icon to remove a record entirely.</li>
-              <li>Click "Add Record" to manually insert a new alumnus.</li>
+              <li>Click &quot;Add Record&quot; to manually insert a new alumnus.</li>
             </ul>
           </div>
 

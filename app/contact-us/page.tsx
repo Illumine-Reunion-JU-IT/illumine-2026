@@ -10,16 +10,19 @@ import DecryptedText from '@/components/ui/DecryptedText';
 export const metadata: Metadata = {
   title: 'Contact Us | Illumine 2026',
   description: 'Reach out to Jadavpur University IT Department for queries, coordination, or support regarding the ILLUMINE 2026 Silver Jubilee Reunion.',
+  alternates: {
+    canonical: '/contact-us',
+  },
   openGraph: {
     title: 'Contact Us | Illumine 2026',
     description: 'Reach out to Jadavpur University IT Department for queries, coordination, or support regarding the ILLUMINE 2026 Silver Jubilee Reunion.',
-    url: 'https://illumine-reunion-ju-it.vercel.app/contact-us',
+    url: '/contact-us',
     type: 'website',
     images: [
       {
-        url: '/photos/Hero/logo.jpeg',
-        width: 800,
-        height: 800,
+        url: '/photos/Hero/hero.png',
+        width: 1440,
+        height: 714,
         alt: 'ILLUMINE 2026 Contact Channels',
       },
     ],
@@ -28,6 +31,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Contact Us | Illumine 2026',
     description: 'Reach out to Jadavpur University IT Department for queries, coordination, or support regarding the ILLUMINE 2026 Silver Jubilee Reunion.',
+    images: ['/photos/Hero/hero.png'],
   },
 };
 

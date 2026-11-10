@@ -8,16 +8,19 @@ import ComingSoon from '@/components/ui/ComingSoon';
 export const metadata: Metadata = {
   title: 'Alumni Directory | Illumine 2026',
   description: 'Explore and reconnect with the distinguished graduates of Jadavpur University Department of Information Technology.',
+  alternates: {
+    canonical: '/alumni',
+  },
   openGraph: {
     title: 'Alumni Directory | Illumine 2026',
     description: 'Explore and reconnect with the distinguished graduates of Jadavpur University Department of Information Technology.',
-    url: 'https://illumine-reunion-ju-it.vercel.app/alumni',
+    url: '/alumni',
     type: 'website',
     images: [
       {
-        url: '/photos/Hero/logo.jpeg',
-        width: 800,
-        height: 800,
+        url: '/photos/Hero/hero.png',
+        width: 1440,
+        height: 714,
         alt: 'ILLUMINE 2026 Alumni Registry',
       },
     ],
@@ -26,6 +29,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Alumni Directory | Illumine 2026',
     description: 'Explore and reconnect with the distinguished graduates of Jadavpur University Department of Information Technology.',
+    images: ['/photos/Hero/hero.png'],
   },
 };
 
