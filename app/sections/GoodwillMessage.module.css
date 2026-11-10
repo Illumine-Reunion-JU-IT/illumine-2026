@@ -124,15 +124,21 @@
   transform-origin: left center;
 }
 
-/* Equalizer flicker animation */
-.equalizerBar {
-  animation: equalizerPulse calc(0.8s + (var(--bar-index) * 0.04s)) ease-in-out infinite alternate;
-}
-
-@keyframes equalizerPulse {
-  0%   { transform: scaleX(1);    opacity: 0.5; border-color: rgba(190,243,223,0.3); }
-  50%  { transform: scaleX(0.55); opacity: 0.2; border-color: rgba(255,255,255,0.3); }
-  100% { transform: scaleX(0.85); opacity: 0.4; border-color: rgba(190,243,223,0.5); }
+/* ============================================================
+   ACTIVE CIRCLE INDICATOR LINE (Only beside the active circle)
+   ============================================================ */
+.activeCircleIndicatorLine {
+  position: absolute;
+  left: -32px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 3px;
+  background: #FFFFFF;
+  box-shadow: 0 0 10px #FFFFFF, 0 0 20px rgba(255, 255, 255, 0.95), 0 0 30px #BEF3DF;
+  border-radius: 2px;
+  z-index: 10;
+  pointer-events: none;
 }
 
 /* ============================================================
@@ -565,6 +571,12 @@
   transform: scaleY(-1);
 }
 .decorGraphicSvg { width: 108px; height: 115px; }
+
+.bottomOuterBar {
+  transform-box: view-box;
+  transform-origin: 50.36px 57.01px;
+  will-change: transform;
+}
 
 /* ============================================================
    RESPONSIVE

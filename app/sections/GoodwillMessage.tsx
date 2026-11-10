@@ -20,6 +20,8 @@ const RING_CIRCUMFERENCE = 326.73;
 const MOBILE_RING_RADIUS = 46;
 const MOBILE_RING_CIRCUMFERENCE = 289.03;
 
+const BOTTOM_RING_CIRCUMFERENCE = 144.51;
+
 /**
  * Calculates display duration for a given professor.
  * Exactly 10s for complete auto-scroll cycle.
@@ -40,6 +42,8 @@ const GoodwillMessage: React.FC = () => {
   const ringRef = useRef<SVGCircleElement | null>(null);
   const mobileRingRef = useRef<SVGCircleElement | null>(null);
   const rotatingBarRef = useRef<SVGGElement | null>(null);
+  const bottomInnerRingRef = useRef<SVGCircleElement | null>(null);
+  const bottomOuterBarRef = useRef<SVGGElement | null>(null);
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
 
   const activeIndexRef = useRef(0);
@@ -66,6 +70,14 @@ const GoodwillMessage: React.FC = () => {
     if (rotatingBarRef.current) {
       rotatingBarRef.current.setAttribute("transform", "rotate(0 75.67 85.75)");
       rotatingBarRef.current.style.transform = "rotate(0deg)";
+    }
+    if (bottomInnerRingRef.current) {
+      bottomInnerRingRef.current.setAttribute("stroke-dashoffset", String(BOTTOM_RING_CIRCUMFERENCE));
+      bottomInnerRingRef.current.style.strokeDashoffset = `${BOTTOM_RING_CIRCUMFERENCE}px`;
+    }
+    if (bottomOuterBarRef.current) {
+      bottomOuterBarRef.current.setAttribute("transform", "rotate(0 50.36 57.01)");
+      bottomOuterBarRef.current.style.transform = "rotate(0deg)";
     }
     if (messageContainerRef.current) {
       messageContainerRef.current.scrollTop = 0;
@@ -138,6 +150,18 @@ const GoodwillMessage: React.FC = () => {
           rotatingBarRef.current.setAttribute("transform", `rotate(${deg.toFixed(1)} 75.67 85.75)`);
           rotatingBarRef.current.style.transform = `rotate(${deg.toFixed(1)}deg)`;
         }
+
+        // Synchronize below circle inner bar and outer bar
+        if (bottomInnerRingRef.current) {
+          const bOffset = BOTTOM_RING_CIRCUMFERENCE * (1 - ratio);
+          bottomInnerRingRef.current.setAttribute("stroke-dashoffset", bOffset.toFixed(2));
+          bottomInnerRingRef.current.style.strokeDashoffset = `${bOffset.toFixed(2)}px`;
+        }
+        if (bottomOuterBarRef.current) {
+          const bDeg = ratio * 360;
+          bottomOuterBarRef.current.setAttribute("transform", `rotate(${bDeg.toFixed(1)} 50.36 57.01)`);
+          bottomOuterBarRef.current.style.transform = `rotate(${bDeg.toFixed(1)}deg)`;
+        }
       }
     }
 
@@ -185,6 +209,18 @@ const GoodwillMessage: React.FC = () => {
           const deg = progress * 360;
           rotatingBarRef.current.setAttribute("transform", `rotate(${deg.toFixed(1)} 75.67 85.75)`);
           rotatingBarRef.current.style.transform = `rotate(${deg.toFixed(1)}deg)`;
+        }
+
+        // Synchronize below circle inner bar and outer bar
+        if (bottomInnerRingRef.current) {
+          const bOffset = BOTTOM_RING_CIRCUMFERENCE * (1 - progress);
+          bottomInnerRingRef.current.setAttribute("stroke-dashoffset", bOffset.toFixed(2));
+          bottomInnerRingRef.current.style.strokeDashoffset = `${bOffset.toFixed(2)}px`;
+        }
+        if (bottomOuterBarRef.current) {
+          const bDeg = progress * 360;
+          bottomOuterBarRef.current.setAttribute("transform", `rotate(${bDeg.toFixed(1)} 50.36 57.01)`);
+          bottomOuterBarRef.current.style.transform = `rotate(${bDeg.toFixed(1)}deg)`;
         }
 
         // 3. Automatically scroll message down in direct sync with the progress bar
@@ -317,22 +353,10 @@ const GoodwillMessage: React.FC = () => {
       </div>
 
       <div className={styles.contentWrapper}>
-        {/* Left ruler — animated equalizer bars */}
-        <div className={styles.rulerWrapper} aria-hidden="true">
-          {Array.from({ length: 52 }).map((_, i) => {
-            const isMajor = i % 5 === 0;
-            return (
-              <div
-                key={i}
-                className={`${isMajor ? styles.rulerTickMajor : styles.rulerTickMinor} ${styles.equalizerBar}`}
-                style={{ "--bar-index": i } as React.CSSProperties}
-              />
-            );
-          })}
-        </div>
-
         {/* Dynamic thumbnail column */}
         <div className={styles.thumbnailColumn}>
+          {/* Bright white line indicator beside the active circle currently being scrolled */}
+          <div className={styles.activeCircleIndicatorLine} aria-hidden="true" />
           {/* HUD ring overlay with dynamic animated loader circle bar */}
           <div className={styles.activeRingContainer} aria-hidden="true">
             <svg
@@ -784,10 +808,48 @@ const GoodwillMessage: React.FC = () => {
               fill="#BEF3DF"
             />
           </g>
-          <path
-            d="M84.5134 102.787C74.9892 109.911 63.1688 114.134 50.3611 114.134V109.872C62.212 109.872 73.154 105.966 81.965 99.3735L84.5134 102.787Z"
-            fill="#BEF3DF"
+          {/* Faint track for below circle inner bar */}
+          <circle
+            cx="50.36"
+            cy="57.01"
+            r="23"
+            stroke="rgba(190,243,223,0.18)"
+            strokeWidth="3.5"
+            fill="none"
           />
+
+          {/* DYNAMIC BELOW CIRCLE INNER BAR THAT FILLS AS SCROLLED */}
+          <circle
+            ref={bottomInnerRingRef}
+            cx="50.36"
+            cy="57.01"
+            r="23"
+            stroke="#BEF3DF"
+            strokeWidth="3.5"
+            fill="none"
+            strokeLinecap="round"
+            strokeDasharray={BOTTOM_RING_CIRCUMFERENCE}
+            strokeDashoffset={BOTTOM_RING_CIRCUMFERENCE}
+            transform="rotate(-90 50.36 57.01)"
+            style={{
+              filter: "drop-shadow(0 0 6px #BEF3DF)",
+            }}
+          />
+
+          {/* DYNAMIC BELOW CIRCLE OUTER BAR THAT MOVES/ROTATES AS SCROLLED */}
+          <g
+            ref={bottomOuterBarRef}
+            className={styles.bottomOuterBar}
+            transform="rotate(0 50.36 57.01)"
+          >
+            <path
+              d="M84.5134 102.787C74.9892 109.911 63.1688 114.134 50.3611 114.134V109.872C62.212 109.872 73.154 105.966 81.965 99.3735L84.5134 102.787Z"
+              fill="#BEF3DF"
+              style={{
+                filter: "drop-shadow(0 0 6px #BEF3DF)",
+              }}
+            />
+          </g>
           <path
             d="M50.3394 63.4902C46.7907 63.4902 43.916 60.6156 43.916 57.0668C43.916 53.5181 46.7907 50.6434 50.3394 50.6434C53.8882 50.6434 56.7627 53.5181 56.7627 57.0668C56.7627 60.6156 53.8882 63.4902 50.3394 63.4902ZM50.3394 53.0701C48.1345 53.0701 46.3427 54.8576 46.3427 57.0668C46.3427 59.2717 48.1302 61.0635 50.3394 61.0635C52.5444 61.0635 54.3361 59.2761 54.3361 57.0668C54.3317 54.8619 52.5444 53.0701 50.3394 53.0701Z"
             fill="white"
