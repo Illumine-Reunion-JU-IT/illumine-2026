@@ -51,6 +51,7 @@ const GoodwillMessage: React.FC = () => {
   const durationRef = useRef(getProfessorDuration(professors[0]) * 1000);
   const isTransitioningRef = useRef(false);
   const isTabHiddenRef = useRef(false);
+  const isAutoScrollingRef = useRef(false);
   const isUserScrollingRef = useRef(false);
   const userScrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastTimeRef = useRef<number | null>(null);
@@ -118,7 +119,8 @@ const GoodwillMessage: React.FC = () => {
 
   // Allows user manual scrolling (wheel, trackpad, drag) while keeping loader ring in sync
   const handleContainerScroll = () => {
-    if (isTransitioningRef.current) return;
+    // Ignore programmatic auto-scroll events so auto-scrolling is never stopped by itself
+    if (isAutoScrollingRef.current || isTransitioningRef.current) return;
 
     isUserScrollingRef.current = true;
     if (userScrollTimeoutRef.current) {
@@ -229,7 +231,11 @@ const GoodwillMessage: React.FC = () => {
           const maxScroll = el.scrollHeight - el.clientHeight;
           if (maxScroll > 0) {
             // Smoothly glide from top (scrollTop=0) to bottom (scrollTop=maxScroll)
+            isAutoScrollingRef.current = true;
             el.scrollTop = maxScroll * progress;
+            requestAnimationFrame(() => {
+              isAutoScrollingRef.current = false;
+            });
           }
         }
 
@@ -759,9 +765,19 @@ const GoodwillMessage: React.FC = () => {
           ref={messageContainerRef}
           onScroll={handleContainerScroll}
           onWheel={() => {
+            isAutoScrollingRef.current = false;
+            isUserScrollingRef.current = true;
+          }}
+          onTouchStart={() => {
+            isAutoScrollingRef.current = false;
             isUserScrollingRef.current = true;
           }}
           onTouchMove={() => {
+            isAutoScrollingRef.current = false;
+            isUserScrollingRef.current = true;
+          }}
+          onPointerDown={() => {
+            isAutoScrollingRef.current = false;
             isUserScrollingRef.current = true;
           }}
           className={`${styles.messageContent} ${revealing ? styles.messageRevealing : ""}`}
