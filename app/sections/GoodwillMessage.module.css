@@ -38,10 +38,22 @@
   height: 586px;
   right: -200px;
   top: 10px;
-  opacity: 0.5;
+  opacity: 0.45;
   transform: rotate(112.45deg);
   pointer-events: none;
   z-index: 0;
+  animation: targetPulse 12s ease-in-out infinite alternate;
+}
+
+@keyframes targetPulse {
+  0% {
+    opacity: 0.35;
+    transform: rotate(112.45deg) scale(0.97);
+  }
+  100% {
+    opacity: 0.55;
+    transform: rotate(112.45deg) scale(1.02);
+  }
 }
 .targetSvg { width: 100%; height: 100%; }
 
@@ -133,12 +145,26 @@
   top: 50%;
   transform: translateY(-50%);
   width: 32px;
-  height: 3px;
+  height: 2px;
   background: #FFFFFF;
-  box-shadow: 0 0 10px #FFFFFF, 0 0 20px rgba(255, 255, 255, 0.95), 0 0 30px #BEF3DF;
+  box-shadow: 0 0 8px #FFFFFF, 0 0 16px rgba(255, 255, 255, 0.95), 0 0 25px #BEF3DF;
   border-radius: 2px;
   z-index: 10;
   pointer-events: none;
+  animation: lineGlowPulse 2.2s ease-in-out infinite alternate;
+}
+
+@keyframes lineGlowPulse {
+  0% {
+    width: 26px;
+    box-shadow: 0 0 6px #FFFFFF, 0 0 12px #BEF3DF;
+    opacity: 0.85;
+  }
+  100% {
+    width: 36px;
+    box-shadow: 0 0 12px #FFFFFF, 0 0 22px #FFFFFF, 0 0 32px #BEF3DF;
+    opacity: 1;
+  }
 }
 
 /* ============================================================
@@ -238,9 +264,19 @@
 .thumbnailActive {
   width: 100px;
   height: 100px;
-  border-color: rgba(190, 243, 223, 0.6);
-  box-shadow: 0 0 20px rgba(190, 243, 223, 0.15);
+  border-color: #BEF3DF;
+  box-shadow: 0 0 25px rgba(190, 243, 223, 0.4), inset 0 0 15px rgba(190, 243, 223, 0.2);
   z-index: 5;
+  animation: activeAura 3s ease-in-out infinite alternate;
+}
+
+@keyframes activeAura {
+  0% {
+    box-shadow: 0 0 18px rgba(190, 243, 223, 0.3), inset 0 0 10px rgba(190, 243, 223, 0.15);
+  }
+  100% {
+    box-shadow: 0 0 30px rgba(190, 243, 223, 0.6), inset 0 0 20px rgba(190, 243, 223, 0.35);
+  }
 }
 
 .thumbnailInactive {
@@ -321,6 +357,11 @@
   position: relative;
   width: 272px;
   height: 383px;
+  filter: drop-shadow(0 0 14px rgba(190, 243, 223, 0.2));
+  transition: filter 0.4s ease;
+}
+.featuredCard:hover {
+  filter: drop-shadow(0 0 24px rgba(190, 243, 223, 0.4));
 }
 
 .frameSvg {

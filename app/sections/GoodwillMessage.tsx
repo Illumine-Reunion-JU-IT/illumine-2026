@@ -423,19 +423,19 @@ const GoodwillMessage: React.FC = () => {
                 cx="75.67"
                 cy="85.75"
                 r={RING_RADIUS}
-                stroke="rgba(190,243,223,0.22)"
-                strokeWidth="5"
+                stroke="rgba(190,243,223,0.18)"
+                strokeWidth="2.5"
                 fill="none"
               />
 
-              {/* DYNAMIC INSIDE LOADER CIRCLE BAR */}
+              {/* DYNAMIC INSIDE LOADER CIRCLE BAR — refined thin glowing neon stroke */}
               <circle
                 ref={ringRef}
                 cx="75.67"
                 cy="85.75"
                 r={RING_RADIUS}
                 stroke="#BEF3DF"
-                strokeWidth="5"
+                strokeWidth="2.5"
                 fill="none"
                 strokeLinecap="round"
                 strokeDasharray={RING_CIRCUMFERENCE}
@@ -443,7 +443,7 @@ const GoodwillMessage: React.FC = () => {
                 transform="rotate(-90 75.67 85.75)"
                 className={styles.progressRing}
                 style={{
-                  filter: "drop-shadow(0 0 10px #BEF3DF) drop-shadow(0 0 18px rgba(190,243,223,0.85))",
+                  filter: "drop-shadow(0 0 6px #BEF3DF) drop-shadow(0 0 12px rgba(190,243,223,0.9))",
                 }}
               />
 
@@ -829,26 +829,26 @@ const GoodwillMessage: React.FC = () => {
             cx="50.36"
             cy="57.01"
             r="23"
-            stroke="rgba(190,243,223,0.18)"
-            strokeWidth="3.5"
+            stroke="rgba(190,243,223,0.15)"
+            strokeWidth="2"
             fill="none"
           />
 
-          {/* DYNAMIC BELOW CIRCLE INNER BAR THAT FILLS AS SCROLLED */}
+          {/* DYNAMIC BELOW CIRCLE INNER BAR THAT FILLS AS SCROLLED — thin refined stroke */}
           <circle
             ref={bottomInnerRingRef}
             cx="50.36"
             cy="57.01"
             r="23"
             stroke="#BEF3DF"
-            strokeWidth="3.5"
+            strokeWidth="2"
             fill="none"
             strokeLinecap="round"
             strokeDasharray={BOTTOM_RING_CIRCUMFERENCE}
             strokeDashoffset={BOTTOM_RING_CIRCUMFERENCE}
             transform="rotate(-90 50.36 57.01)"
             style={{
-              filter: "drop-shadow(0 0 6px #BEF3DF)",
+              filter: "drop-shadow(0 0 5px #BEF3DF)",
             }}
           />
 
