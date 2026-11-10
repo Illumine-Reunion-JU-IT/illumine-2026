@@ -1,8 +1,13 @@
 import React from 'react';
 
-export default function ComingSoonText() {
+interface ComingSoonTextProps {
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+export default function ComingSoonText({ className, style }: ComingSoonTextProps) {
   return (
-    <svg width="582" height="48" viewBox="0 0 582 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 582 48" fill="none" className={className} style={style} xmlns="http://www.w3.org/2000/svg">
       <path d="M527.906 48V22.7812V12L539.906 24V48H527.906ZM569.906 48L527.906 6V1.78125V0H539.906L569.906 30V0H581.906V48H569.906Z" fill="#FFF34D"/>
       <path d="M475.125 48L487.125 36H511.125V18L523.125 6V42L517.125 48H475.125ZM469.125 48V18.6094V6L475.125 0H523.125L511.125 12H481.125V36L469.125 48Z" fill="#FFF34D"/>
       <path d="M416.344 48L428.344 36H452.344V18L464.344 6V42L458.344 48H416.344ZM410.344 48V18.6094V6L416.344 0H464.344L452.344 12H422.344V36L410.344 48Z" fill="#FFF34D"/>

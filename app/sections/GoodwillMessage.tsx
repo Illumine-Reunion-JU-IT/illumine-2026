@@ -1,44 +1,295 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { professors, sectionTitle } from "@/data/goodwillData";
-import type { ProfessorData } from "@/data/goodwillData";
+import type { ProfessorData } from "@/types/goodwill";
 import DecryptedText from "@/components/ui/DecryptedText";
 import styles from "./GoodwillMessage.module.css";
 
-const GLITCH_DURATION = 500; // ms for .systemUpdate class
-const RING_CIRCUMFERENCE = 2 * Math.PI * 54; // r=54 on the progress ring
+/**
+ * Configurable duration for each professor's message cycle.
+ * Set to exactly 10s for complete automatic scrolling.
+ */
+export const GOODWILL_DURATION_SECONDS = 10;
+
+const GLITCH_DURATION = 400; // ms for .systemUpdate transition
+const RING_RADIUS = 52;
+const RING_CIRCUMFERENCE = 326.73;
+
+const MOBILE_RING_RADIUS = 46;
+const MOBILE_RING_CIRCUMFERENCE = 289.03;
+
+const BOTTOM_RING_CIRCUMFERENCE = 144.51;
+
+/**
+ * Calculates display duration for a given professor.
+ * Exactly 10s for complete auto-scroll cycle.
+ */
+function getProfessorDuration(prof: ProfessorData): number {
+  if (typeof prof.durationSeconds === "number") {
+    return prof.durationSeconds;
+  }
+  return GOODWILL_DURATION_SECONDS;
+}
 
 const GoodwillMessage: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [glitching, setGlitching] = useState(false);
-  const [textKey, setTextKey] = useState(0); // force re-mount text on swap
   const [revealing, setRevealing] = useState(false);
+
+  // References for direct 60fps SVG stroke and scroll manipulation
+  const ringRef = useRef<SVGCircleElement | null>(null);
+  const mobileRingRef = useRef<SVGCircleElement | null>(null);
+  const rotatingBarRef = useRef<SVGGElement | null>(null);
+  const bottomInnerRingRef = useRef<SVGCircleElement | null>(null);
+  const bottomOuterBarRef = useRef<SVGGElement | null>(null);
+  const messageContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const activeIndexRef = useRef(0);
+  const elapsedRef = useRef(0);
+  const durationRef = useRef(getProfessorDuration(professors[0]) * 1000);
+  const isTransitioningRef = useRef(false);
+  const isTabHiddenRef = useRef(false);
+  const isAutoScrollingRef = useRef(false);
+  const isUserScrollingRef = useRef(false);
+  const userScrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastTimeRef = useRef<number | null>(null);
+  const rafIdRef = useRef<number | null>(null);
 
   const activeProfessor: ProfessorData = professors[activeIndex];
 
-  const advanceTo = useCallback((nextIdx: number) => {
-    setGlitching(true);
-    setTimeout(() => {
-      setActiveIndex(nextIdx);
-      setTextKey((k) => k + 1);
-      setGlitching(false);
-      setRevealing(true);
-      setTimeout(() => setRevealing(false), 1200);
-    }, GLITCH_DURATION);
+  const resetVisuals = useCallback(() => {
+    if (ringRef.current) {
+      ringRef.current.setAttribute("stroke-dashoffset", String(RING_CIRCUMFERENCE));
+      ringRef.current.style.strokeDashoffset = `${RING_CIRCUMFERENCE}px`;
+    }
+    if (mobileRingRef.current) {
+      mobileRingRef.current.setAttribute("stroke-dashoffset", String(MOBILE_RING_CIRCUMFERENCE));
+      mobileRingRef.current.style.strokeDashoffset = `${MOBILE_RING_CIRCUMFERENCE}px`;
+    }
+    if (rotatingBarRef.current) {
+      rotatingBarRef.current.setAttribute("transform", "rotate(0 75.67 85.75)");
+      rotatingBarRef.current.style.transform = "rotate(0deg)";
+    }
+    if (bottomInnerRingRef.current) {
+      bottomInnerRingRef.current.setAttribute("stroke-dashoffset", String(BOTTOM_RING_CIRCUMFERENCE));
+      bottomInnerRingRef.current.style.strokeDashoffset = `${BOTTOM_RING_CIRCUMFERENCE}px`;
+    }
+    if (bottomOuterBarRef.current) {
+      bottomOuterBarRef.current.setAttribute("transform", "rotate(0 50.36 57.01)");
+      bottomOuterBarRef.current.style.transform = "rotate(0deg)";
+    }
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop = 0;
+    }
   }, []);
 
-  const handleSelectProfessor = (idx: number) => {
-    if (idx === activeIndex) return;
-    advanceTo(idx);
+  const advanceTo = useCallback(
+    (nextIdx: number) => {
+      isTransitioningRef.current = true;
+      setGlitching(true);
+      elapsedRef.current = 0;
+      resetVisuals();
+
+      setTimeout(() => {
+        setActiveIndex(nextIdx);
+        activeIndexRef.current = nextIdx;
+        durationRef.current = getProfessorDuration(professors[nextIdx]) * 1000;
+        setGlitching(false);
+        isTransitioningRef.current = false;
+        setRevealing(true);
+        lastTimeRef.current = performance.now();
+
+        setTimeout(() => setRevealing(false), 800);
+      }, GLITCH_DURATION);
+    },
+    [resetVisuals]
+  );
+
+  const handleSelectProfessor = useCallback(
+    (idx: number) => {
+      if (idx === activeIndexRef.current) {
+        elapsedRef.current = 0;
+        resetVisuals();
+        lastTimeRef.current = performance.now();
+        return;
+      }
+      advanceTo(idx);
+    },
+    [advanceTo, resetVisuals]
+  );
+
+  // Allows user manual scrolling (wheel, trackpad, drag) while keeping loader ring in sync
+  const handleContainerScroll = () => {
+    // Ignore programmatic auto-scroll events so auto-scrolling is never stopped by itself
+    if (isAutoScrollingRef.current || isTransitioningRef.current) return;
+
+    isUserScrollingRef.current = true;
+    if (userScrollTimeoutRef.current) {
+      clearTimeout(userScrollTimeoutRef.current);
+    }
+
+    if (messageContainerRef.current) {
+      const el = messageContainerRef.current;
+      const maxScroll = el.scrollHeight - el.clientHeight;
+      if (maxScroll > 0) {
+        const ratio = Math.max(0, Math.min(1, el.scrollTop / maxScroll));
+        elapsedRef.current = ratio * durationRef.current;
+
+        // Synchronize inside circular loader ring
+        if (ringRef.current) {
+          const offset = RING_CIRCUMFERENCE * (1 - ratio);
+          ringRef.current.setAttribute("stroke-dashoffset", offset.toFixed(2));
+          ringRef.current.style.strokeDashoffset = `${offset.toFixed(2)}px`;
+        }
+        if (mobileRingRef.current) {
+          const mobileOffset = MOBILE_RING_CIRCUMFERENCE * (1 - ratio);
+          mobileRingRef.current.setAttribute("stroke-dashoffset", mobileOffset.toFixed(2));
+          mobileRingRef.current.style.strokeDashoffset = `${mobileOffset.toFixed(2)}px`;
+        }
+
+        // Synchronize rotating bar on the circle
+        if (rotatingBarRef.current) {
+          const deg = ratio * 360;
+          rotatingBarRef.current.setAttribute("transform", `rotate(${deg.toFixed(1)} 75.67 85.75)`);
+          rotatingBarRef.current.style.transform = `rotate(${deg.toFixed(1)}deg)`;
+        }
+
+        // Synchronize below circle inner bar and outer bar
+        if (bottomInnerRingRef.current) {
+          const bOffset = BOTTOM_RING_CIRCUMFERENCE * (1 - ratio);
+          bottomInnerRingRef.current.setAttribute("stroke-dashoffset", bOffset.toFixed(2));
+          bottomInnerRingRef.current.style.strokeDashoffset = `${bOffset.toFixed(2)}px`;
+        }
+        if (bottomOuterBarRef.current) {
+          const bDeg = ratio * 360;
+          bottomOuterBarRef.current.setAttribute("transform", `rotate(${bDeg.toFixed(1)} 50.36 57.01)`);
+          bottomOuterBarRef.current.style.transform = `rotate(${bDeg.toFixed(1)}deg)`;
+        }
+      }
+    }
+
+    // Resume smooth auto-scrolling 2s after user finishes scrolling so they can re-read skipped portions
+    userScrollTimeoutRef.current = setTimeout(() => {
+      isUserScrollingRef.current = false;
+      lastTimeRef.current = performance.now();
+    }, 2000);
   };
+
+  // Continuous high-performance animation loop driving countdown ring, rotating bar, and scroll synchronization
+  useEffect(() => {
+    activeIndexRef.current = activeIndex;
+    durationRef.current = getProfessorDuration(professors[activeIndex]) * 1000;
+
+    const animate = (now: number) => {
+      if (lastTimeRef.current === null) {
+        lastTimeRef.current = now;
+      }
+      const delta = now - lastTimeRef.current;
+      lastTimeRef.current = now;
+
+      if (!isTransitioningRef.current && !isTabHiddenRef.current) {
+        if (!isUserScrollingRef.current) {
+          elapsedRef.current += delta;
+        }
+        const totalDuration = durationRef.current;
+        const progress = Math.min(1, Math.max(0, elapsedRef.current / totalDuration));
+
+        // 1. Move the inside loader circle bar clockwise as time elapses
+        if (ringRef.current) {
+          const offset = RING_CIRCUMFERENCE * (1 - progress);
+          ringRef.current.setAttribute("stroke-dashoffset", offset.toFixed(2));
+          ringRef.current.style.strokeDashoffset = `${offset.toFixed(2)}px`;
+        }
+
+        if (mobileRingRef.current) {
+          const mobileOffset = MOBILE_RING_CIRCUMFERENCE * (1 - progress);
+          mobileRingRef.current.setAttribute("stroke-dashoffset", mobileOffset.toFixed(2));
+          mobileRingRef.current.style.strokeDashoffset = `${mobileOffset.toFixed(2)}px`;
+        }
+
+        // 2. Rotate the bar on the circle as scrolling progresses
+        if (rotatingBarRef.current) {
+          const deg = progress * 360;
+          rotatingBarRef.current.setAttribute("transform", `rotate(${deg.toFixed(1)} 75.67 85.75)`);
+          rotatingBarRef.current.style.transform = `rotate(${deg.toFixed(1)}deg)`;
+        }
+
+        // Synchronize below circle inner bar and outer bar
+        if (bottomInnerRingRef.current) {
+          const bOffset = BOTTOM_RING_CIRCUMFERENCE * (1 - progress);
+          bottomInnerRingRef.current.setAttribute("stroke-dashoffset", bOffset.toFixed(2));
+          bottomInnerRingRef.current.style.strokeDashoffset = `${bOffset.toFixed(2)}px`;
+        }
+        if (bottomOuterBarRef.current) {
+          const bDeg = progress * 360;
+          bottomOuterBarRef.current.setAttribute("transform", `rotate(${bDeg.toFixed(1)} 50.36 57.01)`);
+          bottomOuterBarRef.current.style.transform = `rotate(${bDeg.toFixed(1)}deg)`;
+        }
+
+        // 3. Automatically scroll message down in direct sync with the progress bar
+        if (messageContainerRef.current && !isUserScrollingRef.current) {
+          const el = messageContainerRef.current;
+          const maxScroll = el.scrollHeight - el.clientHeight;
+          if (maxScroll > 0) {
+            // Smoothly glide from top (scrollTop=0) to bottom (scrollTop=maxScroll)
+            isAutoScrollingRef.current = true;
+            el.scrollTop = maxScroll * progress;
+            requestAnimationFrame(() => {
+              isAutoScrollingRef.current = false;
+            });
+          }
+        }
+
+        // 4. When the loader circle bar completes, automatically advance to next circle/professor
+        if (elapsedRef.current >= totalDuration) {
+          elapsedRef.current = 0;
+          if (professors.length > 1) {
+            const nextIdx = (activeIndexRef.current + 1) % professors.length;
+            advanceTo(nextIdx);
+          }
+        }
+      }
+
+      rafIdRef.current = requestAnimationFrame(animate);
+    };
+
+    rafIdRef.current = requestAnimationFrame(animate);
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        isTabHiddenRef.current = true;
+      } else {
+        isTabHiddenRef.current = false;
+        lastTimeRef.current = performance.now();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      if (rafIdRef.current) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
+      if (userScrollTimeoutRef.current) {
+        clearTimeout(userScrollTimeoutRef.current);
+      }
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [activeIndex, advanceTo]);
 
   return (
     <section
       id="goodwill-message"
       className={`${styles.section} ${glitching ? styles.systemUpdate : ""}`}
     >
+      {/* Screen reader live region announcing active professor */}
+      <div className={styles.srOnly} aria-live="polite" aria-atomic="true">
+        {`Now displaying goodwill message from ${activeProfessor.name}, ${activeProfessor.designation.join(", ")}`}
+      </div>
+
       {/* Background target graphic */}
       <div className={styles.targetGraphic} aria-hidden="true">
         <svg
@@ -97,38 +348,34 @@ const GoodwillMessage: React.FC = () => {
         </svg>
       </div>
 
-      {/* Title */}
-      <div className={styles.titleContainer}>
-        <h2 className={styles.title}>
-          <DecryptedText
-            text={sectionTitle}
-            animateOn="view"
-            speed={60}
-            sequential={true}
-            revealDirection="start"
-          />
-        </h2>
-        <div className={styles.accentBar} aria-hidden="true" />
-      </div>
+      {/* Title — Slides in from LEFT as user scrolls and sits at middle of screen */}
+      <motion.div
+        initial={{ opacity: 0, x: -200, scale: 0.92 }}
+        whileInView={{ opacity: 1, x: 0, scale: 1 }}
+        viewport={{ once: false, amount: 0.3 }}
+        transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full flex justify-center items-center relative z-10"
+      >
+        <div className={styles.titleContainer}>
+          <h2 className={styles.title}>
+            <DecryptedText
+              text={sectionTitle}
+              animateOn="view"
+              speed={60}
+              sequential={true}
+              revealDirection="start"
+            />
+          </h2>
+          <div className={styles.accentBar} aria-hidden="true" />
+        </div>
+      </motion.div>
 
       <div className={styles.contentWrapper}>
-        {/* Left ruler — animated equalizer bars */}
-        <div className={styles.rulerWrapper} aria-hidden="true">
-          {Array.from({ length: 52 }).map((_, i) => {
-            const isMajor = i % 5 === 0;
-            return (
-              <div
-                key={i}
-                className={`${isMajor ? styles.rulerTickMajor : styles.rulerTickMinor} ${styles.equalizerBar}`}
-                style={{ "--bar-index": i } as React.CSSProperties}
-              />
-            );
-          })}
-        </div>
-
-        {/* Thumbnail carousel column */}
+        {/* Dynamic thumbnail column */}
         <div className={styles.thumbnailColumn}>
-          {/* HUD ring overlay with progress arc */}
+          {/* Bright white line indicator beside the active circle currently being scrolled */}
+          <div className={styles.activeCircleIndicatorLine} aria-hidden="true" />
+          {/* HUD ring overlay with dynamic animated loader circle bar */}
           <div className={styles.activeRingContainer} aria-hidden="true">
             <svg
               width="162"
@@ -138,7 +385,7 @@ const GoodwillMessage: React.FC = () => {
               xmlns="http://www.w3.org/2000/svg"
               className={styles.activeRingSvg}
             >
-              {/* Slow clockwise background ring */}
+              {/* Slow clockwise ambient background ring */}
               <circle
                 cx="75.67"
                 cy="85.75"
@@ -154,14 +401,14 @@ const GoodwillMessage: React.FC = () => {
                 cx="75.67"
                 cy="85.75"
                 r="61"
-                stroke="rgba(190,243,223,0.08)"
+                stroke="rgba(190,243,223,0.10)"
                 strokeWidth="1"
                 fill="none"
                 strokeDasharray="6 8"
                 className={styles.slowRingCCW}
               />
 
-              {/* Static base ring (original SVG structure) */}
+              {/* Static base decorative elements */}
               <g opacity="0.9">
                 <g opacity="0.5">
                   <path
@@ -183,48 +430,48 @@ const GoodwillMessage: React.FC = () => {
                 />
               </g>
 
-              {/* STATIC PROGRESS ARC */}
+              {/* Faint circular track beneath loader circle bar */}
               <circle
                 cx="75.67"
                 cy="85.75"
-                r="54"
+                r={RING_RADIUS}
+                stroke="rgba(190,243,223,0.18)"
+                strokeWidth="2.5"
+                fill="none"
+              />
+
+              {/* DYNAMIC INSIDE LOADER CIRCLE BAR — refined thin glowing neon stroke */}
+              <circle
+                ref={ringRef}
+                cx="75.67"
+                cy="85.75"
+                r={RING_RADIUS}
                 stroke="#BEF3DF"
                 strokeWidth="2.5"
                 fill="none"
                 strokeLinecap="round"
                 strokeDasharray={RING_CIRCUMFERENCE}
-                strokeDashoffset={0}
+                strokeDashoffset={RING_CIRCUMFERENCE}
                 transform="rotate(-90 75.67 85.75)"
                 className={styles.progressRing}
                 style={{
-                  filter: glitching
-                    ? "drop-shadow(0 0 8px #BEF3DF) brightness(2)"
-                    : undefined,
+                  filter: "drop-shadow(0 0 6px #BEF3DF) drop-shadow(0 0 12px rgba(190,243,223,0.9))",
                 }}
               />
 
-              {/* Tick marks around progress ring - Now entirely static */}
-              {Array.from({ length: 24 }).map((_, i) => {
-                const angle = (i / 24) * 360 - 90;
-                const rad = (angle * Math.PI) / 180;
-                const r1 = 57,
-                  r2 = 60;
-                const x1 = parseFloat((75.67 + r1 * Math.cos(rad)).toFixed(6));
-                const y1 = parseFloat((85.75 + r1 * Math.sin(rad)).toFixed(6));
-                const x2 = parseFloat((75.67 + r2 * Math.cos(rad)).toFixed(6));
-                const y2 = parseFloat((85.75 + r2 * Math.sin(rad)).toFixed(6));
-                return (
-                  <line
-                    key={i}
-                    x1={x1}
-                    y1={y1}
-                    x2={x2}
-                    y2={y2}
-                    stroke="#BEF3DF"
-                    strokeWidth={i % 6 === 0 ? 2 : 1}
-                  />
-                );
-              })}
+              {/* Deterministic tick marks around loader circle using SVG rotation transforms */}
+              {Array.from({ length: 24 }).map((_, i) => (
+                <line
+                  key={i}
+                  x1="75.67"
+                  y1={i % 6 === 0 ? "23.75" : "26.75"}
+                  x2="75.67"
+                  y2="28.75"
+                  stroke="#BEF3DF"
+                  strokeWidth={i % 6 === 0 ? 2 : 1}
+                  transform={`rotate(${i * 15} 75.67 85.75)`}
+                />
+              ))}
 
               {/* Outer ring decoration */}
               <g opacity="0.35">
@@ -234,10 +481,20 @@ const GoodwillMessage: React.FC = () => {
                   fillOpacity="0.15"
                 />
               </g>
-              <path
-                d="M126.993 17.0494C112.682 6.34534 94.92 0 75.6748 0V6.40416C93.4824 6.40416 109.924 12.2725 123.164 22.1793L126.993 17.0494Z"
-                fill="white"
-              />
+              {/* Dynamic rotating arc bar that orbits the circle in sync with scrolling */}
+              <g
+                ref={rotatingBarRef}
+                className={styles.rotatingArcBar}
+                transform="rotate(0 75.67 85.75)"
+              >
+                <path
+                  d="M126.993 17.0494C112.682 6.34534 94.92 0 75.6748 0V6.40416C93.4824 6.40416 109.924 12.2725 123.164 22.1793L126.993 17.0494Z"
+                  fill="white"
+                  style={{
+                    filter: "drop-shadow(0 0 6px rgba(255,255,255,0.9)) drop-shadow(0 0 12px rgba(190,243,223,0.95))",
+                  }}
+                />
+              </g>
               <g opacity="0.8">
                 <path
                   d="M75.6413 161.392C33.9291 161.392 0 127.456 0 85.7506C0 72.8508 3.30657 60.1144 9.55391 48.9201L11.2661 49.8742C5.17562 60.7809 1.96046 73.1841 1.96046 85.7506C1.96046 126.378 35.0139 159.431 75.6413 159.431C116.269 159.431 149.322 126.378 149.322 85.7506C149.322 72.8312 145.93 60.1209 139.513 48.9985L141.212 48.0183C147.799 59.4413 151.283 72.4914 151.283 85.7506C151.283 127.456 117.347 161.392 75.6413 161.392Z"
@@ -247,7 +504,7 @@ const GoodwillMessage: React.FC = () => {
               </g>
             </svg>
 
-            {/* Connecting line with running-light effect */}
+            {/* Connecting line */}
             <div className={styles.connectingLine}>
               <svg
                 viewBox="0 0 1051 330"
@@ -285,7 +542,6 @@ const GoodwillMessage: React.FC = () => {
                   </mask>
                 </defs>
                 <circle cx="8" cy="8" r="8" fill="white" opacity="0.5" />
-                {/* Base path */}
                 <path
                   stroke="white"
                   strokeWidth="2"
@@ -293,7 +549,6 @@ const GoodwillMessage: React.FC = () => {
                   opacity="0.25"
                   d="M8 8 H33 L73.5 48.5 V223.5 L119.5 269.5 H443 L502 328.5 H1049"
                 />
-                {/* Running light overlay */}
                 <rect
                   x="0"
                   y="0"
@@ -307,7 +562,7 @@ const GoodwillMessage: React.FC = () => {
             </div>
           </div>
 
-          {/* Thumbnail gallery track */}
+          {/* Dynamic sliding circles carousel track */}
           <div className={styles.galleryTrack}>
             {professors.map((prof, idx) => {
               const N = professors.length;
@@ -323,10 +578,12 @@ const GoodwillMessage: React.FC = () => {
               else if (offset < 0)
                 y = -ACTIVE_OFFSET - (Math.abs(offset) - 1) * INACTIVE_OFFSET;
 
+              const isActive = idx === activeIndex;
+
               return (
                 <button
                   key={prof.id}
-                  className={`${styles.thumbnailWrapper} ${idx === activeIndex ? styles.thumbnailActive : styles.thumbnailInactive}`}
+                  className={`${styles.thumbnailWrapper} ${isActive ? styles.thumbnailActive : styles.thumbnailInactive}`}
                   style={{ transform: `translate(-50%, calc(-50% + ${y}px))` }}
                   onClick={() => handleSelectProfessor(idx)}
                   onTouchEnd={(e) => {
@@ -335,6 +592,7 @@ const GoodwillMessage: React.FC = () => {
                   }}
                   aria-label={`View message from ${prof.name}`}
                   type="button"
+                  tabIndex={0}
                 >
                   <Image
                     src={prof.imagePath}
@@ -343,8 +601,43 @@ const GoodwillMessage: React.FC = () => {
                     height={100}
                     className={styles.thumbnailImg}
                   />
+
+                  {/* Responsive mobile countdown indicator ring */}
+                  {isActive && (
+                    <svg
+                      className={styles.mobileCountdownRing}
+                      viewBox="0 0 100 100"
+                      aria-hidden="true"
+                    >
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r={MOBILE_RING_RADIUS}
+                        stroke="rgba(190,243,223,0.18)"
+                        strokeWidth="3.5"
+                        fill="none"
+                      />
+                      <circle
+                        ref={mobileRingRef}
+                        cx="50"
+                        cy="50"
+                        r={MOBILE_RING_RADIUS}
+                        stroke="#BEF3DF"
+                        strokeWidth="3.5"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeDasharray={MOBILE_RING_CIRCUMFERENCE}
+                        strokeDashoffset={MOBILE_RING_CIRCUMFERENCE}
+                        transform="rotate(-90 50 50)"
+                        style={{
+                          filter: "drop-shadow(0 0 6px rgba(190,243,223,0.8))",
+                        }}
+                      />
+                    </svg>
+                  )}
+
                   {/* Breathing glow for active */}
-                  {idx === activeIndex && (
+                  {isActive && (
                     <span className={styles.activeBreath} aria-hidden="true" />
                   )}
                 </button>
@@ -442,20 +735,20 @@ const GoodwillMessage: React.FC = () => {
                 sizes="(max-width: 768px) 200px, 250px"
                 priority
               />
-              {/* Scanline overlay */}
               <div
                 className={`${styles.scanlines} ${glitching ? styles.scanlinesPulse : ""}`}
                 aria-hidden="true"
               />
               <div className={styles.vignette} />
-              {/* Chromatic aberration fringe (CSS only) */}
               {glitching && (
                 <div className={styles.chromaticFringe} aria-hidden="true" />
               )}
             </div>
           </div>
 
-          <div className={styles.profInfo}>
+          <div
+            className={`${styles.profInfo} ${glitching ? styles.profInfoFading : ""}`}
+          >
             <h3 className={styles.profName}>
               <DecryptedText
                 key={`name-${activeIndex}`}
@@ -479,19 +772,36 @@ const GoodwillMessage: React.FC = () => {
           </div>
         </div>
 
-        {/* Message content — masked scan reveal */}
+        {/* Message content — smooth continuous synchronized auto-scroll + interactive manual scroll */}
         <div
-          key={textKey}
+          ref={messageContainerRef}
+          onScroll={handleContainerScroll}
+          onWheel={() => {
+            isAutoScrollingRef.current = false;
+            isUserScrollingRef.current = true;
+          }}
+          onTouchStart={() => {
+            isAutoScrollingRef.current = false;
+            isUserScrollingRef.current = true;
+          }}
+          onTouchMove={() => {
+            isAutoScrollingRef.current = false;
+            isUserScrollingRef.current = true;
+          }}
+          onPointerDown={() => {
+            isAutoScrollingRef.current = false;
+            isUserScrollingRef.current = true;
+          }}
           className={`${styles.messageContent} ${revealing ? styles.messageRevealing : ""}`}
         >
           {activeProfessor.message.split("\n").map((paragraph, i) => (
             <p
-              key={i}
+              key={`msg-${activeIndex}-${i}`}
               className={`${i === 0 ? styles.messageHeading : styles.messageParagraph} ${styles.messageRow}`}
               style={{ "--row-index": i } as React.CSSProperties}
             >
               <DecryptedText
-                key={`msg-${textKey}-${i}`}
+                key={`decrypted-msg-${activeIndex}-${i}`}
                 text={paragraph}
                 animateOn="view"
                 speed={12}
@@ -526,10 +836,48 @@ const GoodwillMessage: React.FC = () => {
               fill="#BEF3DF"
             />
           </g>
-          <path
-            d="M84.5134 102.787C74.9892 109.911 63.1688 114.134 50.3611 114.134V109.872C62.212 109.872 73.154 105.966 81.965 99.3735L84.5134 102.787Z"
-            fill="#BEF3DF"
+          {/* Faint track for below circle inner bar */}
+          <circle
+            cx="50.36"
+            cy="57.01"
+            r="23"
+            stroke="rgba(190,243,223,0.15)"
+            strokeWidth="2"
+            fill="none"
           />
+
+          {/* DYNAMIC BELOW CIRCLE INNER BAR THAT FILLS AS SCROLLED — thin refined stroke */}
+          <circle
+            ref={bottomInnerRingRef}
+            cx="50.36"
+            cy="57.01"
+            r="23"
+            stroke="#BEF3DF"
+            strokeWidth="2"
+            fill="none"
+            strokeLinecap="round"
+            strokeDasharray={BOTTOM_RING_CIRCUMFERENCE}
+            strokeDashoffset={BOTTOM_RING_CIRCUMFERENCE}
+            transform="rotate(-90 50.36 57.01)"
+            style={{
+              filter: "drop-shadow(0 0 5px #BEF3DF)",
+            }}
+          />
+
+          {/* DYNAMIC BELOW CIRCLE OUTER BAR THAT MOVES/ROTATES AS SCROLLED */}
+          <g
+            ref={bottomOuterBarRef}
+            className={styles.bottomOuterBar}
+            transform="rotate(0 50.36 57.01)"
+          >
+            <path
+              d="M84.5134 102.787C74.9892 109.911 63.1688 114.134 50.3611 114.134V109.872C62.212 109.872 73.154 105.966 81.965 99.3735L84.5134 102.787Z"
+              fill="#BEF3DF"
+              style={{
+                filter: "drop-shadow(0 0 6px #BEF3DF)",
+              }}
+            />
+          </g>
           <path
             d="M50.3394 63.4902C46.7907 63.4902 43.916 60.6156 43.916 57.0668C43.916 53.5181 46.7907 50.6434 50.3394 50.6434C53.8882 50.6434 56.7627 53.5181 56.7627 57.0668C56.7627 60.6156 53.8882 63.4902 50.3394 63.4902ZM50.3394 53.0701C48.1345 53.0701 46.3427 54.8576 46.3427 57.0668C46.3427 59.2717 48.1302 61.0635 50.3394 61.0635C52.5444 61.0635 54.3361 59.2761 54.3361 57.0668C54.3317 54.8619 52.5444 53.0701 50.3394 53.0701Z"
             fill="white"

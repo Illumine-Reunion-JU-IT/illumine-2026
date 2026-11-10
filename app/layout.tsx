@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import Providers from "@/components/Providers";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,13 +15,41 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://illumine-ju-it.in";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Illumine 2026",
-  description: "Illumine 2026 Coming Soon",
+  description: "Official Silver Jubilee Reunion of Jadavpur University Information Technology Department.",
   icons: {
     icon: "/images/logos/primary-icon.svg",
     shortcut: "/images/logos/primary-icon.svg",
     apple: "/images/logos/primary-icon.png",
+  },
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Illumine 2026",
+    description: "Official Silver Jubilee Reunion of Jadavpur University Information Technology Department.",
+    url: "/",
+    siteName: "Illumine 2026",
+    images: [
+      {
+        url: "/photos/Hero/hero.png",
+        width: 1440,
+        height: 714,
+        alt: "Illumine 2026 Jadavpur University IT Reunion",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Illumine 2026",
+    description: "Official Silver Jubilee Reunion of Jadavpur University Information Technology Department.",
+    images: ["/photos/Hero/hero.png"],
   },
 };
 
@@ -41,12 +70,14 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-screen flex flex-col bg-[#090d19]">
-        <Navbar />
-        <main className="flex-grow relative">
-          {children}
-        </main>
-        <Footer />
+      <body className="min-h-screen flex flex-col bg-[#070707] overflow-x-hidden">
+        <Providers>
+          <Navbar />
+          <main className="flex-grow relative">
+            {children}
+          </main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );

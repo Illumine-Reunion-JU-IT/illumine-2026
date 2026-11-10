@@ -340,14 +340,17 @@ export default function DecryptedText({
     }, [animateOn, hasAnimated, triggerDecrypt]);
 
     useEffect(() => {
-        if (animateOn === 'click') {
-            encryptInstantly();
-        } else {
-            setDisplayText(text);
-            setIsDecrypted(true);
-        }
-        setRevealedIndices(new Set());
-        setDirection('forward');
+        const id = setTimeout(() => {
+            if (animateOn === 'click') {
+                encryptInstantly();
+            } else {
+                setDisplayText(text);
+                setIsDecrypted(true);
+            }
+            setRevealedIndices(new Set());
+            setDirection('forward');
+        }, 0);
+        return () => clearTimeout(id);
     }, [animateOn, text, encryptInstantly]);
 
     const animateProps =

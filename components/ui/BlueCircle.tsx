@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import React, { useEffect, useRef } from 'react'
-import { motion, useAnimate, useMotionValue, animate } from 'framer-motion'
+import React, { useEffect } from 'react'
+import { motion, useAnimate } from 'framer-motion'
 import { blueCirclePaths } from '@/data/Paths/heroPaths'
 
 type BlueCircleProps = {
@@ -54,7 +54,7 @@ function useOrbitAnimation(delay = 0.42) {
             })
         }
         run()
-    }, [])
+    }, [animateEl, delay, scope])
 
     return scope
 }
@@ -99,7 +99,7 @@ function RingLayer({
             })
         }
         run()
-    }, [])
+    }, [animateEl, direction, duration, opacity, scope])
 
     return (
         <path

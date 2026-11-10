@@ -1,0 +1,225 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { AlumniProfile } from '@/types/alumni';
+import AlumniCard from './AlumniCard';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, FilterX, Users, Edit3 } from 'lucide-react';
+import Link from 'next/link';
+
+export const AlumniList: React.FC = () => {
+  const batchList = Array.from({ length: 25 }, (_, i) => `IT ${String(i + 4).padStart(2, '0')}`);
+  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [selectedBatch, setSelectedBatch] = useState(batchList[0]);
+  
+  const [profiles, setProfiles] = useState<AlumniProfile[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Debounce search
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery.trim());
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  // Fetch data from API
+  useEffect(() => {
+    let isMounted = true;
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        let url = '';
+        if (debouncedSearch && debouncedSearch.length >= 2) {
+          url = `/api/alumni/search?q=${encodeURIComponent(debouncedSearch)}`;
+        } else {
+          url = `/api/alumni/batch?batch=${encodeURIComponent(selectedBatch)}`;
+        }
+        
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = await res.json();
+        
+        if (isMounted) {
+          setProfiles(data.profiles || []);
+        }
+      } catch (error) {
+        console.error(error);
+        if (isMounted) setProfiles([]);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    fetchData();
+    return () => { isMounted = false; };
+  }, [selectedBatch, debouncedSearch]);
+
+  const handleBatchClick = (batch: string) => {
+    setSelectedBatch(batch);
+    setSearchQuery(''); // Reset search when clicking a batch
+  };
+
+  // Framer Motion variants for staggered grid
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05
+      }
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-10 w-full relative z-10 font-mono max-w-7xl mx-auto">
+      
+      {/* ── SEARCH + FILTERS ── */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 pb-8 border-b border-white/10 w-full relative">
+        <div className="absolute bottom-0 left-0 w-1/3 h-[1px] bg-gradient-to-r from-[#BEF3DF] to-transparent pointer-events-none" />
+        
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full max-w-2xl">
+          {/* Animated Search Bar */}
+          <div className="relative w-full max-w-md group">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#BEF3DF]/20 to-[#7B61FF]/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            
+            <div className="relative bg-[#0c0f1d]/80 backdrop-blur-md border border-white/10 group-focus-within:border-[#BEF3DF]/50 transition-all duration-300 rounded-xl overflow-hidden flex items-center shadow-lg group-focus-within:shadow-[0_0_20px_rgba(190,243,223,0.15)]">
+              <div className="pl-4 text-gray-400 group-focus-within:text-[#BEF3DF] transition-colors">
+                <Search size={18} />
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search alumni globally..."
+                aria-label="Search alumni registry"
+                className="w-full bg-transparent border-0 text-white placeholder-gray-500 text-sm tracking-wide px-4 py-3.5 focus:outline-none focus:ring-0 font-tt-lakes"
+              />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery('')}
+                  className="pr-4 text-gray-500 hover:text-white transition-colors"
+                >
+                  <FilterX size={16} />
+                </button>
+              )}
+            </div>
+            {debouncedSearch.length >= 2 && (
+               <div className="absolute -bottom-6 left-2 text-[10px] text-[#BEF3DF] tracking-widest uppercase">
+                 Searching all batches...
+               </div>
+            )}
+          </div>
+
+          <Link href="/update-record" className="shrink-0">
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-white/5 hover:bg-[#BEF3DF]/10 border border-white/10 hover:border-[#BEF3DF]/50 text-white hover:text-[#BEF3DF] px-4 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 flex items-center gap-2 shadow-[0_0_15px_rgba(0,0,0,0.5)]"
+            >
+              <Edit3 size={14} /> Rectify Profile
+            </motion.button>
+          </Link>
+        </div>
+
+        {/* Batch Filter Pills */}
+        <div className="flex flex-wrap items-center justify-start lg:justify-end gap-2 max-w-2xl">
+          <div className="flex items-center gap-2 mr-2 text-gray-500 text-xs uppercase tracking-widest font-bold">
+            <Users size={14} /> Filter:
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {batchList.map((batch) => {
+              const isActive = selectedBatch === batch && debouncedSearch.length < 2;
+              
+              return (
+                <button
+                  key={batch}
+                  onClick={() => handleBatchClick(batch)}
+                  aria-pressed={isActive}
+                  className="relative px-4 py-1.5 rounded-full text-xs tracking-wider transition-all duration-300 uppercase font-bold overflow-hidden group"
+                >
+                  {/* Background indicator */}
+                  {isActive ? (
+                    <motion.div 
+                      layoutId="activeBatchIndicator"
+                      className="absolute inset-0 bg-[#BEF3DF] shadow-[0_0_15px_rgba(190,243,223,0.4)]"
+                      initial={false}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-white/5 border border-white/10 group-hover:bg-white/10 transition-colors" />
+                  )}
+                  
+                  {/* Text */}
+                  <span className={`relative z-10 ${isActive ? 'text-black' : 'text-gray-400 group-hover:text-white'}`}>
+                    {batch}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ── ALUMNI CARD GRID ── */}
+      <AnimatePresence mode="wait">
+        {isLoading ? (
+          <motion.div 
+            key="loading-state"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full justify-items-center"
+          >
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="w-full max-w-[300px] h-[360px] bg-[#0c0f1d]/50 backdrop-blur-sm border border-white/5 rounded-2xl flex flex-col p-6 gap-4 animate-pulse">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-full bg-white/10 shrink-0" />
+                  <div className="flex flex-col gap-2 w-full">
+                    <div className="h-4 bg-white/10 rounded w-3/4" />
+                    <div className="h-3 bg-white/5 rounded w-1/2" />
+                  </div>
+                </div>
+                <div className="h-10 bg-white/5 rounded-lg mt-auto w-full" />
+                <div className="h-10 bg-white/5 rounded-lg w-full" />
+                <div className="h-10 bg-white/5 rounded-lg mt-2 w-full" />
+              </div>
+            ))}
+          </motion.div>
+        ) : profiles.length === 0 ? (
+          <motion.div 
+            key="empty-state"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="flex flex-col items-center justify-center py-24 px-4 w-full bg-[#0c0f1d]/30 backdrop-blur-sm border border-white/5 rounded-2xl relative overflow-hidden"
+          >
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-red-500/5 rounded-full blur-[80px]" />
+            <FilterX size={48} className="text-gray-600 mb-4 animate-pulse" />
+            <span className="text-white text-xl font-tt-lakes font-bold mb-2">No Profiles Found</span>
+            <p className="text-gray-500 text-sm tracking-wider uppercase text-center max-w-md">
+              Try adjusting your search terms or selecting a different batch filter to locate alumni.
+            </p>
+          </motion.div>
+        ) : (
+          <motion.div 
+            key="grid-state"
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full justify-items-center"
+          >
+            {profiles.map((alumnus, i) => (
+              <AlumniCard key={alumnus.id} profile={alumnus} index={i} />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+    </div>
+  );
+};
+
+export default AlumniList;

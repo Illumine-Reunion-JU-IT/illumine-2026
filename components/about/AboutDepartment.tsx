@@ -2,10 +2,10 @@
 
 import React from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import BigCircle from "@/components/ui/BigCircle";
 import Vector4 from "@/assets/coming_soon_svgs/svg/Vector4";
 import Vector5 from "@/assets/coming_soon_svgs/svg/Vector5";
-import Svg60_50 from "@/assets/coming_soon_svgs/svg/Svg60_50";
 import Group95 from "@/assets/coming_soon_svgs/svg/Group95";
 import Rectangle70 from "@/assets/coming_soon_svgs/svg/Rectangle70";
 import DecryptedText from "@/components/ui/DecryptedText";
@@ -28,8 +28,7 @@ const Cross = ({
 
 export default function AboutDepartment() {
   return (
-    <div className="relative w-full min-h-screen bg-black overflow-hidden flex flex-col items-center justify-center font-tt-lakes text-white py-20">
-
+    <div className="relative w-full min-h-screen bg-[#070707] overflow-hidden flex flex-col items-center justify-center font-tt-lakes text-white py-20">
       {/* subtle noise */}
       <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"
         style={{
@@ -45,16 +44,26 @@ export default function AboutDepartment() {
       <Cross style={{ bottom: "10%", right: "25%" }} />
       <Cross style={{ top: "45%", right: "5%" }} />
 
-      {/* heading */}
-      <h1 className="font-mechsuit text-xl lg:text-2xl xl:text-[2.3vw] text-[#C4CCFF] drop-shadow-[0_0_10px_rgba(196,204,255,0.4)] tracking-[0.2em] z-10 mb-14 text-center">
-        <DecryptedText
-          text="ABOUT THE DEPARTMENT"
-          animateOn="view"
-          speed={60}
-          sequential
-          revealDirection="start"
-        />
-      </h1>
+      {/* heading — slides in from RIGHT as user scrolls and sits in middle of screen */}
+      <motion.div 
+        initial={{ opacity: 0, x: 200, scale: 0.92 }}
+        whileInView={{ opacity: 1, x: 0, scale: 1 }}
+        viewport={{ once: false, amount: 0.3 }}
+        transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-10 mb-14 text-center flex flex-col items-center justify-center w-full px-4"
+      >
+        <h1 className="font-mechsuit text-xl lg:text-2xl xl:text-[2.3vw] text-[#C4CCFF] drop-shadow-[0_0_14px_rgba(196,204,255,0.6)] tracking-[0.2em]">
+          <DecryptedText
+            text="ABOUT THE DEPARTMENT"
+            animateOn="view"
+            speed={60}
+            sequential
+            revealDirection="start"
+          />
+        </h1>
+        {/* Cyberpunk Accent Underline */}
+        <div className="h-[2px] w-32 md:w-64 mx-auto mt-3 bg-gradient-to-r from-transparent via-[#7B61FF] to-transparent shadow-[0_0_8px_#7B61FF]" />
+      </motion.div>
 
       {/* main container */}
       <div className="relative w-[92vw] max-w-[1200px] min-h-[650px] lg:h-[600px] z-10">

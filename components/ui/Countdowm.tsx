@@ -7,11 +7,6 @@ const oxanium = Oxanium({
     weight: ['200', '300', '400', '500', '600', '700', '800'],
 })
 
-type TimeUnit = {
-    value: number
-    label: string
-}
-
 function getTimeRemaining() {
     // Explicit UTC midnight to avoid timezone shifting the date
     const target = new Date(Date.UTC(2026, 11, 22, 0, 0, 0)) // month is 0-indexed: 11 = December
@@ -41,9 +36,12 @@ const FlipDigit: React.FC<DigitProps> = ({ value, prevValue }) => {
 
     useEffect(() => {
         if (value !== prevValue) {
-            setFlipping(true)
+            const id = setTimeout(() => setFlipping(true), 0)
             const t = setTimeout(() => setFlipping(false), 400)
-            return () => clearTimeout(t)
+            return () => {
+                clearTimeout(id)
+                clearTimeout(t)
+            }
         }
     }, [value, prevValue])
 
@@ -121,11 +119,12 @@ const Countdown: React.FC = () => {
     const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
-        setMounted(true)
-        // Set initial values fresh on client
-        const initial = getTimeRemaining()
-        setTime(initial)
-        setPrev(initial)
+        const id = setTimeout(() => {
+            setMounted(true)
+            const initial = getTimeRemaining()
+            setTime(initial)
+            setPrev(initial)
+        }, 0)
 
         const interval = setInterval(() => {
             // Use functional updates to avoid stale closure —
@@ -136,7 +135,10 @@ const Countdown: React.FC = () => {
             })
         }, 1000)
 
-        return () => clearInterval(interval)
+        return () => {
+            clearTimeout(id)
+            clearInterval(interval)
+        }
     }, [])
 
     if (!mounted) {
