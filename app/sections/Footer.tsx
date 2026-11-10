@@ -245,8 +245,17 @@ export default function Footer() {
         <div className="border-t border-black pt-16 grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand Column */}
           <div className="flex flex-col gap-6">
-            <div className="bg-gray-300 px-8 py-3 inline-block font-bold text-2xl uppercase w-fit">
-              LOGO
+            <div className="flex items-center gap-4">
+              <img
+                src="/images/JULogoPNG.png"
+                alt="Jadavpur University"
+                className="h-14 w-14 object-contain"
+              />
+              <img
+                src="/images/logos/primary-horizontal-logo.png"
+                alt="Illumine 2026"
+                className="h-12 w-auto object-contain max-w-[200px]"
+              />
             </div>
             <div className="flex flex-col gap-3">
               <h4 className="font-bold text-sm uppercase tracking-wide">

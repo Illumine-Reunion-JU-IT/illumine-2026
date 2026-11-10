@@ -32,10 +32,17 @@ const Footer = () => {
         {/* Column 1: System Identity */}
         <div className="flex flex-col space-y-4 border-b border-white/10 pb-6 md:border-b-0 md:pb-0 lg:border-r lg:border-white/5 lg:pr-4">
           
-          {/* Restored pure text logo with Mechsuit */}
-          <h2 className={`text-3xl sm:text-2xl tracking-wider text-[#FFFFFF] ${mechsuit.className}`}>
-            ILLUMINE
-          </h2>
+          {/* Illumine Logo + Text */}
+          <div className="flex items-center gap-3">
+            <img
+              src="/images/logos/light-icon.svg"
+              alt="Illumine 2026"
+              className="h-10 w-auto object-contain"
+            />
+            <h2 className={`text-3xl sm:text-2xl tracking-wider text-[#FFFFFF] ${mechsuit.className}`}>
+              ILLUMINE
+            </h2>
+          </div>
           
           <div className="text-[#888888] text-xs tracking-widest uppercase flex flex-col space-y-1">
             <span>NODE: IT DEPT</span>
