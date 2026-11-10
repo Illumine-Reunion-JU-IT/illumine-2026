@@ -425,6 +425,33 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.profInfoFading {
+  opacity: 0.3;
+  transform: translateY(4px);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.mobileCountdownRing {
+  display: none;
+}
+
+.thumbnailWrapper:focus-visible {
+  outline: 2px solid #BEF3DF;
+  outline-offset: 3px;
 }
 
 .profName {
@@ -560,6 +587,16 @@
 
   .activeRingContainer { display: none; }
 
+  .mobileCountdownRing {
+    display: block;
+    position: absolute;
+    inset: -4px;
+    width: calc(100% + 8px);
+    height: calc(100% + 8px);
+    pointer-events: none;
+    z-index: 5;
+  }
+
   .galleryTrack {
     position: relative;
     top: auto; left: auto;
@@ -578,10 +615,10 @@
     left: auto; top: auto;
     transform: none !important;
     border-radius: 50%;
-    overflow: hidden;
+    overflow: visible;
   }
 
-  .thumbnailActive  { width: 80px; height: 80px; border-radius: 50%; border: 2px solid rgba(190,243,223,0.6); box-shadow: 0 0 20px rgba(190,243,223,0.15); }
+  .thumbnailActive  { width: 80px; height: 80px; border-radius: 50%; border: 2px solid transparent; box-shadow: 0 0 20px rgba(190,243,223,0.15); }
   .thumbnailInactive { width: 56px; height: 56px; border-radius: 50%; border: 2px solid transparent; }
 
   .featuredColumn  { margin-left: 0; margin-bottom: 30px; align-items: center; }
@@ -602,7 +639,7 @@
   .contentWrapper { padding: 24px 16px 0; }
   .galleryTrack   { gap: 8px; }
 
-  .thumbnailActive  { width: 56px; height: 56px; border-radius: 50%; border: 2px solid rgba(190,243,223,0.6); box-shadow: 0 0 16px rgba(190,243,223,0.15); }
+  .thumbnailActive  { width: 56px; height: 56px; border-radius: 50%; border: 2px solid transparent; box-shadow: 0 0 16px rgba(190,243,223,0.15); }
   .thumbnailInactive { width: 40px; height: 40px; border-radius: 50%; }
 
   .featuredCard       { width: 220px; height: 310px; }
@@ -612,4 +649,18 @@
   .profName        { font-size: 16px; }
   .profDesignation { font-size: 13px; }
   .targetGraphic   { width: 250px; height: 250px; right: -60px; top: 20px; opacity: 0.15; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slowRingCW,
+  .slowRingCCW,
+  .equalizerBar,
+  .systemUpdate,
+  .messageRow,
+  .scanReveal,
+  .scanlinesPulse,
+  .scanlines {
+    animation: none !important;
+    transition: none !important;
+  }
 }

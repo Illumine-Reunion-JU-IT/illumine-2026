@@ -1,14 +1,38 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import { professors, sectionTitle } from "@/data/goodwillData";
 import type { ProfessorData } from "@/types/goodwill";
 import DecryptedText from "@/components/ui/DecryptedText";
 import styles from "./GoodwillMessage.module.css";
 
+/**
+ * Configurable base duration for each professor's message cycle (range 30-40s).
+ */
+export const GOODWILL_DURATION_SECONDS = 35;
+
 const GLITCH_DURATION = 500; // ms for .systemUpdate class
-const RING_CIRCUMFERENCE = 2 * Math.PI * 54; // r=54 on the progress ring
+const RING_RADIUS = 54;
+const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS; // ~339.292
+
+const MOBILE_RING_RADIUS = 46;
+const MOBILE_RING_CIRCUMFERENCE = 2 * Math.PI * MOBILE_RING_RADIUS; // ~289.026
+
+/**
+ * Calculates display duration for a given professor.
+ * Supports per-professor override via `durationSeconds`, or auto-calculates
+ * based on message word count (clamped strictly between 30 and 40 seconds).
+ */
+function getProfessorDuration(prof: ProfessorData): number {
+  if (typeof prof.durationSeconds === "number") {
+    return Math.max(30, Math.min(40, prof.durationSeconds));
+  }
+  const wordCount = prof.message.trim().split(/\s+/).length;
+  // Scaled reading pacing clamped strictly between 30 and 40 seconds
+  const dynamicSeconds = Math.round(30 + ((wordCount - 150) / 200) * 10);
+  return Math.max(30, Math.min(40, dynamicSeconds || GOODWILL_DURATION_SECONDS));
+}
 
 const GoodwillMessage: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -16,29 +40,179 @@ const GoodwillMessage: React.FC = () => {
   const [textKey, setTextKey] = useState(0); // force re-mount text on swap
   const [revealing, setRevealing] = useState(false);
 
+  // References for high-performance direct SVG stroke manipulation (zero re-render per frame)
+  const ringRef = useRef<SVGCircleElement | null>(null);
+  const mobileRingRef = useRef<SVGCircleElement | null>(null);
+  const messageContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const activeIndexRef = useRef(0);
+  const elapsedRef = useRef(0);
+  const durationRef = useRef(getProfessorDuration(professors[0]) * 1000);
+  const isPausedRef = useRef(false);
+  const isGlitchingRef = useRef(false);
+  const isTabHiddenRef = useRef(false);
+  const lastTimeRef = useRef<number | null>(null);
+  const rafIdRef = useRef<number | null>(null);
+
   const activeProfessor: ProfessorData = professors[activeIndex];
 
-  const advanceTo = useCallback((nextIdx: number) => {
-    setGlitching(true);
-    setTimeout(() => {
-      setActiveIndex(nextIdx);
-      setTextKey((k) => k + 1);
-      setGlitching(false);
-      setRevealing(true);
-      setTimeout(() => setRevealing(false), 1200);
-    }, GLITCH_DURATION);
+  const resetRingVisuals = useCallback(() => {
+    if (ringRef.current) {
+      ringRef.current.setAttribute("stroke-dashoffset", String(RING_CIRCUMFERENCE));
+    }
+    if (mobileRingRef.current) {
+      mobileRingRef.current.setAttribute("stroke-dashoffset", String(MOBILE_RING_CIRCUMFERENCE));
+    }
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop = 0;
+    }
   }, []);
 
+  const advanceTo = useCallback(
+    (nextIdx: number) => {
+      isGlitchingRef.current = true;
+      setGlitching(true);
+      elapsedRef.current = 0;
+      resetRingVisuals();
+
+      setTimeout(() => {
+        setActiveIndex(nextIdx);
+        activeIndexRef.current = nextIdx;
+        durationRef.current = getProfessorDuration(professors[nextIdx]) * 1000;
+        setTextKey((k) => k + 1);
+        setGlitching(false);
+        isGlitchingRef.current = false;
+        setRevealing(true);
+        lastTimeRef.current = performance.now();
+
+        setTimeout(() => setRevealing(false), 1200);
+      }, GLITCH_DURATION);
+    },
+    [resetRingVisuals]
+  );
+
   const handleSelectProfessor = (idx: number) => {
-    if (idx === activeIndex) return;
+    if (idx === activeIndexRef.current) {
+      // Re-trigger current professor from beginning
+      elapsedRef.current = 0;
+      resetRingVisuals();
+      lastTimeRef.current = performance.now();
+      return;
+    }
     advanceTo(idx);
   };
+
+  // Main high-performance requestAnimationFrame loop driving the countdown ring
+  useEffect(() => {
+    activeIndexRef.current = activeIndex;
+    durationRef.current = getProfessorDuration(professors[activeIndex]) * 1000;
+
+    const animate = (now: number) => {
+      if (lastTimeRef.current === null) {
+        lastTimeRef.current = now;
+      }
+      const delta = now - lastTimeRef.current;
+      lastTimeRef.current = now;
+
+      // Only progress when tab is visible, not paused by user, and not mid-glitch
+      if (!isPausedRef.current && !isGlitchingRef.current && !isTabHiddenRef.current) {
+        elapsedRef.current += delta;
+        const totalDuration = durationRef.current;
+        const progress = Math.min(1, elapsedRef.current / totalDuration);
+
+        // Update desktop SVG progress ring (filling from full circumference to 0 offset)
+        if (ringRef.current) {
+          const offset = RING_CIRCUMFERENCE * (1 - progress);
+          ringRef.current.setAttribute("stroke-dashoffset", offset.toFixed(2));
+        }
+
+        // Update responsive mobile progress ring
+        if (mobileRingRef.current) {
+          const mobileOffset = MOBILE_RING_CIRCUMFERENCE * (1 - progress);
+          mobileRingRef.current.setAttribute("stroke-dashoffset", mobileOffset.toFixed(2));
+        }
+
+        // Synchronized auto-scroll for overflowing message content
+        if (messageContainerRef.current) {
+          const el = messageContainerRef.current;
+          const maxScroll = el.scrollHeight - el.clientHeight;
+          if (maxScroll > 0) {
+            // Buffer at start (first 8%) and finish (last 8%) for comfortable reading
+            const scrollProgress = Math.min(1, Math.max(0, (progress - 0.08) / 0.84));
+            el.scrollTop = maxScroll * scrollProgress;
+          }
+        }
+
+        // Check if countdown cycle is complete
+        if (elapsedRef.current >= totalDuration) {
+          elapsedRef.current = 0;
+          if (professors.length > 1) {
+            const nextIdx = (activeIndexRef.current + 1) % professors.length;
+            advanceTo(nextIdx);
+          }
+        }
+      }
+
+      rafIdRef.current = requestAnimationFrame(animate);
+    };
+
+    rafIdRef.current = requestAnimationFrame(animate);
+
+    // Handle tab switching without jumping progress
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        isTabHiddenRef.current = true;
+      } else {
+        isTabHiddenRef.current = false;
+        lastTimeRef.current = performance.now();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      if (rafIdRef.current) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [activeIndex, advanceTo]);
 
   return (
     <section
       id="goodwill-message"
       className={`${styles.section} ${glitching ? styles.systemUpdate : ""}`}
+      onMouseEnter={() => {
+        isPausedRef.current = true;
+      }}
+      onMouseLeave={() => {
+        isPausedRef.current = false;
+        lastTimeRef.current = performance.now();
+      }}
+      onFocusCapture={() => {
+        isPausedRef.current = true;
+      }}
+      onBlurCapture={() => {
+        isPausedRef.current = false;
+        lastTimeRef.current = performance.now();
+      }}
+      onTouchStart={() => {
+        isPausedRef.current = true;
+      }}
+      onTouchEnd={() => {
+        isPausedRef.current = false;
+        lastTimeRef.current = performance.now();
+      }}
+      onTouchCancel={() => {
+        isPausedRef.current = false;
+        lastTimeRef.current = performance.now();
+      }}
     >
+      {/* Screen reader live region announcing active professor */}
+      <div className={styles.srOnly} aria-live="polite" aria-atomic="true">
+        {`Now displaying goodwill message from ${activeProfessor.name}, ${activeProfessor.designation.join(", ")}`}
+      </div>
+
       {/* Background target graphic */}
       <div className={styles.targetGraphic} aria-hidden="true">
         <svg
@@ -149,7 +323,7 @@ const GoodwillMessage: React.FC = () => {
                 className={styles.slowRingCW}
               />
 
-              {/* Counter-clockwise dashed ring */}
+              {/* Counter-clockwise dashed ring (subtle ambient rotation) */}
               <circle
                 cx="75.67"
                 cy="85.75"
@@ -183,17 +357,28 @@ const GoodwillMessage: React.FC = () => {
                 />
               </g>
 
-              {/* STATIC PROGRESS ARC */}
+              {/* Faint track circle beneath progress ring */}
               <circle
                 cx="75.67"
                 cy="85.75"
-                r="54"
+                r={RING_RADIUS}
+                stroke="rgba(190,243,223,0.12)"
+                strokeWidth="2.5"
+                fill="none"
+              />
+
+              {/* ANIMATED COUNTDOWN PROGRESS RING */}
+              <circle
+                ref={ringRef}
+                cx="75.67"
+                cy="85.75"
+                r={RING_RADIUS}
                 stroke="#BEF3DF"
                 strokeWidth="2.5"
                 fill="none"
                 strokeLinecap="round"
                 strokeDasharray={RING_CIRCUMFERENCE}
-                strokeDashoffset={0}
+                strokeDashoffset={RING_CIRCUMFERENCE}
                 transform="rotate(-90 75.67 85.75)"
                 className={styles.progressRing}
                 style={{
@@ -203,7 +388,7 @@ const GoodwillMessage: React.FC = () => {
                 }}
               />
 
-              {/* Tick marks around progress ring - Now entirely static */}
+              {/* Tick marks around progress ring */}
               {Array.from({ length: 24 }).map((_, i) => {
                 const angle = (i / 24) * 360 - 90;
                 const rad = (angle * Math.PI) / 180;
@@ -323,10 +508,12 @@ const GoodwillMessage: React.FC = () => {
               else if (offset < 0)
                 y = -ACTIVE_OFFSET - (Math.abs(offset) - 1) * INACTIVE_OFFSET;
 
+              const isActive = idx === activeIndex;
+
               return (
                 <button
                   key={prof.id}
-                  className={`${styles.thumbnailWrapper} ${idx === activeIndex ? styles.thumbnailActive : styles.thumbnailInactive}`}
+                  className={`${styles.thumbnailWrapper} ${isActive ? styles.thumbnailActive : styles.thumbnailInactive}`}
                   style={{ transform: `translate(-50%, calc(-50% + ${y}px))` }}
                   onClick={() => handleSelectProfessor(idx)}
                   onTouchEnd={(e) => {
@@ -335,6 +522,7 @@ const GoodwillMessage: React.FC = () => {
                   }}
                   aria-label={`View message from ${prof.name}`}
                   type="button"
+                  tabIndex={0}
                 >
                   <Image
                     src={prof.imagePath}
@@ -343,8 +531,40 @@ const GoodwillMessage: React.FC = () => {
                     height={100}
                     className={styles.thumbnailImg}
                   />
+
+                  {/* Responsive mobile countdown indicator ring */}
+                  {isActive && (
+                    <svg
+                      className={styles.mobileCountdownRing}
+                      viewBox="0 0 100 100"
+                      aria-hidden="true"
+                    >
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r={MOBILE_RING_RADIUS}
+                        stroke="rgba(190,243,223,0.15)"
+                        strokeWidth="3.5"
+                        fill="none"
+                      />
+                      <circle
+                        ref={mobileRingRef}
+                        cx="50"
+                        cy="50"
+                        r={MOBILE_RING_RADIUS}
+                        stroke="#BEF3DF"
+                        strokeWidth="3.5"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeDasharray={MOBILE_RING_CIRCUMFERENCE}
+                        strokeDashoffset={MOBILE_RING_CIRCUMFERENCE}
+                        transform="rotate(-90 50 50)"
+                      />
+                    </svg>
+                  )}
+
                   {/* Breathing glow for active */}
-                  {idx === activeIndex && (
+                  {isActive && (
                     <span className={styles.activeBreath} aria-hidden="true" />
                   )}
                 </button>
@@ -455,7 +675,9 @@ const GoodwillMessage: React.FC = () => {
             </div>
           </div>
 
-          <div className={styles.profInfo}>
+          <div
+            className={`${styles.profInfo} ${glitching ? styles.profInfoFading : ""}`}
+          >
             <h3 className={styles.profName}>
               <DecryptedText
                 key={`name-${activeIndex}`}
@@ -479,8 +701,9 @@ const GoodwillMessage: React.FC = () => {
           </div>
         </div>
 
-        {/* Message content — masked scan reveal */}
+        {/* Message content — masked scan reveal with synchronized smooth reading auto-scroll */}
         <div
+          ref={messageContainerRef}
           key={textKey}
           className={`${styles.messageContent} ${revealing ? styles.messageRevealing : ""}`}
         >
