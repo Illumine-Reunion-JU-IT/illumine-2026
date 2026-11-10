@@ -107,15 +107,18 @@ const GoodwillMessage: React.FC = () => {
     [resetVisuals]
   );
 
-  const handleSelectProfessor = (idx: number) => {
-    if (idx === activeIndexRef.current) {
-      elapsedRef.current = 0;
-      resetVisuals();
-      lastTimeRef.current = performance.now();
-      return;
-    }
-    advanceTo(idx);
-  };
+  const handleSelectProfessor = useCallback(
+    (idx: number) => {
+      if (idx === activeIndexRef.current) {
+        elapsedRef.current = 0;
+        resetVisuals();
+        lastTimeRef.current = performance.now();
+        return;
+      }
+      advanceTo(idx);
+    },
+    [advanceTo, resetVisuals]
+  );
 
   // Allows user manual scrolling (wheel, trackpad, drag) while keeping loader ring in sync
   const handleContainerScroll = () => {
