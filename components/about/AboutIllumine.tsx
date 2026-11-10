@@ -1,15 +1,95 @@
 'use client';
 
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { svgPaths } from '../../data/aboutilluminepaths';
 
 export default function AboutIllumine() {
+  const [isInView, setIsInView] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+        }
+      },
+      { threshold: 0.15 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div id='about-illumine'  className="relative min-h-screen w-full bg-[#070707] overflow-hidden flex items-center justify-center p-2 md:p-6 font-mono">
+    <div 
+      ref={sectionRef}
+      id='about-illumine'  
+      className="relative min-h-screen w-full bg-[#070707] overflow-hidden flex items-center justify-center p-2 md:p-6 font-mono"
+    >
+      <style>{`
+        @keyframes slideInFlashLeft {
+          0% {
+            opacity: 0;
+            transform: translateX(-150px) skewX(-14deg) scale(0.92);
+            filter: brightness(3.5) drop-shadow(0 0 35px #BEF3DF) drop-shadow(0 0 70px #7B61FF);
+          }
+          35% {
+            opacity: 0.8;
+            filter: brightness(2.2) drop-shadow(0 0 30px #7B61FF);
+          }
+          70% {
+            transform: translateX(12px) skewX(3deg) scale(1.03);
+          }
+          100% {
+            opacity: 1;
+            transform: translateX(0) skewX(0deg) scale(1);
+            filter: brightness(1) drop-shadow(0 0 16px rgba(182,187,255,0.6));
+          }
+        }
+        @keyframes laserFlashSweep {
+          0% {
+            transform: translateX(-160%) skewX(-25deg);
+            opacity: 0;
+          }
+          20% {
+            opacity: 1;
+          }
+          80% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(260%) skewX(-25deg);
+            opacity: 0;
+          }
+        }
+        @keyframes neonBorderPulse {
+          0%, 100% {
+            opacity: 0.7;
+            filter: drop-shadow(0 0 12px rgba(165,180,252,0.4));
+          }
+          50% {
+            opacity: 1;
+            filter: drop-shadow(0 0 26px rgba(190,243,223,0.85));
+          }
+        }
+      `}</style>
       <div className="relative z-10 w-full max-w-7xl h-[92vh] md:h-[95vh] flex flex-col transition-all duration-500">
         <div className="w-full flex flex-col items-center shrink-0 mb-4">
-          <div className="relative z-30 -mb-4 md:-mb-6">
-            <div className="relative w-72 md:w-[520px] h-14 md:h-20">
+          <div className="relative z-30 -mb-4 md:-mb-6 overflow-hidden">
+            <div 
+              className={`relative w-72 md:w-[520px] h-14 md:h-20 transition-all duration-700 ease-out ${
+                isInView ? 'opacity-100' : 'opacity-0 -translate-x-28'
+              }`}
+              style={isInView ? { animation: 'slideInFlashLeft 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards' } : undefined}
+            >
+              {/* Laser Flash Beam */}
+              {isInView && (
+                <div 
+                  className="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-white/90 to-transparent pointer-events-none z-40"
+                  style={{ animation: 'laserFlashSweep 1.2s ease-out 0.2s 1 forwards' }}
+                />
+              )}
               <Image
                 src={svgPaths.aboutIllumine}
                 alt="About Illumine"
@@ -26,6 +106,7 @@ export default function AboutIllumine() {
             width={1200}
             height={40}
             className="w-full h-auto drop-shadow-[0_0_20px_rgba(165,180,252,0.5)]"
+            style={{ animation: 'neonBorderPulse 4s ease-in-out infinite' }}
           />
         </div>
 

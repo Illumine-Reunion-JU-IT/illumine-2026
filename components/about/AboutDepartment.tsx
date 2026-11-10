@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import BigCircle from "@/components/ui/BigCircle";
 import Vector4 from "@/assets/coming_soon_svgs/svg/Vector4";
@@ -8,6 +8,7 @@ import Vector5 from "@/assets/coming_soon_svgs/svg/Vector5";
 import Group95 from "@/assets/coming_soon_svgs/svg/Group95";
 import Rectangle70 from "@/assets/coming_soon_svgs/svg/Rectangle70";
 import DecryptedText from "@/components/ui/DecryptedText";
+
 const Cross = ({
   style,
   className,
@@ -25,8 +26,71 @@ const Cross = ({
 );
 
 export default function AboutDepartment() {
+  const [isInView, setIsInView] = useState(false);
+  const headingRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+        }
+      },
+      { threshold: 0.2 }
+    );
+    if (headingRef.current) observer.observe(headingRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="relative w-full min-h-screen bg-[#070707] overflow-hidden flex flex-col items-center justify-center font-tt-lakes text-white py-20">
+      <style>{`
+        @keyframes slideInFlashRight {
+          0% {
+            opacity: 0;
+            transform: translateX(150px) skewX(14deg) scale(0.92);
+            filter: brightness(3.5) drop-shadow(0 0 35px #7B61FF) drop-shadow(0 0 70px #BEF3DF);
+          }
+          35% {
+            opacity: 0.8;
+            filter: brightness(2.2) drop-shadow(0 0 30px #BEF3DF);
+          }
+          70% {
+            transform: translateX(-12px) skewX(-3deg) scale(1.03);
+          }
+          100% {
+            opacity: 1;
+            transform: translateX(0) skewX(0deg) scale(1);
+            filter: brightness(1) drop-shadow(0 0 16px rgba(196,204,255,0.6));
+          }
+        }
+        @keyframes laserSweepRight {
+          0% {
+            transform: translateX(160%) skewX(25deg);
+            opacity: 0;
+          }
+          20% {
+            opacity: 1;
+          }
+          80% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(-260%) skewX(25deg);
+            opacity: 0;
+          }
+        }
+        @keyframes lineExpandRight {
+          0% {
+            width: 0%;
+            opacity: 0;
+          }
+          100% {
+            width: 100%;
+            opacity: 1;
+          }
+        }
+      `}</style>
 
       {/* subtle noise */}
       <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"
@@ -43,16 +107,36 @@ export default function AboutDepartment() {
       <Cross style={{ bottom: "10%", right: "25%" }} />
       <Cross style={{ top: "45%", right: "5%" }} />
 
-      {/* heading */}
-      <h1 className="font-mechsuit text-xl lg:text-2xl xl:text-[2.3vw] text-[#C4CCFF] drop-shadow-[0_0_10px_rgba(196,204,255,0.4)] tracking-[0.2em] z-10 mb-14 text-center">
-        <DecryptedText
-          text="ABOUT THE DEPARTMENT"
-          animateOn="view"
-          speed={60}
-          sequential
-          revealDirection="start"
+      {/* heading with dynamic slide from right and laser flash */}
+      <div 
+        ref={headingRef}
+        className={`relative z-10 mb-14 text-center transition-all duration-700 ease-out overflow-hidden px-4 ${
+          isInView ? 'opacity-100' : 'opacity-0 translate-x-28'
+        }`}
+        style={isInView ? { animation: 'slideInFlashRight 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards' } : undefined}
+      >
+        {/* Laser Flash Beam */}
+        {isInView && (
+          <div 
+            className="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-[#BEF3DF]/90 to-transparent pointer-events-none z-40"
+            style={{ animation: 'laserSweepRight 1.2s ease-out 0.2s 1 forwards' }}
+          />
+        )}
+        <h1 className="font-mechsuit text-xl lg:text-2xl xl:text-[2.3vw] text-[#C4CCFF] drop-shadow-[0_0_12px_rgba(196,204,255,0.5)] tracking-[0.2em]">
+          <DecryptedText
+            text="ABOUT THE DEPARTMENT"
+            animateOn="view"
+            speed={60}
+            sequential
+            revealDirection="start"
+          />
+        </h1>
+        {/* Cyberpunk Accent Underline */}
+        <div 
+          className="h-[2px] mx-auto mt-3 bg-gradient-to-r from-transparent via-[#7B61FF] to-transparent"
+          style={isInView ? { animation: 'lineExpandRight 1s ease-out forwards' } : { width: '0%' }}
         />
-      </h1>
+      </div>
 
       {/* main container */}
       <div className="relative w-[92vw] max-w-[1200px] min-h-[650px] lg:h-[600px] z-10">
