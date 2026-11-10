@@ -8,16 +8,16 @@ import DecryptedText from "@/components/ui/DecryptedText";
 import styles from "./GoodwillMessage.module.css";
 
 /**
- * Configurable base duration for each professor's message cycle (range 30-40s).
+ * Configurable duration for each professor's message cycle (range 30-40s).
  */
-export const GOODWILL_DURATION_SECONDS = 35;
+export const GOODWILL_DURATION_SECONDS = 32;
 
-const GLITCH_DURATION = 500; // ms for .systemUpdate class
+const GLITCH_DURATION = 400; // ms for .systemUpdate transition
 const RING_RADIUS = 54;
-const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS; // ~339.292
+const RING_CIRCUMFERENCE = 339.29;
 
 const MOBILE_RING_RADIUS = 46;
-const MOBILE_RING_CIRCUMFERENCE = 2 * Math.PI * MOBILE_RING_RADIUS; // ~289.026
+const MOBILE_RING_CIRCUMFERENCE = 289.03;
 
 /**
  * Calculates display duration for a given professor.
@@ -29,7 +29,6 @@ function getProfessorDuration(prof: ProfessorData): number {
     return Math.max(30, Math.min(40, prof.durationSeconds));
   }
   const wordCount = prof.message.trim().split(/\s+/).length;
-  // Scaled reading pacing clamped strictly between 30 and 40 seconds
   const dynamicSeconds = Math.round(30 + ((wordCount - 150) / 200) * 10);
   return Math.max(30, Math.min(40, dynamicSeconds || GOODWILL_DURATION_SECONDS));
 }
@@ -37,10 +36,9 @@ function getProfessorDuration(prof: ProfessorData): number {
 const GoodwillMessage: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [glitching, setGlitching] = useState(false);
-  const [textKey, setTextKey] = useState(0); // force re-mount text on swap
   const [revealing, setRevealing] = useState(false);
 
-  // References for high-performance direct SVG stroke manipulation (zero re-render per frame)
+  // References for direct 60fps SVG stroke and scroll manipulation
   const ringRef = useRef<SVGCircleElement | null>(null);
   const mobileRingRef = useRef<SVGCircleElement | null>(null);
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
@@ -48,15 +46,14 @@ const GoodwillMessage: React.FC = () => {
   const activeIndexRef = useRef(0);
   const elapsedRef = useRef(0);
   const durationRef = useRef(getProfessorDuration(professors[0]) * 1000);
-  const isPausedRef = useRef(false);
-  const isGlitchingRef = useRef(false);
+  const isTransitioningRef = useRef(false);
   const isTabHiddenRef = useRef(false);
   const lastTimeRef = useRef<number | null>(null);
   const rafIdRef = useRef<number | null>(null);
 
   const activeProfessor: ProfessorData = professors[activeIndex];
 
-  const resetRingVisuals = useCallback(() => {
+  const resetVisuals = useCallback(() => {
     if (ringRef.current) {
       ringRef.current.setAttribute("stroke-dashoffset", String(RING_CIRCUMFERENCE));
     }
@@ -70,39 +67,37 @@ const GoodwillMessage: React.FC = () => {
 
   const advanceTo = useCallback(
     (nextIdx: number) => {
-      isGlitchingRef.current = true;
+      isTransitioningRef.current = true;
       setGlitching(true);
       elapsedRef.current = 0;
-      resetRingVisuals();
+      resetVisuals();
 
       setTimeout(() => {
         setActiveIndex(nextIdx);
         activeIndexRef.current = nextIdx;
         durationRef.current = getProfessorDuration(professors[nextIdx]) * 1000;
-        setTextKey((k) => k + 1);
         setGlitching(false);
-        isGlitchingRef.current = false;
+        isTransitioningRef.current = false;
         setRevealing(true);
         lastTimeRef.current = performance.now();
 
-        setTimeout(() => setRevealing(false), 1200);
+        setTimeout(() => setRevealing(false), 800);
       }, GLITCH_DURATION);
     },
-    [resetRingVisuals]
+    [resetVisuals]
   );
 
   const handleSelectProfessor = (idx: number) => {
     if (idx === activeIndexRef.current) {
-      // Re-trigger current professor from beginning
       elapsedRef.current = 0;
-      resetRingVisuals();
+      resetVisuals();
       lastTimeRef.current = performance.now();
       return;
     }
     advanceTo(idx);
   };
 
-  // Main high-performance requestAnimationFrame loop driving the countdown ring
+  // Continuous high-performance animation loop driving countdown ring and scroll synchronization
   useEffect(() => {
     activeIndexRef.current = activeIndex;
     durationRef.current = getProfessorDuration(professors[activeIndex]) * 1000;
@@ -114,36 +109,33 @@ const GoodwillMessage: React.FC = () => {
       const delta = now - lastTimeRef.current;
       lastTimeRef.current = now;
 
-      // Only progress when tab is visible, not paused by user, and not mid-glitch
-      if (!isPausedRef.current && !isGlitchingRef.current && !isTabHiddenRef.current) {
+      if (!isTransitioningRef.current && !isTabHiddenRef.current) {
         elapsedRef.current += delta;
         const totalDuration = durationRef.current;
-        const progress = Math.min(1, elapsedRef.current / totalDuration);
+        const progress = Math.min(1, Math.max(0, elapsedRef.current / totalDuration));
 
-        // Update desktop SVG progress ring (filling from full circumference to 0 offset)
+        // 1. Move the loader circle bar clockwise as time elapses
         if (ringRef.current) {
           const offset = RING_CIRCUMFERENCE * (1 - progress);
           ringRef.current.setAttribute("stroke-dashoffset", offset.toFixed(2));
         }
 
-        // Update responsive mobile progress ring
         if (mobileRingRef.current) {
           const mobileOffset = MOBILE_RING_CIRCUMFERENCE * (1 - progress);
           mobileRingRef.current.setAttribute("stroke-dashoffset", mobileOffset.toFixed(2));
         }
 
-        // Synchronized auto-scroll for overflowing message content
+        // 2. Automatically scroll message down in direct sync with the progress bar
         if (messageContainerRef.current) {
           const el = messageContainerRef.current;
           const maxScroll = el.scrollHeight - el.clientHeight;
           if (maxScroll > 0) {
-            // Buffer at start (first 8%) and finish (last 8%) for comfortable reading
-            const scrollProgress = Math.min(1, Math.max(0, (progress - 0.08) / 0.84));
-            el.scrollTop = maxScroll * scrollProgress;
+            // Smoothly glide from top (scrollTop=0) to bottom (scrollTop=maxScroll)
+            el.scrollTop = maxScroll * progress;
           }
         }
 
-        // Check if countdown cycle is complete
+        // 3. When the loader circle bar completes, automatically advance to next circle/professor
         if (elapsedRef.current >= totalDuration) {
           elapsedRef.current = 0;
           if (professors.length > 1) {
@@ -158,7 +150,6 @@ const GoodwillMessage: React.FC = () => {
 
     rafIdRef.current = requestAnimationFrame(animate);
 
-    // Handle tab switching without jumping progress
     const handleVisibilityChange = () => {
       if (document.hidden) {
         isTabHiddenRef.current = true;
@@ -182,31 +173,7 @@ const GoodwillMessage: React.FC = () => {
     <section
       id="goodwill-message"
       className={`${styles.section} ${glitching ? styles.systemUpdate : ""}`}
-      onMouseEnter={() => {
-        isPausedRef.current = true;
-      }}
-      onMouseLeave={() => {
-        isPausedRef.current = false;
-        lastTimeRef.current = performance.now();
-      }}
-      onFocusCapture={() => {
-        isPausedRef.current = true;
-      }}
-      onBlurCapture={() => {
-        isPausedRef.current = false;
-        lastTimeRef.current = performance.now();
-      }}
-      onTouchStart={() => {
-        isPausedRef.current = true;
-      }}
-      onTouchEnd={() => {
-        isPausedRef.current = false;
-        lastTimeRef.current = performance.now();
-      }}
-      onTouchCancel={() => {
-        isPausedRef.current = false;
-        lastTimeRef.current = performance.now();
-      }}
+      suppressHydrationWarning
     >
       {/* Screen reader live region announcing active professor */}
       <div className={styles.srOnly} aria-live="polite" aria-atomic="true">
@@ -300,9 +267,9 @@ const GoodwillMessage: React.FC = () => {
           })}
         </div>
 
-        {/* Thumbnail carousel column */}
+        {/* Dynamic thumbnail column */}
         <div className={styles.thumbnailColumn}>
-          {/* HUD ring overlay with progress arc */}
+          {/* HUD ring overlay with dynamic animated loader circle bar */}
           <div className={styles.activeRingContainer} aria-hidden="true">
             <svg
               width="162"
@@ -311,8 +278,9 @@ const GoodwillMessage: React.FC = () => {
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className={styles.activeRingSvg}
+              suppressHydrationWarning
             >
-              {/* Slow clockwise background ring */}
+              {/* Slow clockwise ambient background ring */}
               <circle
                 cx="75.67"
                 cy="85.75"
@@ -323,19 +291,19 @@ const GoodwillMessage: React.FC = () => {
                 className={styles.slowRingCW}
               />
 
-              {/* Counter-clockwise dashed ring (subtle ambient rotation) */}
+              {/* Counter-clockwise dashed ring */}
               <circle
                 cx="75.67"
                 cy="85.75"
                 r="61"
-                stroke="rgba(190,243,223,0.08)"
+                stroke="rgba(190,243,223,0.10)"
                 strokeWidth="1"
                 fill="none"
                 strokeDasharray="6 8"
                 className={styles.slowRingCCW}
               />
 
-              {/* Static base ring (original SVG structure) */}
+              {/* Static base decorative elements */}
               <g opacity="0.9">
                 <g opacity="0.5">
                   <path
@@ -357,24 +325,24 @@ const GoodwillMessage: React.FC = () => {
                 />
               </g>
 
-              {/* Faint track circle beneath progress ring */}
+              {/* Faint circular track beneath loader circle bar */}
               <circle
                 cx="75.67"
                 cy="85.75"
                 r={RING_RADIUS}
-                stroke="rgba(190,243,223,0.12)"
-                strokeWidth="2.5"
+                stroke="rgba(190,243,223,0.18)"
+                strokeWidth="4"
                 fill="none"
               />
 
-              {/* ANIMATED COUNTDOWN PROGRESS RING */}
+              {/* DYNAMIC LOADER CIRCLE BAR */}
               <circle
                 ref={ringRef}
                 cx="75.67"
                 cy="85.75"
                 r={RING_RADIUS}
                 stroke="#BEF3DF"
-                strokeWidth="2.5"
+                strokeWidth="4"
                 fill="none"
                 strokeLinecap="round"
                 strokeDasharray={RING_CIRCUMFERENCE}
@@ -382,34 +350,23 @@ const GoodwillMessage: React.FC = () => {
                 transform="rotate(-90 75.67 85.75)"
                 className={styles.progressRing}
                 style={{
-                  filter: glitching
-                    ? "drop-shadow(0 0 8px #BEF3DF) brightness(2)"
-                    : undefined,
+                  filter: "drop-shadow(0 0 8px rgba(190,243,223,0.9))",
                 }}
               />
 
-              {/* Tick marks around progress ring */}
-              {Array.from({ length: 24 }).map((_, i) => {
-                const angle = (i / 24) * 360 - 90;
-                const rad = (angle * Math.PI) / 180;
-                const r1 = 57,
-                  r2 = 60;
-                const x1 = 75.67 + r1 * Math.cos(rad);
-                const y1 = 85.75 + r1 * Math.sin(rad);
-                const x2 = 75.67 + r2 * Math.cos(rad);
-                const y2 = 85.75 + r2 * Math.sin(rad);
-                return (
-                  <line
-                    key={i}
-                    x1={x1}
-                    y1={y1}
-                    x2={x2}
-                    y2={y2}
-                    stroke="#BEF3DF"
-                    strokeWidth={i % 6 === 0 ? 2 : 1}
-                  />
-                );
-              })}
+              {/* Deterministic tick marks around loader circle — uses pure SVG rotation transforms (zero float precision discrepancies) */}
+              {Array.from({ length: 24 }).map((_, i) => (
+                <line
+                  key={i}
+                  x1="75.67"
+                  y1={i % 6 === 0 ? "23.75" : "26.75"}
+                  x2="75.67"
+                  y2="28.75"
+                  stroke="#BEF3DF"
+                  strokeWidth={i % 6 === 0 ? 2 : 1}
+                  transform={`rotate(${i * 15} 75.67 85.75)`}
+                />
+              ))}
 
               {/* Outer ring decoration */}
               <g opacity="0.35">
@@ -432,7 +389,7 @@ const GoodwillMessage: React.FC = () => {
               </g>
             </svg>
 
-            {/* Connecting line with running-light effect */}
+            {/* Connecting line */}
             <div className={styles.connectingLine}>
               <svg
                 viewBox="0 0 1051 330"
@@ -470,7 +427,6 @@ const GoodwillMessage: React.FC = () => {
                   </mask>
                 </defs>
                 <circle cx="8" cy="8" r="8" fill="white" opacity="0.5" />
-                {/* Base path */}
                 <path
                   stroke="white"
                   strokeWidth="2"
@@ -478,7 +434,6 @@ const GoodwillMessage: React.FC = () => {
                   opacity="0.25"
                   d="M8 8 H33 L73.5 48.5 V223.5 L119.5 269.5 H443 L502 328.5 H1049"
                 />
-                {/* Running light overlay */}
                 <rect
                   x="0"
                   y="0"
@@ -492,7 +447,7 @@ const GoodwillMessage: React.FC = () => {
             </div>
           </div>
 
-          {/* Thumbnail gallery track */}
+          {/* Dynamic sliding circles carousel track */}
           <div className={styles.galleryTrack}>
             {professors.map((prof, idx) => {
               const N = professors.length;
@@ -543,7 +498,7 @@ const GoodwillMessage: React.FC = () => {
                         cx="50"
                         cy="50"
                         r={MOBILE_RING_RADIUS}
-                        stroke="rgba(190,243,223,0.15)"
+                        stroke="rgba(190,243,223,0.18)"
                         strokeWidth="3.5"
                         fill="none"
                       />
@@ -559,6 +514,9 @@ const GoodwillMessage: React.FC = () => {
                         strokeDasharray={MOBILE_RING_CIRCUMFERENCE}
                         strokeDashoffset={MOBILE_RING_CIRCUMFERENCE}
                         transform="rotate(-90 50 50)"
+                        style={{
+                          filter: "drop-shadow(0 0 6px rgba(190,243,223,0.8))",
+                        }}
                       />
                     </svg>
                   )}
@@ -662,13 +620,11 @@ const GoodwillMessage: React.FC = () => {
                 sizes="(max-width: 768px) 200px, 250px"
                 priority
               />
-              {/* Scanline overlay */}
               <div
                 className={`${styles.scanlines} ${glitching ? styles.scanlinesPulse : ""}`}
                 aria-hidden="true"
               />
               <div className={styles.vignette} />
-              {/* Chromatic aberration fringe (CSS only) */}
               {glitching && (
                 <div className={styles.chromaticFringe} aria-hidden="true" />
               )}
@@ -701,20 +657,19 @@ const GoodwillMessage: React.FC = () => {
           </div>
         </div>
 
-        {/* Message content — masked scan reveal with synchronized smooth reading auto-scroll */}
+        {/* Message content — smooth continuous synchronized auto-scroll */}
         <div
           ref={messageContainerRef}
-          key={textKey}
           className={`${styles.messageContent} ${revealing ? styles.messageRevealing : ""}`}
         >
           {activeProfessor.message.split("\n").map((paragraph, i) => (
             <p
-              key={i}
+              key={`msg-${activeIndex}-${i}`}
               className={`${i === 0 ? styles.messageHeading : styles.messageParagraph} ${styles.messageRow}`}
               style={{ "--row-index": i } as React.CSSProperties}
             >
               <DecryptedText
-                key={`msg-${textKey}-${i}`}
+                key={`decrypted-msg-${activeIndex}-${i}`}
                 text={paragraph}
                 animateOn="view"
                 speed={12}

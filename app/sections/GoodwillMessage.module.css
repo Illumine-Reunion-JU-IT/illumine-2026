@@ -481,8 +481,10 @@
   padding-top: 8px;
   z-index: 3;
   max-width: 656px;
-  max-height: 400px;
+  height: 380px;
+  max-height: 380px;
   overflow-y: auto;
+  scroll-behavior: auto !important;
   padding-right: 15px;
   /* Fixed height prevents layout jump between short/long messages */
   min-height: 300px;
@@ -491,10 +493,10 @@
   grid-template-rows: auto;
   align-content: start;
 }
-.messageContent::-webkit-scrollbar        { width: 4px; }
-.messageContent::-webkit-scrollbar-track  { background: transparent; }
-.messageContent::-webkit-scrollbar-thumb  { background: rgba(190,243,223,0.3); border-radius: 4px; }
-.messageContent::-webkit-scrollbar-thumb:hover { background: rgba(190,243,223,0.6); }
+.messageContent::-webkit-scrollbar        { width: 5px; }
+.messageContent::-webkit-scrollbar-track  { background: rgba(255, 255, 255, 0.04); border-radius: 4px; }
+.messageContent::-webkit-scrollbar-thumb  { background: rgba(190,243,223,0.5); border-radius: 4px; box-shadow: 0 0 6px rgba(190,243,223,0.3); }
+.messageContent::-webkit-scrollbar-thumb:hover { background: rgba(190,243,223,0.8); }
 
 /* On new message reveal, rows stagger in from top */
 .messageRevealing .messageRow {
@@ -555,7 +557,12 @@
   pointer-events: none;
   transform: scaleY(-1);
 }
-.decorGraphicSvg { width: 108px; height: 115px; }
+.decorGraphicSvg {
+  width: 108px;
+  height: 115px;
+  transform-origin: 50.36px 57.01px;
+  animation: rotateCW 24s linear infinite;
+}
 
 /* ============================================================
    RESPONSIVE
