@@ -17,6 +17,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Illumine 2026",
   description: "Illumine 2026 Coming Soon",
+  icons: {
+    icon: "/images/illumineLogo26.svg",
+    shortcut: "/images/illumineLogo26.svg",
+    apple: "/images/illumineLogo26.svg",
+  },
 };
 
 /**

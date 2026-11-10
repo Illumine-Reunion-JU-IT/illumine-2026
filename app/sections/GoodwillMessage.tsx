@@ -209,10 +209,10 @@ const GoodwillMessage: React.FC = () => {
                 const rad = (angle * Math.PI) / 180;
                 const r1 = 57,
                   r2 = 60;
-                const x1 = 75.67 + r1 * Math.cos(rad);
-                const y1 = 85.75 + r1 * Math.sin(rad);
-                const x2 = 75.67 + r2 * Math.cos(rad);
-                const y2 = 85.75 + r2 * Math.sin(rad);
+                const x1 = parseFloat((75.67 + r1 * Math.cos(rad)).toFixed(6));
+                const y1 = parseFloat((85.75 + r1 * Math.sin(rad)).toFixed(6));
+                const x2 = parseFloat((75.67 + r2 * Math.cos(rad)).toFixed(6));
+                const y2 = parseFloat((85.75 + r2 * Math.sin(rad)).toFixed(6));
                 return (
                   <line
                     key={i}

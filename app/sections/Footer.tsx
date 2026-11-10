@@ -245,9 +245,11 @@ export default function Footer() {
         <div className="border-t border-black pt-16 grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand Column */}
           <div className="flex flex-col gap-6">
-            <div className="bg-gray-300 px-8 py-3 inline-block font-bold text-2xl uppercase w-fit">
-              LOGO
-            </div>
+            <img
+              src="/images/illumineLogo26.png"
+              alt="Illumine 2026"
+              className="h-16 w-16 object-contain"
+            />
             <div className="flex flex-col gap-3">
               <h4 className="font-bold text-sm uppercase tracking-wide">
                 About Me
