@@ -21,6 +21,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "Illumine 2026",
   description: "Official Silver Jubilee Reunion of Jadavpur University Information Technology Department.",
+  icons: {
+    icon: "/images/logos/primary-icon.svg",
+    shortcut: "/images/logos/primary-icon.svg",
+    apple: "/images/logos/primary-icon.png",
+  },
   alternates: {
     canonical: "/",
   },
@@ -45,6 +50,7 @@ export const metadata: Metadata = {
     title: "Illumine 2026",
     description: "Official Silver Jubilee Reunion of Jadavpur University Information Technology Department.",
     images: ["/photos/Hero/hero.png"],
+  },
   },
 };
 
