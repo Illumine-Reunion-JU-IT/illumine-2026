@@ -51,7 +51,6 @@ export const metadata: Metadata = {
     description: "Official Silver Jubilee Reunion of Jadavpur University Information Technology Department.",
     images: ["/photos/Hero/hero.png"],
   },
-  },
 };
 
 /**
