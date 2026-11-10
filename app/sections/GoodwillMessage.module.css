@@ -17,9 +17,9 @@
 }
 
 /* ── SYSTEM UPDATE glitch ── */
-/* Applied for 500ms on every professor swap */
+/* Applied briefly on every professor swap */
 .systemUpdate {
-  animation: sectionGlitch 0.5s steps(2) forwards;
+  animation: sectionGlitch 0.2s steps(2) forwards;
 }
 
 @keyframes sectionGlitch {
@@ -38,10 +38,22 @@
   height: 586px;
   right: -200px;
   top: 10px;
-  opacity: 0.5;
+  opacity: 0.45;
   transform: rotate(112.45deg);
   pointer-events: none;
   z-index: 0;
+  animation: targetPulse 12s ease-in-out infinite alternate;
+}
+
+@keyframes targetPulse {
+  0% {
+    opacity: 0.35;
+    transform: rotate(112.45deg) scale(0.97);
+  }
+  100% {
+    opacity: 0.55;
+    transform: rotate(112.45deg) scale(1.02);
+  }
 }
 .targetSvg { width: 100%; height: 100%; }
 
@@ -124,15 +136,35 @@
   transform-origin: left center;
 }
 
-/* Equalizer flicker animation */
-.equalizerBar {
-  animation: equalizerPulse calc(0.8s + (var(--bar-index) * 0.04s)) ease-in-out infinite alternate;
+/* ============================================================
+   ACTIVE CIRCLE INDICATOR LINE (Only beside the active circle)
+   ============================================================ */
+.activeCircleIndicatorLine {
+  position: absolute;
+  left: -32px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 2px;
+  background: #FFFFFF;
+  box-shadow: 0 0 8px #FFFFFF, 0 0 16px rgba(255, 255, 255, 0.95), 0 0 25px #BEF3DF;
+  border-radius: 2px;
+  z-index: 10;
+  pointer-events: none;
+  animation: lineGlowPulse 2.2s ease-in-out infinite alternate;
 }
 
-@keyframes equalizerPulse {
-  0%   { transform: scaleX(1);    opacity: 0.5; border-color: rgba(190,243,223,0.3); }
-  50%  { transform: scaleX(0.55); opacity: 0.2; border-color: rgba(255,255,255,0.3); }
-  100% { transform: scaleX(0.85); opacity: 0.4; border-color: rgba(190,243,223,0.5); }
+@keyframes lineGlowPulse {
+  0% {
+    width: 26px;
+    box-shadow: 0 0 6px #FFFFFF, 0 0 12px #BEF3DF;
+    opacity: 0.85;
+  }
+  100% {
+    width: 36px;
+    box-shadow: 0 0 12px #FFFFFF, 0 0 22px #FFFFFF, 0 0 32px #BEF3DF;
+    opacity: 1;
+  }
 }
 
 /* ============================================================
@@ -161,7 +193,7 @@
   width: 162px;
   height: 172px;
   pointer-events: none;
-  z-index: 1;
+  z-index: 10;
 }
 .activeRingSvg { width: 100%; height: 100%; }
 
@@ -177,6 +209,13 @@
 
 @keyframes rotateCW  { to { transform: rotate(360deg);  } }
 @keyframes rotateCCW { to { transform: rotate(-360deg); } }
+
+/* ── Rotating arc bar that orbits the circle ── */
+.rotatingArcBar {
+  transform-box: view-box;
+  transform-origin: 75.67px 85.75px;
+  will-change: transform;
+}
 
 /* ── Static Progress arc ── */
 .progressRing {
@@ -203,12 +242,12 @@
   overflow: visible;      /* allow glow to bleed outside */
   border: 2px solid transparent;
   transition:
-    transform       0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity         0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    border-color    0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow      0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    width           0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    height          0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform       0.28s cubic-bezier(0.25, 1, 0.5, 1),
+    opacity         0.28s cubic-bezier(0.25, 1, 0.5, 1),
+    border-color    0.28s ease,
+    box-shadow      0.28s ease,
+    width           0.28s cubic-bezier(0.25, 1, 0.5, 1),
+    height          0.28s cubic-bezier(0.25, 1, 0.5, 1);
   cursor: pointer;
   background: transparent;
   padding: 0;
@@ -225,9 +264,19 @@
 .thumbnailActive {
   width: 100px;
   height: 100px;
-  border-color: rgba(190, 243, 223, 0.6);
-  box-shadow: 0 0 20px rgba(190, 243, 223, 0.15);
+  border-color: #BEF3DF;
+  box-shadow: 0 0 25px rgba(190, 243, 223, 0.4), inset 0 0 15px rgba(190, 243, 223, 0.2);
   z-index: 5;
+  animation: activeAura 3s ease-in-out infinite alternate;
+}
+
+@keyframes activeAura {
+  0% {
+    box-shadow: 0 0 18px rgba(190, 243, 223, 0.3), inset 0 0 10px rgba(190, 243, 223, 0.15);
+  }
+  100% {
+    box-shadow: 0 0 30px rgba(190, 243, 223, 0.6), inset 0 0 20px rgba(190, 243, 223, 0.35);
+  }
 }
 
 .thumbnailInactive {
@@ -308,6 +357,11 @@
   position: relative;
   width: 272px;
   height: 383px;
+  filter: drop-shadow(0 0 14px rgba(190, 243, 223, 0.2));
+  transition: filter 0.4s ease;
+}
+.featuredCard:hover {
+  filter: drop-shadow(0 0 24px rgba(190, 243, 223, 0.4));
 }
 
 .frameSvg {
@@ -425,6 +479,33 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.profInfoFading {
+  opacity: 0.3;
+  transform: translateY(4px);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.mobileCountdownRing {
+  display: none;
+}
+
+.thumbnailWrapper:focus-visible {
+  outline: 2px solid #BEF3DF;
+  outline-offset: 3px;
 }
 
 .profName {
@@ -454,8 +535,10 @@
   padding-top: 8px;
   z-index: 3;
   max-width: 656px;
-  max-height: 400px;
+  height: 380px;
+  max-height: 380px;
   overflow-y: auto;
+  scroll-behavior: auto !important;
   padding-right: 15px;
   /* Fixed height prevents layout jump between short/long messages */
   min-height: 300px;
@@ -464,10 +547,10 @@
   grid-template-rows: auto;
   align-content: start;
 }
-.messageContent::-webkit-scrollbar        { width: 4px; }
-.messageContent::-webkit-scrollbar-track  { background: transparent; }
-.messageContent::-webkit-scrollbar-thumb  { background: rgba(190,243,223,0.3); border-radius: 4px; }
-.messageContent::-webkit-scrollbar-thumb:hover { background: rgba(190,243,223,0.6); }
+.messageContent::-webkit-scrollbar        { width: 5px; }
+.messageContent::-webkit-scrollbar-track  { background: rgba(255, 255, 255, 0.04); border-radius: 4px; }
+.messageContent::-webkit-scrollbar-thumb  { background: rgba(190,243,223,0.5); border-radius: 4px; box-shadow: 0 0 6px rgba(190,243,223,0.3); }
+.messageContent::-webkit-scrollbar-thumb:hover { background: rgba(190,243,223,0.8); }
 
 /* On new message reveal, rows stagger in from top */
 .messageRevealing .messageRow {
@@ -530,6 +613,12 @@
 }
 .decorGraphicSvg { width: 108px; height: 115px; }
 
+.bottomOuterBar {
+  transform-box: view-box;
+  transform-origin: 50.36px 57.01px;
+  will-change: transform;
+}
+
 /* ============================================================
    RESPONSIVE
    ============================================================ */
@@ -560,6 +649,16 @@
 
   .activeRingContainer { display: none; }
 
+  .mobileCountdownRing {
+    display: block;
+    position: absolute;
+    inset: -4px;
+    width: calc(100% + 8px);
+    height: calc(100% + 8px);
+    pointer-events: none;
+    z-index: 5;
+  }
+
   .galleryTrack {
     position: relative;
     top: auto; left: auto;
@@ -578,10 +677,10 @@
     left: auto; top: auto;
     transform: none !important;
     border-radius: 50%;
-    overflow: hidden;
+    overflow: visible;
   }
 
-  .thumbnailActive  { width: 80px; height: 80px; border-radius: 50%; border: 2px solid rgba(190,243,223,0.6); box-shadow: 0 0 20px rgba(190,243,223,0.15); }
+  .thumbnailActive  { width: 80px; height: 80px; border-radius: 50%; border: 2px solid transparent; box-shadow: 0 0 20px rgba(190,243,223,0.15); }
   .thumbnailInactive { width: 56px; height: 56px; border-radius: 50%; border: 2px solid transparent; }
 
   .featuredColumn  { margin-left: 0; margin-bottom: 30px; align-items: center; }
@@ -602,7 +701,7 @@
   .contentWrapper { padding: 24px 16px 0; }
   .galleryTrack   { gap: 8px; }
 
-  .thumbnailActive  { width: 56px; height: 56px; border-radius: 50%; border: 2px solid rgba(190,243,223,0.6); box-shadow: 0 0 16px rgba(190,243,223,0.15); }
+  .thumbnailActive  { width: 56px; height: 56px; border-radius: 50%; border: 2px solid transparent; box-shadow: 0 0 16px rgba(190,243,223,0.15); }
   .thumbnailInactive { width: 40px; height: 40px; border-radius: 50%; }
 
   .featuredCard       { width: 220px; height: 310px; }
@@ -612,4 +711,18 @@
   .profName        { font-size: 16px; }
   .profDesignation { font-size: 13px; }
   .targetGraphic   { width: 250px; height: 250px; right: -60px; top: 20px; opacity: 0.15; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slowRingCW,
+  .slowRingCCW,
+  .equalizerBar,
+  .systemUpdate,
+  .messageRow,
+  .scanReveal,
+  .scanlinesPulse,
+  .scanlines {
+    animation: none !important;
+    transition: none !important;
+  }
 }

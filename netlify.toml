@@ -1,0 +1,37 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# Netlify configuration for Illumine 2026
+# Production site : https://illumine-ju-it.in
+# Netlify alias   : https://illumine26.netlify.app  (redirects → canonical)
+# ──────────────────────────────────────────────────────────────────────────────
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # Tell Next.js to use the standalone output so Netlify's Next.js runtime
+  # can serve it correctly.  Set the canonical URL here as a build-time default;
+  # override in the Netlify dashboard for each environment as needed.
+  NEXT_PUBLIC_SITE_URL = "https://illumine-ju-it.in"
+
+# ── CDN-layer canonical redirect ──────────────────────────────────────────────
+# This fires at the Netlify edge BEFORE the Next.js server wakes up, so it is
+# faster and more reliable than the next.config.ts redirect alone.
+# `force = true` ensures it overrides any matching _redirects file entries.
+#
+# IMPORTANT: Netlify deploy-preview and branch-deploy URLs
+#   (deploy-preview-*.netlify.app, branch-name--illumine26.netlify.app)
+#   do NOT match "illumine26.netlify.app" exactly, so they are unaffected.
+[[redirects]]
+  from   = "https://illumine26.netlify.app/*"
+  to     = "https://illumine-ju-it.in/:splat"
+  status = 308
+  force  = true
+
+# ── SPA / Next.js catch-all ───────────────────────────────────────────────────
+# Required when using the Netlify Next.js runtime (@netlify/plugin-nextjs).
+# Passes all unmatched requests to the Next.js handler.
+[[redirects]]
+  from   = "/*"
+  to     = "/.netlify/functions/___netlify-handler"
+  status = 200

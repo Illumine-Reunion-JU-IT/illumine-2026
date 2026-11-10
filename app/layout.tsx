@@ -15,20 +15,30 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://illumine-ju-it.in";
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://illumine-reunion-ju-it.vercel.app'),
+  metadataBase: new URL(siteUrl),
   title: "Illumine 2026",
   description: "Official Silver Jubilee Reunion of Jadavpur University Information Technology Department.",
+  icons: {
+    icon: "/images/logos/primary-icon.svg",
+    shortcut: "/images/logos/primary-icon.svg",
+    apple: "/images/logos/primary-icon.png",
+  },
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "Illumine 2026",
     description: "Official Silver Jubilee Reunion of Jadavpur University Information Technology Department.",
-    url: "https://illumine-reunion-ju-it.vercel.app/",
+    url: "/",
     siteName: "Illumine 2026",
     images: [
       {
-        url: "/photos/Hero/logo.jpeg",
-        width: 800,
-        height: 800,
+        url: "/photos/Hero/hero.png",
+        width: 1440,
+        height: 714,
         alt: "Illumine 2026 Jadavpur University IT Reunion",
       },
     ],
@@ -39,7 +49,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Illumine 2026",
     description: "Official Silver Jubilee Reunion of Jadavpur University Information Technology Department.",
-    images: ["/photos/Hero/logo.jpeg"],
+    images: ["/photos/Hero/hero.png"],
   },
 };
 

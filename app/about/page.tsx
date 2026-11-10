@@ -10,16 +10,19 @@ import AboutCTA from '@/components/about/AboutCTA';
 export const metadata: Metadata = {
   title: 'About | Illumine 2026',
   description: 'Understand the mission, department updates, Silver Jubilee details, and historical legacy of Jadavpur University IT Department Reunion.',
+  alternates: {
+    canonical: '/about',
+  },
   openGraph: {
     title: 'About | Illumine 2026',
     description: 'Understand the mission, department updates, Silver Jubilee details, and historical legacy of Jadavpur University IT Department Reunion.',
-    url: 'https://illumine-reunion-ju-it.vercel.app/about',
+    url: '/about',
     type: 'website',
     images: [
       {
-        url: '/photos/Hero/logo.jpeg',
-        width: 800,
-        height: 800,
+        url: '/photos/Hero/hero.png',
+        width: 1440,
+        height: 714,
         alt: 'ILLUMINE 2026 About Details',
       },
     ],
@@ -28,6 +31,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'About | Illumine 2026',
     description: 'Understand the mission, department updates, Silver Jubilee details, and historical legacy of Jadavpur University IT Department Reunion.',
+    images: ['/photos/Hero/hero.png'],
   },
 };
 
