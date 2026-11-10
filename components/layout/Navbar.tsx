@@ -74,31 +74,20 @@ export default function Navbar() {
 
         <div className="max-w-[90rem] mx-auto px-4 sm:px-6 h-20 grid grid-cols-[auto_1fr_auto] items-center">
           
-          {/* 1. LOGO — Dynamic 3D Pop-out & Ambient Levitation */}
-          <Link href="/" className="flex items-center gap-3 group relative perspective-[800px]">
-            {/* Ambient cyber neon aura behind logos */}
-            <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-[#7B61FF]/0 via-[#7B61FF]/25 to-[#BEF3DF]/0 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-
-            {/* JU Crest with subtle floating animation and 3D hover pop-out */}
-            <div className="relative transform-gpu transition-all duration-500 ease-out group-hover:scale-115 group-hover:-translate-y-0.5 group-hover:drop-shadow-[0_0_16px_rgba(182,187,255,0.85)]">
-              <img
-                src="/images/JULogoPNG.png"
-                alt="Jadavpur University"
-                className="h-12 w-12 object-contain transition-transform duration-700 group-hover:rotate-6"
-                style={{
-                  filter: "drop-shadow(0 0 8px rgba(255,255,255,0.35))",
-                }}
-              />
-            </div>
-
-            {/* Illumine Horizontal Logo with levitating dynamic shine */}
-            <div className="relative transform-gpu transition-all duration-500 ease-out group-hover:scale-110 group-hover:translate-x-1">
-              <img
-                src="/images/logos/light-horizontal-logo.svg"
-                alt="Illumine 2026"
-                className="h-9 w-auto object-contain transition-all duration-500 group-hover:drop-shadow-[0_0_18px_rgba(123,97,255,0.9)]"
-              />
-            </div>
+          {/* 1. LOGO */}
+          <Link href="/" className="flex items-center gap-3 group">
+            {/* JU Logo */}
+            <img
+              src="/images/JULogoPNG.png"
+              alt="Jadavpur University"
+              className="h-12 w-12 object-contain"
+            />
+            {/* Illumine Horizontal Logo (White on Dark with Wordmark) */}
+            <img
+              src="/images/logos/light-horizontal-logo.svg"
+              alt="Illumine 2026"
+              className="h-9 w-auto object-contain transition-all duration-300 group-hover:drop-shadow-[0_0_12px_rgba(123,97,255,0.7)]"
+            />
           </Link>
 
           {/* 2. DESKTOP LINKS */}

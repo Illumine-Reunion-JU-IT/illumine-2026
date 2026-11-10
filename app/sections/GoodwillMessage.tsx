@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { professors, sectionTitle } from "@/data/goodwillData";
 import type { ProfessorData } from "@/types/goodwill";
 import DecryptedText from "@/components/ui/DecryptedText";
@@ -347,19 +348,27 @@ const GoodwillMessage: React.FC = () => {
         </svg>
       </div>
 
-      {/* Title */}
-      <div className={styles.titleContainer}>
-        <h2 className={styles.title}>
-          <DecryptedText
-            text={sectionTitle}
-            animateOn="view"
-            speed={60}
-            sequential={true}
-            revealDirection="start"
-          />
-        </h2>
-        <div className={styles.accentBar} aria-hidden="true" />
-      </div>
+      {/* Title — Slides in from LEFT as user scrolls and sits at middle of screen */}
+      <motion.div
+        initial={{ opacity: 0, x: -200, scale: 0.92 }}
+        whileInView={{ opacity: 1, x: 0, scale: 1 }}
+        viewport={{ once: false, amount: 0.3 }}
+        transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full flex justify-center items-center relative z-10"
+      >
+        <div className={styles.titleContainer}>
+          <h2 className={styles.title}>
+            <DecryptedText
+              text={sectionTitle}
+              animateOn="view"
+              speed={60}
+              sequential={true}
+              revealDirection="start"
+            />
+          </h2>
+          <div className={styles.accentBar} aria-hidden="true" />
+        </div>
+      </motion.div>
 
       <div className={styles.contentWrapper}>
         {/* Dynamic thumbnail column */}
