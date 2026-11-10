@@ -9,24 +9,24 @@ import styles from "./GoodwillMessage.module.css";
 
 /**
  * Configurable duration for each professor's message cycle.
- * Set to ~14s for brisk reading flow and optimal video capture.
+ * Set to exactly 10s for complete automatic scrolling.
  */
-export const GOODWILL_DURATION_SECONDS = 14;
+export const GOODWILL_DURATION_SECONDS = 10;
 
 const GLITCH_DURATION = 400; // ms for .systemUpdate transition
-const RING_RADIUS = 54;
-const RING_CIRCUMFERENCE = 339.29;
+const RING_RADIUS = 52;
+const RING_CIRCUMFERENCE = 326.73;
 
 const MOBILE_RING_RADIUS = 46;
 const MOBILE_RING_CIRCUMFERENCE = 289.03;
 
 /**
  * Calculates display duration for a given professor.
- * Set to ~14s for smooth dynamic auto-scroll pacing.
+ * Exactly 10s for complete auto-scroll cycle.
  */
 function getProfessorDuration(prof: ProfessorData): number {
   if (typeof prof.durationSeconds === "number") {
-    return Math.max(10, Math.min(25, prof.durationSeconds));
+    return prof.durationSeconds;
   }
   return GOODWILL_DURATION_SECONDS;
 }
@@ -57,12 +57,15 @@ const GoodwillMessage: React.FC = () => {
   const resetVisuals = useCallback(() => {
     if (ringRef.current) {
       ringRef.current.setAttribute("stroke-dashoffset", String(RING_CIRCUMFERENCE));
+      ringRef.current.style.strokeDashoffset = `${RING_CIRCUMFERENCE}px`;
     }
     if (mobileRingRef.current) {
       mobileRingRef.current.setAttribute("stroke-dashoffset", String(MOBILE_RING_CIRCUMFERENCE));
+      mobileRingRef.current.style.strokeDashoffset = `${MOBILE_RING_CIRCUMFERENCE}px`;
     }
     if (rotatingBarRef.current) {
       rotatingBarRef.current.setAttribute("transform", "rotate(0 75.67 85.75)");
+      rotatingBarRef.current.style.transform = "rotate(0deg)";
     }
     if (messageContainerRef.current) {
       messageContainerRef.current.scrollTop = 0;
@@ -117,14 +120,16 @@ const GoodwillMessage: React.FC = () => {
         const ratio = Math.max(0, Math.min(1, el.scrollTop / maxScroll));
         elapsedRef.current = ratio * durationRef.current;
 
-        // Synchronize circular loader ring
+        // Synchronize inside circular loader ring
         if (ringRef.current) {
           const offset = RING_CIRCUMFERENCE * (1 - ratio);
           ringRef.current.setAttribute("stroke-dashoffset", offset.toFixed(2));
+          ringRef.current.style.strokeDashoffset = `${offset.toFixed(2)}px`;
         }
         if (mobileRingRef.current) {
           const mobileOffset = MOBILE_RING_CIRCUMFERENCE * (1 - ratio);
           mobileRingRef.current.setAttribute("stroke-dashoffset", mobileOffset.toFixed(2));
+          mobileRingRef.current.style.strokeDashoffset = `${mobileOffset.toFixed(2)}px`;
         }
 
         // Synchronize rotating bar on the circle
@@ -136,11 +141,11 @@ const GoodwillMessage: React.FC = () => {
       }
     }
 
-    // Resume smooth auto-scrolling 1.5s after user finishes scrolling
+    // Resume smooth auto-scrolling 2s after user finishes scrolling so they can re-read skipped portions
     userScrollTimeoutRef.current = setTimeout(() => {
       isUserScrollingRef.current = false;
       lastTimeRef.current = performance.now();
-    }, 1500);
+    }, 2000);
   };
 
   // Continuous high-performance animation loop driving countdown ring, rotating bar, and scroll synchronization
@@ -162,15 +167,17 @@ const GoodwillMessage: React.FC = () => {
         const totalDuration = durationRef.current;
         const progress = Math.min(1, Math.max(0, elapsedRef.current / totalDuration));
 
-        // 1. Move the loader circle bar clockwise as time elapses
+        // 1. Move the inside loader circle bar clockwise as time elapses
         if (ringRef.current) {
           const offset = RING_CIRCUMFERENCE * (1 - progress);
           ringRef.current.setAttribute("stroke-dashoffset", offset.toFixed(2));
+          ringRef.current.style.strokeDashoffset = `${offset.toFixed(2)}px`;
         }
 
         if (mobileRingRef.current) {
           const mobileOffset = MOBILE_RING_CIRCUMFERENCE * (1 - progress);
           mobileRingRef.current.setAttribute("stroke-dashoffset", mobileOffset.toFixed(2));
+          mobileRingRef.current.style.strokeDashoffset = `${mobileOffset.toFixed(2)}px`;
         }
 
         // 2. Rotate the bar on the circle as scrolling progresses
@@ -386,19 +393,19 @@ const GoodwillMessage: React.FC = () => {
                 cx="75.67"
                 cy="85.75"
                 r={RING_RADIUS}
-                stroke="rgba(190,243,223,0.18)"
-                strokeWidth="4"
+                stroke="rgba(190,243,223,0.22)"
+                strokeWidth="5"
                 fill="none"
               />
 
-              {/* DYNAMIC LOADER CIRCLE BAR */}
+              {/* DYNAMIC INSIDE LOADER CIRCLE BAR */}
               <circle
                 ref={ringRef}
                 cx="75.67"
                 cy="85.75"
                 r={RING_RADIUS}
                 stroke="#BEF3DF"
-                strokeWidth="4"
+                strokeWidth="5"
                 fill="none"
                 strokeLinecap="round"
                 strokeDasharray={RING_CIRCUMFERENCE}
@@ -406,7 +413,7 @@ const GoodwillMessage: React.FC = () => {
                 transform="rotate(-90 75.67 85.75)"
                 className={styles.progressRing}
                 style={{
-                  filter: "drop-shadow(0 0 8px rgba(190,243,223,0.9))",
+                  filter: "drop-shadow(0 0 10px #BEF3DF) drop-shadow(0 0 18px rgba(190,243,223,0.85))",
                 }}
               />
 
