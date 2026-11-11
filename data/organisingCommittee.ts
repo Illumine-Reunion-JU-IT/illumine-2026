@@ -128,7 +128,7 @@ export const committeeMembers: CommitteeMember[] = [
   },
   {
     name: "Ankit Roy",
-    role: "On Day Coordinator",
+    role: "Logistics Coordinator",
     batch: "UG3",
     image: portrait(3),
     group: "Position of Responsibility",
@@ -170,7 +170,7 @@ export const committeeMembers: CommitteeMember[] = [
   },
   {
     name: "Shlok Sinha",
-    role: "Logistics Coordinator",
+    role: "On Day Coordinator",
     batch: "UG2",
     image: portrait(11),
     group: "Position of Responsibility",

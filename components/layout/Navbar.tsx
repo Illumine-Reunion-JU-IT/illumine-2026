@@ -1,26 +1,27 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from 'next/navigation';
-import { ttLakes } from './fonts'; 
+import { usePathname } from "next/navigation";
+import { ttLakes } from "./fonts";
 
 const navLinks = [
-  { label: 'HOME', href: '/' },
-  { label: 'ABOUT', href: '/about' },
-  { label: 'EVENTS', href: '/events' },
-  { label: 'COMMITTEE', href: '/organising-committee' },
-  { label: 'MAGAZINE', href: '/magazine'},
-  { label: 'ALUMNI', href: '/alumni' },
-  { label: 'CONTACT US', href: '/contact-us' },
+  { label: "HOME", href: "/" },
+  { label: "ABOUT", href: "/about" },
+  { label: "EVENTS", href: "/events" },
+  { label: "COMMITTEE", href: "/organising-committee" },
+  { label: "MAGAZINE", href: "/magazine" },
+  { label: "ALUMNI", href: "/alumni" },
+  { label: "CONTACT US", href: "/contact-us" },
 ];
 
 export default function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const polyClass = "[clip-path:polygon(8%_0,100%_0,100%_65%,92%_100%,0_100%,0_35%)]";
+  const polyClass =
+    "[clip-path:polygon(8%_0,100%_0,100%_65%,92%_100%,0_100%,0_35%)]";
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export default function Navbar() {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const currentScrollY = Math.max(0, window.scrollY);
-          
+
           setScrolled(currentScrollY > 20);
 
           if (currentScrollY <= 60) {
@@ -56,24 +57,23 @@ export default function Navbar() {
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <>
       <nav
-        className={`sticky top-0 left-0 right-0 z-[100] transition-all duration-500 ${isVisible ? 'translate-y-0' : '-translate-y-full'} ${
-          scrolled 
-            ? 'bg-black/80 backdrop-blur-xl border-b border-[#7B61FF]/30 shadow-[0_4px_30px_rgba(123,97,255,0.1)]' 
-            : 'bg-black' 
+        className={`sticky top-0 left-0 right-0 z-[100] transition-all duration-500 ${isVisible ? "translate-y-0" : "-translate-y-full"} ${
+          scrolled
+            ? "bg-black/80 backdrop-blur-xl border-b border-[#7B61FF]/30 shadow-[0_4px_30px_rgba(123,97,255,0.1)]"
+            : "bg-black"
         }`}
       >
         {/* Animated Gradient Scanline (Top) */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#7B61FF] to-transparent animate-pulse opacity-70" />
 
         <div className="max-w-[90rem] mx-auto px-4 sm:px-6 h-20 grid grid-cols-[auto_1fr_auto] items-center">
-          
           {/* 1. LOGO */}
           <Link href="/" className="flex items-center gap-3 group">
             {/* JU Logo */}
@@ -101,9 +101,10 @@ export default function Navbar() {
                   className={`
                     relative px-7 py-2.5 text-[10px] font-bold tracking-[0.2em] transition-all duration-300
                     ${ttLakes.className} ${polyClass}
-                    ${isActive 
-                      ? 'bg-[#6265fe] text-white shadow-[0_0_20px_rgba(98,101,254,0.6)] border-t border-white/20' 
-                      : 'text-white/60 hover:text-[#7B61FF] hover:bg-[#7B61FF]/10'
+                    ${
+                      isActive
+                        ? "bg-[#6265fe] text-white shadow-[0_0_20px_rgba(98,101,254,0.6)] border-t border-white/20"
+                        : "text-white/60 hover:text-[#7B61FF] hover:bg-[#7B61FF]/10"
                     }
                   `}
                 >
@@ -113,7 +114,7 @@ export default function Navbar() {
             })}
           </div>
 
-           {/* 3. ACTION BUTTONS (COMMENTED OUT) 
+          {/* 3. ACTION BUTTONS (COMMENTED OUT)
           <div className="hidden lg:flex flex-1 justify-end items-center gap-5 h-9 z-10">
             <Link
               href="/login"
@@ -147,31 +148,41 @@ export default function Navbar() {
             onClick={() => setMobileOpen(!mobileOpen)}
             className="lg:hidden flex flex-col gap-1.5 p-2 z-10"
           >
-            <div className={`h-[2px] w-6 bg-[#7B61FF] transition-all ${mobileOpen ? 'rotate-45 translate-y-2' : ''} shadow-[0_0_8px_#7B61FF]`} />
-            <div className={`h-[2px] w-4 bg-[#7B61FF] transition-all ${mobileOpen ? 'opacity-0' : 'opacity-100'}`} />
-            <div className={`h-[2px] w-6 bg-[#7B61FF] transition-all ${mobileOpen ? '-rotate-45 -translate-y-2' : ''} shadow-[0_0_8px_#7B61FF]`} />
+            <div
+              className={`h-[2px] w-6 bg-[#7B61FF] transition-all ${mobileOpen ? "rotate-45 translate-y-2" : ""} shadow-[0_0_8px_#7B61FF]`}
+            />
+            <div
+              className={`h-[2px] w-4 bg-[#7B61FF] transition-all ${mobileOpen ? "opacity-0" : "opacity-100"}`}
+            />
+            <div
+              className={`h-[2px] w-6 bg-[#7B61FF] transition-all ${mobileOpen ? "-rotate-45 -translate-y-2" : ""} shadow-[0_0_8px_#7B61FF]`}
+            />
           </button>
-
         </div>
       </nav>
 
-      {/* MOBILE OVERLAY */} 
-      <div className={`fixed inset-0 z-[90] lg:hidden transition-all duration-700 ${mobileOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      {/* MOBILE OVERLAY */}
+      <div
+        className={`fixed inset-y-0 right-0 z-[90] w-[86%] max-w-sm border-l border-[#7B61FF]/30 lg:hidden transition-all duration-700 ${mobileOpen ? "translate-x-0" : "translate-x-full"}`}
+      >
         <div className="absolute inset-0 bg-black/95 backdrop-blur-3xl border-l border-[#7B61FF]/30" />
-        
+
         <div className="absolute inset-0 opacity-10 pointer-events-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
 
-        <div className="relative h-full flex flex-col justify-center items-end pr-12 gap-8">
-          
+        <div className="relative h-full flex flex-col justify-start items-end gap-7 px-7 pt-28 sm:pr-12">
           {navLinks.map((link, i) => (
-            <Link 
-              key={link.label} 
-              href={link.href} 
+            <Link
+              key={link.label}
+              href={link.href}
               onClick={() => setMobileOpen(false)}
               className="group text-right"
             >
-              <span className="block text-[10px] text-[#7B61FF] font-mono tracking-widest opacity-50">SECTION_0{i+1}</span>
-              <span className={`text-3xl font-bold tracking-tighter text-white group-hover:text-[#7B61FF] transition-colors ${ttLakes.className}`}>
+              <span className="block text-[10px] text-[#7B61FF] font-mono tracking-widest opacity-50">
+                SECTION_0{i + 1}
+              </span>
+              <span
+                className={`text-3xl font-bold tracking-tighter text-white group-hover:text-[#7B61FF] transition-colors ${ttLakes.className}`}
+              >
                 {link.label}
               </span>
             </Link>
@@ -202,15 +213,20 @@ export default function Navbar() {
             </span>
           </Link>
           */}
-
         </div>
       </div>
 
       <style jsx global>{`
         @keyframes gradient-x {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
         }
         .animate-gradient-x {
           background-size: 200% 200%;
