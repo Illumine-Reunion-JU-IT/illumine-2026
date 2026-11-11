@@ -146,7 +146,7 @@ export default function Navbar() {
           {/* MOBILE TOGGLE */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden flex flex-col gap-1.5 p-2 z-10"
+            className="col-start-3 justify-self-end lg:hidden flex flex-col gap-1.5 p-2 z-10"
           >
             <div
               className={`h-[2px] w-6 bg-[#7B61FF] transition-all ${mobileOpen ? "rotate-45 translate-y-2" : ""} shadow-[0_0_8px_#7B61FF]`}
