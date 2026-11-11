@@ -4,6 +4,66 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import type { CommitteeMember } from "@/data/organisingCommittee";
 
+const roleName = (role: string) => {
+  if (role === "Faculty Coordinator") return "Faculty Mentor";
+  if (role.startsWith("Design ")) return "Design Team";
+  if (role.startsWith("Logistics ")) return "Logistics Team";
+  if (role === "Tech Lead") return "Tech Team";
+  if (role === "On Day Coordinator") return "On-day Team";
+  return role;
+};
+
+const designation = (role: string) =>
+  role === "Design Lead" || role === "Logistics Lead"
+    ? "Lead"
+    : role === "Design Coordinator" || role === "Logistics Coordinator"
+      ? "Coordinator"
+      : role === "On Day Coordinator"
+        ? "On-day Coordinator"
+        : role;
+
+const descriptions: Record<string, string> = {
+  President:
+    "Leading with vision, shaping every memory into legacy! Meet the President of ILLUMINE 2K26 — the steady force bringing people, purpose, and the Silver Jubilee celebration together.",
+  "Vice President":
+    "The seat is reserved for the co-pilot of the celebration — ready to connect people, ideas, and every moving part of ILLUMINE 2K26. A new chapter is about to be written.",
+  "Faculty Mentor":
+    "Mentors in the classroom, guiding lights of our legacy! Meet our Faculty Advisors of ILLUMINE 2K26 and KERNEL 1.0 — the esteemed faculty of our department, ultimate mentors, and proud alumni who continue to shape our journey. From teaching us every day to steering our grandest fests toward perfection, they are the true pillars of our IT family. Because a Silver Jubilee shines brightest when backed by the wisdom of our own professors!",
+  "General Secretary":
+    "Leading from the front, turning dreams into legacy! Meet the General Secretary of ILLUMINE 2K26 — the visionary captain, ultimate decision-maker, and guiding light steering this grand Silver Jubilee celebration to absolute perfection. Because every historic fest needs a legendary leader!",
+  "Additional General Secretary":
+    "Leading with purpose, connecting every effort! Meet the Additional General Secretary of ILLUMINE 2K26 — a driving force behind the coordination, teamwork, and dedication that bring every vision closer to reality. Because great celebrations are built on great leadership!",
+  "Joint Secretary":
+    "Bridging the gap, turning ideas into action! Meet the Joint Secretary of ILLUMINE 2K26 — the ultimate multitaskers, creative problem-solvers, and driving force keeping the team united and the momentum going. Because flawless execution needs seamless collaboration!",
+  Treasurer:
+    "Making every penny count, turning every plan into possibility! Meet the Treasurer of ILLUMINE 2K26 and KERNEL 1.0 — the masterminds behind the numbers, guardians of the budget, and the ones keeping every financial move on track. Behind every great fest is a smart plan and a balanced account!",
+  "On-day Team":
+    "Making every moment count, every second unforgettable! Meet the On-day Coordinators of ILLUMINE 2K26 — the energetic minds on the ground, keeping everything in sync and ensuring every moment of the reunion runs seamlessly. When the big day arrives, they are the ones making the magic.",
+  "Tech Team":
+    "Powering ideas, driving innovation! Meet the Tech Team of ILLUMINE 2K26 — the tech enthusiasts behind the scenes, ensuring every digital detail runs seamlessly and every idea comes to life. Building the tech that makes the reunion unforgettable!",
+  "Design Team":
+    "Turning imagination into identity! Meet the Design Team of ILLUMINE 2K26 — the creative minds adding colour, character, and life to every idea, making this reunion truly unforgettable. Because every great celebration deserves a masterpiece!",
+  "Logistics Team":
+    "Making every moment seamless, one detail at a time! Meet the Logistics Team of ILLUMINE 2K26 — the minds behind the planning, coordination, and execution that bring the grand reunion to life. The countdown to reliving memories and creating new ones begins!",
+};
+
+const seniority = (batch?: string) => Number(batch?.replace("UG", "") ?? 0);
+
+const sortMembers = (role: string, members: CommitteeMember[]) =>
+  [...members].sort((a, b) => {
+    if (role === "Faculty Mentor") {
+      const order = [
+        "Prof. Parama Bhowmik",
+        "Mr. Utpal Kumar Ray",
+        "Dr. Munmun Bhattacharya",
+      ];
+      return order.indexOf(a.name) - order.indexOf(b.name);
+    }
+    return (
+      seniority(b.batch) - seniority(a.batch) || a.name.localeCompare(b.name)
+    );
+  });
+
 function Photo({ member, n }: { member: CommitteeMember; n: number }) {
   return (
     <article className="group min-w-0">
@@ -37,7 +97,7 @@ function Photo({ member, n }: { member: CommitteeMember; n: number }) {
       </div>
       <div className="px-1 pt-4">
         <p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8fe0e8]">
-          {member.role}
+          {designation(member.role)}
         </p>
         <h3 className="mt-1 font-tt-lakes text-lg font-bold leading-tight text-[#fff4e4] sm:text-xl">
           {member.name}
@@ -63,19 +123,21 @@ export default function CommitteeDirectory({
     () => [...leadership, ...responsibility],
     [leadership, responsibility],
   );
-  const groups = useMemo(
-    () =>
-      [...new Set(members.map((member) => member.role))].map((role) => ({
+  const groups = useMemo(() => {
+    const roles = [...new Set(members.map((member) => roleName(member.role)))];
+    return roles.map((role) => ({
+      role,
+      members: sortMembers(
         role,
-        members: members.filter((member) => member.role === role),
-      })),
-    [members],
-  );
+        members.filter((member) => roleName(member.role) === role),
+      ),
+    }));
+  }, [members]);
   const activeGroups = groups
     .map((group) => ({
       ...group,
       members: group.members.filter((member) =>
-        `${member.name} ${member.role}`
+        `${member.name} ${member.role} ${roleName(member.role)}`
           .toLowerCase()
           .includes(query.toLowerCase()),
       ),
@@ -188,9 +250,7 @@ export default function CommitteeDirectory({
                       {selectedGroup.role}
                     </h3>
                     <p className="mt-2 text-sm text-[#bdb1a4]">
-                      {selectedGroup.members.length}{" "}
-                      {selectedGroup.members.length === 1 ? "person" : "people"}{" "}
-                      carrying Illumine 2026 forward.
+                      {descriptions[selectedGroup.role]}
                     </p>
                   </div>
                   <div
