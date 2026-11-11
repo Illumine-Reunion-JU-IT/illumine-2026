@@ -27,11 +27,3 @@
   to     = "https://illumine-ju-it.in/:splat"
   status = 308
   force  = true
-
-# ── SPA / Next.js catch-all ───────────────────────────────────────────────────
-# Required when using the Netlify Next.js runtime (@netlify/plugin-nextjs).
-# Passes all unmatched requests to the Next.js handler.
-[[redirects]]
-  from   = "/*"
-  to     = "/.netlify/functions/___netlify-handler"
-  status = 200
