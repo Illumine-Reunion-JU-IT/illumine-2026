@@ -10,9 +10,13 @@ const inks = ['#cf3d33', '#1a5e67', '#b87618', '#7e4f8f', '#315d3e', '#9d394e', 
 function Photo({ member, n, small = false }: { member: CommitteeMember; n: number; small?: boolean }) {
   const initials = member.name.split(' ').filter(word => !word.endsWith('.')).slice(0, 2).map(word => word[0]).join('');
   return <article className={`group ${small ? '' : 'min-w-0'}`}>
-    <div className={`relative overflow-hidden bg-[#28211e] ${small ? 'aspect-square rounded-full border-[5px] border-[#d7c2a4] shadow-[0_8px_18px_rgba(0,0,0,.22)]' : 'aspect-[4/4.3] rounded-[1.25rem] border-[7px] border-[#d7c2a4] shadow-[0_16px_32px_rgba(0,0,0,.24)]'}`}>
-      {member.image ? <Image src={member.image} alt={member.name} fill className="object-cover transition duration-500 group-hover:scale-[1.035]" sizes={small ? '140px' : '(max-width: 640px) 100vw, 33vw'} /> : <div className="flex h-full items-center justify-center bg-[#9e4038] font-tt-lakes text-3xl font-extrabold text-[#fff4e4]">{initials}</div>}
-      {!small && <span className="absolute left-3 top-3 rounded-full bg-[#fff4e4] px-2 py-1 font-mono text-[9px] font-bold text-[#6c2a24]">{String(n).padStart(2, '0')}</span>}
+    <div className={`relative overflow-hidden bg-[radial-gradient(circle_at_18%_12%,#4bc3b3_0,transparent_28%),radial-gradient(circle_at_86%_88%,#e17852_0,transparent_32%),linear-gradient(135deg,#172c39,#191320_52%,#42222a)] p-[3px] ${small ? 'aspect-square rounded-full shadow-[0_8px_18px_rgba(0,0,0,.3)]' : 'aspect-[4/4.3] rounded-[1.25rem] shadow-[0_16px_32px_rgba(0,0,0,.3)]'}`}>
+      <div className={`relative h-full w-full overflow-hidden bg-[#16171a] ${small ? 'rounded-full' : 'rounded-[1.05rem]'}`}>
+        <div className="pointer-events-none absolute inset-0 z-10 opacity-30 [background-image:repeating-radial-gradient(circle_at_5%_5%,transparent_0,transparent_19px,rgba(255,231,183,.55)_20px,transparent_21px)]" />
+        {member.image ? <Image src={member.image} alt={member.name} fill className="object-cover transition duration-500 group-hover:scale-[1.035]" sizes={small ? '140px' : '(max-width: 640px) 100vw, 33vw'} /> : <div className="flex h-full items-center justify-center bg-[#9e4038] font-tt-lakes text-3xl font-extrabold text-[#fff4e4]">{initials}</div>}
+        <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-[#070b11]/35 via-transparent to-transparent" />
+      </div>
+      {!small && <span className="absolute left-3 top-3 z-20 rounded-full border border-[#f7d99d]/70 bg-[#111722]/85 px-2 py-1 font-mono text-[9px] font-bold text-[#f7d99d] backdrop-blur">{String(n).padStart(2, '0')}</span>}
     </div>
     {!small && <div className="px-1 pt-4"><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#e7865c]">{member.role}</p><h3 className="mt-1 font-tt-lakes text-xl font-bold leading-tight text-[#fff4e4]">{member.name}</h3>{member.batch && <p className="mt-1 text-xs text-[#bdb1a4]">{member.batch}</p>}</div>}
   </article>;
