@@ -3,7 +3,6 @@ import AboutIllumine from "../components/about/AboutIllumine";
 import AboutDepartment from "@/components/about/AboutDepartment";
 import GoodwillMessage from "./sections/GoodwillMessage";
 import Footer from "./sections/Footer";
-import EventSection from "./sections/EventSection";
 
 /**
  * MODULE: Home Route (/)
@@ -17,7 +16,6 @@ export default function Home() {
       <AboutIllumine />
       <AboutDepartment />
       <GoodwillMessage />
-      <EventSection />
       <Footer />
     </div>
   );
