@@ -59,7 +59,7 @@ function Photo({
           <p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#e7865c]">
             {member.role}
           </p>
-          <h3 className="mt-1 font-tt-lakes text-xl font-bold leading-tight text-[#fff4e4]">
+          <h3 className="mt-1 font-tt-lakes text-lg font-bold leading-tight text-[#fff4e4] sm:text-xl">
             {member.name}
           </h3>
           {member.batch && (
@@ -163,7 +163,7 @@ export default function CommitteeDirectory({
       <div className="pointer-events-none absolute inset-0 opacity-90 [background:radial-gradient(ellipse_at_8%_0%,#15394a_0,transparent_34%),radial-gradient(ellipse_at_96%_16%,#4b242d_0,transparent_33%),radial-gradient(ellipse_at_48%_100%,#2d1e45_0,transparent_45%),linear-gradient(145deg,#090d16_35%,#11131c_68%,#090d16_100%)]" />
       <div className="pointer-events-none absolute inset-0 opacity-[.18] [background-image:linear-gradient(rgba(155,224,238,.18)_1px,transparent_1px),linear-gradient(90deg,rgba(155,224,238,.18)_1px,transparent_1px)] [background-size:42px_42px] sm:[background-size:56px_56px]" />
       <div className="pointer-events-none absolute inset-0 opacity-[.12] [background-image:repeating-radial-gradient(circle_at_5%_5%,transparent_0,transparent_42px,rgba(233,184,119,.35)_43px,transparent_44px)]" />
-      <section className="relative mx-auto max-w-7xl px-4 pt-10 sm:px-8 sm:pt-24">
+      <section className="relative mx-auto max-w-7xl px-4 pt-8 sm:px-8 sm:pt-24">
         <div className="border-b-2 border-[#d9c5aa] pb-7 sm:pb-9">
           <div className="flex items-center gap-3">
             <span className="h-2 w-2 shrink-0 rounded-full bg-[#7ce2c7] shadow-[0_0_13px_#7ce2c7]" />
@@ -172,7 +172,7 @@ export default function CommitteeDirectory({
             </p>
           </div>
           <div className="mt-6 flex flex-col gap-6 lg:mt-7 lg:flex-row lg:items-end lg:justify-between">
-            <h1 className="font-mechsuit text-[2.65rem] leading-[1.12] tracking-[.055em] sm:text-6xl sm:leading-[1.08] sm:tracking-[.08em]">
+            <h1 className="font-mechsuit text-[2.25rem] leading-[1.05] tracking-[.045em] sm:text-6xl sm:leading-[1.08] sm:tracking-[.08em]">
               THE PEOPLE
               <br />
               <span className="text-[#f19468]">OF ILLUMINE</span>
@@ -228,7 +228,21 @@ export default function CommitteeDirectory({
                   <p className="mb-4 font-mono text-[10px] tracking-[.2em] text-[#8fe0e8] sm:mb-5">
                     LEADERSHIP INDEX
                   </p>
-                  <div className="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible">
+                  <label className="block lg:hidden">
+                    <span className="sr-only">Choose a core committee role</span>
+                    <select
+                      value={selectedCoreGroup.role}
+                      onChange={(event) => setSelectedCoreRole(event.target.value)}
+                      className="w-full rounded-lg border border-[#6c9199]/70 bg-[#102632] px-3 py-3 text-sm font-medium text-[#f1ffff] outline-none focus:border-[#8fe0e8]"
+                    >
+                      {coreGroups.map((group, index) => (
+                        <option key={group.role} value={group.role}>
+                          {String(index + 1).padStart(2, "0")}. {group.role}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <div className="hidden gap-2 lg:flex lg:flex-col lg:overflow-visible">
                     {coreGroups.map((group, index) => (
                       <button
                         key={group.role}
@@ -271,7 +285,7 @@ export default function CommitteeDirectory({
                     </p>
                   </div>
                   <div
-                    className={`mt-5 grid gap-4 sm:mt-6 ${selectedCoreGroup.members.length === 1 ? "mx-auto max-w-[20rem] grid-cols-1" : selectedCoreGroup.members.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-2 xl:grid-cols-3"}`}
+                    className={`mt-5 grid gap-3 sm:mt-6 sm:gap-4 ${selectedCoreGroup.members.length === 1 ? "mx-auto max-w-[15rem] grid-cols-1 sm:max-w-[20rem]" : "grid-cols-2"}`}
                   >
                     {selectedCoreGroup.members.map((member, index) => (
                       <Photo key={member.name} member={member} n={index + 1} />
@@ -298,7 +312,21 @@ export default function CommitteeDirectory({
                     <p className="mb-4 font-mono text-[10px] tracking-[.2em] text-[#d99b5d] sm:mb-5">
                       ROLE INDEX
                     </p>
-                    <div className="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible">
+                    <label className="block lg:hidden">
+                      <span className="sr-only">Choose a responsibility role</span>
+                      <select
+                        value={selectedGroup.role}
+                        onChange={(event) => setSelectedRole(event.target.value)}
+                        className="w-full rounded-lg border border-[#a77a65]/70 bg-[#2c191b] px-3 py-3 text-sm font-medium text-[#fff6e9] outline-none focus:border-[#e9ad69]"
+                      >
+                        {activeGroups.map((group, index) => (
+                          <option key={group.role} value={group.role}>
+                            {String(index + 1).padStart(2, "0")}. {group.role}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <div className="hidden gap-2 lg:flex lg:flex-col lg:overflow-visible">
                       {activeGroups.map((group, index) => (
                         <button
                           key={group.role}
@@ -341,7 +369,7 @@ export default function CommitteeDirectory({
                       </p>
                     </div>
                     <div
-                      className={`mt-5 grid gap-4 sm:mt-6 ${selectedGroup.members.length === 1 ? "mx-auto max-w-[20rem] grid-cols-1" : selectedGroup.members.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-2 xl:grid-cols-3"}`}
+                      className={`mt-5 grid gap-3 sm:mt-6 sm:gap-4 ${selectedGroup.members.length === 1 ? "mx-auto max-w-[15rem] grid-cols-1 sm:max-w-[20rem]" : "grid-cols-2"}`}
                     >
                       {selectedGroup.members.map((member, index) => (
                         <Photo
