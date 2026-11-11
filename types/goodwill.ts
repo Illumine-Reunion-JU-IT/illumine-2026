@@ -4,4 +4,6 @@ export interface ProfessorData {
   designation: string[];
   imagePath: string;
   message: string;
+  durationSeconds?: number;
 }
+
