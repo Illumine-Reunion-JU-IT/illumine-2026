@@ -76,13 +76,14 @@ const TimelineItem = ({ node, index }: { node: typeof timelineData[0]; index: nu
       }
     );
 
-    if (itemRef.current) {
-      observer.observe(itemRef.current);
+    const el = itemRef.current;
+    if (el) {
+      observer.observe(el);
     }
 
     return () => {
-      if (itemRef.current) {
-        observer.unobserve(itemRef.current);
+      if (el) {
+        observer.unobserve(el);
       }
     };
   }, []);

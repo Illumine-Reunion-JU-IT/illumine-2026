@@ -35,16 +35,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: titleString,
     description: event.shortDescription,
+    alternates: {
+      canonical: `/events/${event.slug}`,
+    },
     openGraph: {
       title: titleString,
       description: event.shortDescription,
       type: 'article',
-      url: `https://illumine-reunion-ju-it.vercel.app/events/${event.slug}`,
+      url: `/events/${event.slug}`,
       images: [
         {
-          url: '/photos/Hero/logo.jpeg',
-          width: 800,
-          height: 800,
+          url: '/photos/Hero/hero.png',
+          width: 1440,
+          height: 714,
           alt: event.title,
         },
       ],
@@ -53,7 +56,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: titleString,
       description: event.shortDescription,
-      images: ['/photos/Hero/logo.jpeg'],
+      images: ['/photos/Hero/hero.png'],
     },
   };
 }

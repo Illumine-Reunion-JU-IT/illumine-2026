@@ -75,22 +75,20 @@ export default function Navbar() {
         <div className="max-w-[90rem] mx-auto px-4 sm:px-6 h-20 grid grid-cols-[auto_1fr_auto] items-center">
           
           {/* 1. LOGO */}
-         <div className="flex items-center gap-2">
-  {/* JU Logo */}
-  <Image
-    src="/photos/Hero/logo.jpeg"
-    alt="Jadavpur University"
-    width={80}
-    height={80}
-    className="h-20 w-20 object-contain translate-y-[1px]"
-    priority
-  />
-
-  {/* Illumine Text (UNCHANGED styling) */}
-  <span className="font-mechsuit text-xl tracking-[0.25em] text-white transition-all duration-300 ease-in-out hover:text-[#7B61FF] hover:[text-shadow:0_0_15px_#7B61FF]">
-  ILLUMINE
-</span>
-</div>
+          <Link href="/" className="flex items-center gap-3 group">
+            {/* JU Logo */}
+            <img
+              src="/images/JULogoPNG.png"
+              alt="Jadavpur University"
+              className="h-12 w-12 object-contain"
+            />
+            {/* Illumine Horizontal Logo (White on Dark with Wordmark) */}
+            <img
+              src="/images/logos/light-horizontal-logo.svg"
+              alt="Illumine 2026"
+              className="h-9 w-auto object-contain transition-all duration-300 group-hover:drop-shadow-[0_0_12px_rgba(123,97,255,0.7)]"
+            />
+          </Link>
 
           {/* 2. DESKTOP LINKS */}
           <div className="hidden lg:flex justify-center items-center gap-2">

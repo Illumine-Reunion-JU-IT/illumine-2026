@@ -1,146 +1,42 @@
-import { CommitteeMember } from '@/types/organisingCommittee';
+export type CommitteeGroup = 'Leadership' | 'Faculty Coordinators' | 'Position of Responsibility';
+
+export interface CommitteeMember {
+  name: string;
+  role: string;
+  batch?: string;
+  image: string;
+  group: CommitteeGroup;
+}
+
+const portrait = (number: number) => `/photos/committee-clean/${number}.jpg`;
 
 export const committeeMembers: CommitteeMember[] = [
-  {
-    id: 'mem-1',
-    name: 'Prof. Bhaskar Sardar',
-    designation: 'Faculty Advisor',
-    department: 'Faculty',
-    image: '',
-    email: 'bhaskar.sardar@jadavpuruniversity.in',
-    priority: 100,
-  },
-  {
-    id: 'mem-2',
-    name: 'Dr. Parama Bhaumik',
-    designation: 'Faculty Co-Advisor',
-    department: 'Faculty',
-    image: '',
-    priority: 95,
-  },
-  {
-    id: 'mem-3',
-    name: 'Rohan Sen',
-    designation: 'Student Convener',
-    department: 'Core Team',
-    image: '/photos/committee/rohan-sen.png',
-    email: 'rohan.sen@gmail.com',
-    linkedin: 'https://linkedin.com/in/rohan-sen',
-    priority: 90,
-  },
-  {
-    id: 'mem-4',
-    name: 'Anushka Roy',
-    designation: 'Co-Convener',
-    department: 'Core Team',
-    image: '/photos/committee/anushka-roy.png',
-    email: 'anushka.it.ju@gmail.com',
-    linkedin: 'https://linkedin.com/in/anushka-roy',
-    priority: 85,
-  },
-  {
-    id: 'mem-5',
-    name: 'Arijit Ghosh',
-    designation: 'Technical Lead',
-    department: 'Technical',
-    image: '/photos/committee/arijit-ghosh.png',
-    linkedin: 'https://linkedin.com/in/arijit-ghosh',
-    priority: 80,
-  },
-  {
-    id: 'mem-6',
-    name: 'Sourav Datta',
-    designation: 'Sponsorship Head',
-    department: 'Sponsorship',
-    image: '/photos/committee/sourav-datta.png',
-    linkedin: 'https://linkedin.com/in/sourav-datta',
-    priority: 75,
-  },
-  {
-    id: 'mem-7',
-    name: 'Tanya Sharma',
-    designation: 'Lead UI/UX Designer',
-    department: 'Design',
-    image: '/photos/committee/tanya-sharma.png',
-    linkedin: 'https://linkedin.com/in/tanya-sharma',
-    priority: 70,
-  },
-  {
-    id: 'mem-8',
-    name: 'Kabir Verma',
-    designation: 'Full Stack Developer',
-    department: 'Technical',
-    image: '/photos/committee/kabir-verma.png',
-    linkedin: 'https://linkedin.com/in/kabir-verma',
-    priority: 65,
-  },
-  {
-    id: 'mem-9',
-    name: 'Riya Sen',
-    designation: 'Public Relations Head',
-    department: 'Sponsorship',
-    image: '/photos/committee/riya-sen.png',
-    linkedin: 'https://linkedin.com/in/riya-sen',
-    priority: 60,
-  },
-  {
-    id: 'mem-10',
-    name: 'Aditya Das',
-    designation: 'Graphic Designer',
-    department: 'Design',
-    image: '/photos/committee/aditya-das.png',
-    linkedin: 'https://linkedin.com/in/aditya-das',
-    priority: 55,
-  },
-  {
-    id: 'mem-11',
-    name: 'Sneha Paul',
-    designation: 'Event Operations Lead',
-    department: 'Core Team',
-    image: '/photos/committee/sneha-paul.png',
-    linkedin: 'https://linkedin.com/in/sneha-paul',
-    priority: 50,
-  },
+  { name: 'Prof. Bhaskar Sardar', role: 'President', image: portrait(25), group: 'Leadership' },
+  { name: 'Ujaan Datta', role: 'Vice President', image: '', group: 'Leadership' },
+  { name: 'Dr. Munmun Bhattacharya', role: 'Faculty Coordinator', image: portrait(21), group: 'Faculty Coordinators' },
+  { name: 'Prof. Parama Bhowmik', role: 'Faculty Coordinator', image: portrait(22), group: 'Faculty Coordinators' },
+  { name: 'Mr. Utpal Kumar Ray', role: 'Faculty Coordinator', image: portrait(23), group: 'Faculty Coordinators' },
+  { name: 'Aritra Mondal', role: 'General Secretary', batch: 'UG4', image: portrait(1), group: 'Position of Responsibility' },
+  { name: 'Kaustav Mondal', role: 'Additional General Secretary', batch: 'UG4', image: portrait(19), group: 'Position of Responsibility' },
+  { name: 'Krish Agarwal', role: 'Additional General Secretary', batch: 'UG3', image: portrait(20), group: 'Position of Responsibility' },
+  { name: 'Prama Ray', role: 'Joint Secretary', batch: 'UG4', image: portrait(16), group: 'Position of Responsibility' },
+  { name: 'Ayan Ghosh', role: 'Joint Secretary', batch: 'UG4', image: portrait(15), group: 'Position of Responsibility' },
+  { name: 'Soumyadeep Roy Chowdhury', role: 'Joint Secretary', batch: 'UG3', image: portrait(18), group: 'Position of Responsibility' },
+  { name: 'Sauhardya Hazra', role: 'Joint Secretary', batch: 'UG3', image: portrait(17), group: 'Position of Responsibility' },
+  { name: 'Anuska Nath', role: 'Treasurer', batch: 'UG4', image: portrait(13), group: 'Position of Responsibility' },
+  { name: 'Ansh Kumar Singh', role: 'Treasurer', batch: 'UG4', image: portrait(12), group: 'Position of Responsibility' },
+  { name: 'Tanishq Majumder', role: 'Treasurer', batch: 'UG3', image: portrait(14), group: 'Position of Responsibility' },
+  { name: 'Trisanjit Das', role: 'On Day Coordinator', batch: 'UG4', image: portrait(9), group: 'Position of Responsibility' },
+  { name: 'Sanglap Das', role: 'On Day Coordinator', batch: 'UG3', image: portrait(10), group: 'Position of Responsibility' },
+  { name: 'Ankit Roy', role: 'On Day Coordinator', batch: 'UG3', image: portrait(3), group: 'Position of Responsibility' },
+  { name: 'Rajdeep Das', role: 'Tech Lead', batch: 'UG3', image: portrait(8), group: 'Position of Responsibility' },
+  { name: 'Ayush Bhakta', role: 'Design Lead', batch: 'UG3', image: portrait(6), group: 'Position of Responsibility' },
+  { name: 'Gunnumpudi Sree Keertan Dora', role: 'Design Coordinator', batch: 'UG3', image: portrait(7), group: 'Position of Responsibility' },
+  { name: 'Mayukh Sinha', role: 'Logistics Lead', batch: 'UG4', image: portrait(2), group: 'Position of Responsibility' },
+  { name: 'Md. Mirajul Seikh', role: 'Logistics Coordinator', batch: 'UG2', image: portrait(5), group: 'Position of Responsibility' },
+  { name: 'Shlok Sinha', role: 'Logistics Coordinator', batch: 'UG2', image: portrait(11), group: 'Position of Responsibility' },
+  { name: 'Bitan Saha', role: 'Logistics Coordinator', batch: 'UG2', image: portrait(4), group: 'Position of Responsibility' },
 ];
 
-export function getCommitteeMembers(): CommitteeMember[] {
-  return [...committeeMembers].sort((a, b) => b.priority - a.priority);
-}
-
-export function getCommitteeMemberById(id: string): CommitteeMember | undefined {
-  return committeeMembers.find(member => member.id === id);
-}
-
-export function getDepartmentsFromMembers(members: CommitteeMember[]): string[] {
-  const departments = members.map(m => m.department);
-  return Array.from(new Set(departments)).sort();
-}
-
-export function getFilteredCommittee(
-  members: CommitteeMember[],
-  search: string,
-  department: string
-): CommitteeMember[] {
-  let filtered = [...members];
-
-  // Apply department filter
-  if (department && department.toLowerCase() !== 'all') {
-    filtered = filtered.filter(
-      member => member.department.toLowerCase() === department.toLowerCase()
-    );
-  }
-
-  // Apply search query (name, designation, department)
-  if (search) {
-    const query = search.toLowerCase().trim();
-    filtered = filtered.filter(
-      member =>
-        member.name.toLowerCase().includes(query) ||
-        member.designation.toLowerCase().includes(query) ||
-        member.department.toLowerCase().includes(query)
-    );
-  }
-
-  // Ensure output is sorted by priority
-  return filtered.sort((a, b) => b.priority - a.priority);
-}
+export const leadershipMembers = committeeMembers.filter(member => member.group !== 'Position of Responsibility');
+export const responsibilityMembers = committeeMembers.filter(member => member.group === 'Position of Responsibility');
