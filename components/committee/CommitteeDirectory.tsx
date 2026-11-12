@@ -26,7 +26,7 @@ const descriptions: Record<string, string> = {
   President:
     "Leading with vision, shaping every memory into legacy! Meet the President of ILLUMINE 2K26 — the steady force bringing people, purpose, and the Silver Jubilee celebration together.",
   "Vice President":
-    "The seat is reserved for the co-pilot of the celebration — ready to connect people, ideas, and every moving part of ILLUMINE 2K26. A new chapter is about to be written.",
+    "Leading alongside purpose, connecting people and possibility! Meet the Vice President of ILLUMINE 2K26 — a trusted force helping every idea move from vision to a memorable Silver Jubilee celebration.",
   "Faculty Mentor":
     "Mentors in the classroom, guiding lights of our legacy! Meet our Faculty Advisors of ILLUMINE 2K26 and KERNEL 1.0 — the esteemed faculty of our department, ultimate mentors, and proud alumni who continue to shape our journey. From teaching us every day to steering our grandest fests toward perfection, they are the true pillars of our IT family. Because a Silver Jubilee shines brightest when backed by the wisdom of our own professors!",
   "General Secretary":

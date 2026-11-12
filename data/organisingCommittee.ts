@@ -19,9 +19,10 @@ export const committeeMembers: CommitteeMember[] = [
     group: "Leadership",
   },
   {
-    name: "To be decided",
+    name: "Brotin Haldar",
     role: "Vice President",
-    image: "",
+    batch: "Batch of 2025",
+    image: "/photos/committee-clean/brotin-haldar.jpg",
     group: "Leadership",
   },
   {
