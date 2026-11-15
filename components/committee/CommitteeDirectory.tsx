@@ -2,7 +2,13 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import type { CommitteeMember } from "@/data/organisingCommittee";
+import ArcReactor from "@/components/arc-reactor";
+import BigCircle from "@/components/ui/BigCircle";
+import BlueCircle from "@/components/ui/BlueCircle";
+import DecryptedText from "@/components/ui/DecryptedText";
+import Plus from "@/components/ui/Plus";
 
 const roleName = (role: string) => {
   if (role === "Faculty Coordinator") return "Faculty Mentor";
@@ -66,8 +72,14 @@ const sortMembers = (role: string, members: CommitteeMember[]) =>
 
 function Photo({ member, n }: { member: CommitteeMember; n: number }) {
   return (
-    <article className="group min-w-0">
-      <div className="relative aspect-[4/4.3] overflow-hidden rounded-[1.25rem] border-[7px] border-[#d7c2a4] bg-[#28211e] shadow-[0_16px_32px_rgba(0,0,0,.24)]">
+    <motion.article
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, delay: Math.min(n - 1, 5) * 0.07, ease: "easeOut" }}
+      whileHover={{ y: -4 }}
+      className="group min-w-0"
+    >
+      <div className="relative aspect-[4/4.3] overflow-hidden rounded-[1.25rem] border border-white/15 bg-[#0a0a0a] shadow-[0_16px_40px_rgba(0,0,0,.45)] transition duration-300 group-hover:border-[#7B61FF]/60 group-hover:shadow-[0_0_28px_rgba(123,97,255,.18)]">
         {member.image ? (
           <Image
             src={member.image}
@@ -77,36 +89,36 @@ function Photo({ member, n }: { member: CommitteeMember; n: number }) {
             sizes="(max-width: 640px) 50vw, 33vw"
           />
         ) : (
-          <div className="relative flex h-full flex-col items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_28%,rgba(143,224,232,.25),transparent_25%),linear-gradient(145deg,#153b48,#171524)] px-5 text-center text-[#fff4e4]">
-            <span className="absolute h-28 w-28 rounded-full border border-dashed border-[#8fe0e8]/60" />
-            <span className="absolute h-20 w-20 rounded-full border border-[#8fe0e8]/25" />
-            <span className="relative font-mono text-[10px] font-bold uppercase tracking-[.22em] text-[#8fe0e8]">
+          <div className="relative flex h-full flex-col items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_28%,rgba(123,97,255,.24),transparent_30%),linear-gradient(145deg,#10101c,#070707)] px-5 text-center text-white">
+            <span className="absolute h-28 w-28 rounded-full border border-dashed border-[#7B61FF]/60" />
+            <span className="absolute h-20 w-20 rounded-full border border-[#B6BBFF]/25" />
+            <span className="relative font-mono text-[10px] font-bold uppercase tracking-[.22em] text-[#B6BBFF]">
               Vice President
             </span>
             <span className="relative mt-3 font-tt-lakes text-xl font-extrabold leading-tight">
               To be decided
             </span>
-            <span className="relative mt-3 font-mono text-[8px] uppercase tracking-[.18em] text-[#d7c2a4]">
+            <span className="relative mt-3 font-mono text-[8px] uppercase tracking-[.18em] text-[#BEF3DF]">
               Seat reserved
             </span>
           </div>
         )}
-        <span className="absolute left-3 top-3 rounded-full bg-[#fff4e4] px-2 py-1 font-mono text-[9px] font-bold text-[#174451]">
+        <span className="absolute left-3 top-3 rounded-full border border-white/20 bg-black/75 px-2 py-1 font-mono text-[9px] font-bold text-[#B6BBFF] backdrop-blur">
           {String(n).padStart(2, "0")}
         </span>
       </div>
       <div className="px-1 pt-4">
-        <p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8fe0e8]">
+        <p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#7B61FF]">
           {designation(member.role)}
         </p>
-        <h3 className="mt-1 font-tt-lakes text-lg font-bold leading-tight text-[#fff4e4] sm:text-xl">
+        <h3 className="mt-1 font-tt-lakes text-lg font-bold leading-tight text-white sm:text-xl">
           {member.name}
         </h3>
         {member.batch && (
-          <p className="mt-1 text-xs text-[#bdb1a4]">{member.batch}</p>
+          <p className="mt-1 text-xs text-[#BEF3DF]/70">{member.batch}</p>
         )}
       </div>
-    </article>
+    </motion.article>
   );
 }
 
@@ -148,37 +160,47 @@ export default function CommitteeDirectory({
     activeGroups[0];
 
   return (
-    <main className="min-h-screen bg-[#090d16] pb-16 pt-20 text-[#fff4e4] sm:pb-24">
-      <div className="pointer-events-none absolute inset-0 opacity-90 [background:radial-gradient(ellipse_at_8%_0%,#15394a_0,transparent_34%),radial-gradient(ellipse_at_96%_16%,#4b242d_0,transparent_33%),radial-gradient(ellipse_at_48%_100%,#2d1e45_0,transparent_45%),linear-gradient(145deg,#090d16_35%,#11131c_68%,#090d16_100%)]" />
-      <div className="pointer-events-none absolute inset-0 opacity-[.18] [background-image:linear-gradient(rgba(155,224,238,.18)_1px,transparent_1px),linear-gradient(90deg,rgba(155,224,238,.18)_1px,transparent_1px)] [background-size:42px_42px] sm:[background-size:56px_56px]" />
-      <section className="relative mx-auto max-w-7xl px-4 pt-8 sm:px-8 sm:pt-24">
-        <header className="border-b-2 border-[#d9c5aa] pb-7 sm:pb-9">
-          <div className="flex items-center gap-3">
-            <span className="h-2 w-2 shrink-0 rounded-full bg-[#7ce2c7] shadow-[0_0_13px_#7ce2c7]" />
-            <p className="font-mono text-[9px] font-bold uppercase tracking-[.25em] text-[#8fe0e8] sm:text-[10px] sm:tracking-[.45em]">
-              Illumine 2026 · Directory online
-            </p>
-          </div>
-          <div className="mt-6 flex flex-col gap-6 lg:mt-7 lg:flex-row lg:items-end lg:justify-between">
-            <h1 className="font-mechsuit text-[2.25rem] leading-[1.05] tracking-[.045em] sm:text-6xl sm:leading-[1.08] sm:tracking-[.08em]">
-              THE PEOPLE
-              <br />
-              <span className="text-[#f19468]">OF ILLUMINE</span>
-            </h1>
-            <div className="max-w-sm">
-              <p className="font-tt-lakes text-[15px] leading-relaxed text-[#c8bbb0] sm:text-base">
-                One core committee, bringing the reunion to life.
-              </p>
-              <p className="mt-3 font-mono text-[9px] tracking-[.12em] text-[#e8b977] sm:mt-4 sm:text-[10px] sm:tracking-[.18em]">
-                {members.length} MEMBERS · {groups.length} COMMITTEE ROLES
-              </p>
-            </div>
-          </div>
+    <main className="relative min-h-screen overflow-hidden bg-[#070707] pb-16 pt-20 text-white sm:pb-24">
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: "linear-gradient(rgba(123,97,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(123,97,255,0.05) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+        <div className="absolute -left-24 top-[18%] opacity-30">
+          <ArcReactor size={300} accentColor="teal" className="opacity-25" />
+        </div>
+        <div className="absolute -right-24 bottom-[8%] opacity-25">
+          <ArcReactor size={340} accentColor="purple" className="opacity-25" />
+        </div>
+        <Plus className="left-[12%] top-[14%]" delay={0.2} />
+        <Plus className="right-[12%] top-[40%]" delay={0.6} />
+        <Plus className="bottom-[18%] left-[24%]" delay={1} />
+        <BigCircle className="right-[8%] top-[12%] scale-75 opacity-30" />
+        <BlueCircle className="bottom-[12%] left-[4%] rotate-45 opacity-30" />
+      </div>
+      <section className="relative z-10 mx-auto max-w-7xl px-4 pt-8 sm:px-8 sm:pt-16">
+        <header className="relative mb-14 flex flex-col items-center border-b border-white/10 pb-10 text-center sm:mb-16 sm:pb-12">
+          <p className="mb-3 font-mono text-[10px] uppercase tracking-[.4em] text-[#7B61FF] sm:text-xs">
+            Illumine 2026 // Committee Directory
+          </p>
+          <h1 className="mb-4 font-mechsuit text-3xl font-black uppercase tracking-[.1em] text-white drop-shadow-[0_0_15px_rgba(255,255,255,.12)] sm:text-5xl md:text-6xl">
+            <DecryptedText text="CORE COMMITTEE" animateOn="view" speed={70} sequential />
+          </h1>
+          <div className="mb-6 h-[2px] w-24 bg-gradient-to-r from-transparent via-[#7B61FF] to-transparent" />
+          <p className="max-w-xl text-xs uppercase leading-relaxed tracking-wider text-gray-400 sm:text-sm">
+            One core committee, bringing the reunion to life.
+          </p>
+          <p className="mt-4 font-mono text-[9px] tracking-[.18em] text-[#B6BBFF] sm:text-[10px]">
+            {members.length} MEMBERS · {groups.length} COMMITTEE ROLES
+          </p>
         </header>
         <div className="py-9 sm:py-12">
           <div className="mb-6 flex flex-col gap-3 sm:mb-7 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="font-mono text-[10px] font-bold tracking-[.2em] text-[#8fe0e8]">
+              <p className="font-mono text-[10px] font-bold tracking-[.2em] text-[#7B61FF]">
                 01 / ONE TEAM, MANY ROLES
               </p>
               <h2 className="mt-2 font-tt-lakes text-2xl font-extrabold sm:text-3xl">
@@ -190,14 +212,14 @@ export default function CommitteeDirectory({
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search a member or role"
               aria-label="Search committee members or roles"
-              className="w-full border-b border-[#6c9199] bg-transparent px-1 py-2 text-sm text-[#fff4e4] placeholder:text-[#8c9da4] outline-none focus:border-[#8fe0e8] sm:max-w-xs"
+              className="w-full border-b border-white/25 bg-transparent px-1 py-2 text-sm text-white placeholder:text-white/40 outline-none focus:border-[#7B61FF] sm:max-w-xs"
             />
           </div>
           {selectedGroup ? (
-            <div className="overflow-hidden rounded-2xl border border-[#6699a1]/70 bg-[radial-gradient(circle_at_88%_12%,rgba(56,173,184,.24),transparent_34%),radial-gradient(circle_at_25%_90%,rgba(111,74,158,.2),transparent_35%),linear-gradient(135deg,rgba(15,32,44,.96),rgba(14,20,30,.94))] shadow-[0_28px_70px_rgba(0,0,0,.32)] backdrop-blur sm:rounded-[1.4rem]">
+            <div className="overflow-hidden rounded-2xl border border-[#7B61FF]/35 bg-[radial-gradient(circle_at_88%_12%,rgba(123,97,255,.15),transparent_34%),radial-gradient(circle_at_25%_90%,rgba(100,255,218,.06),transparent_35%),linear-gradient(135deg,rgba(15,15,22,.97),rgba(8,8,12,.96))] shadow-[0_28px_70px_rgba(0,0,0,.5)] backdrop-blur sm:rounded-[1.4rem]">
               <div className="grid lg:grid-cols-[19rem_1fr]">
-                <aside className="border-b border-[#6c9199]/45 bg-[#07131d]/55 p-4 backdrop-blur-sm sm:p-5 lg:border-b-0 lg:border-r">
-                  <p className="mb-4 font-mono text-[10px] tracking-[.2em] text-[#8fe0e8] sm:mb-5">
+                <aside className="border-b border-white/10 bg-black/35 p-4 backdrop-blur-sm sm:p-5 lg:border-b-0 lg:border-r lg:border-r-white/10">
+                  <p className="mb-4 font-mono text-[10px] tracking-[.2em] text-[#7B61FF] sm:mb-5">
                     COMMITTEE INDEX
                   </p>
                   <label className="block lg:hidden">
@@ -205,7 +227,7 @@ export default function CommitteeDirectory({
                     <select
                       value={selectedGroup.role}
                       onChange={(event) => setSelectedRole(event.target.value)}
-                      className="w-full rounded-lg border border-[#6c9199]/70 bg-[#102632] px-3 py-3 text-sm font-medium text-[#f1ffff] outline-none focus:border-[#8fe0e8]"
+                      className="w-full rounded-lg border border-white/15 bg-[#101016] px-3 py-3 text-sm font-medium text-white outline-none focus:border-[#7B61FF]"
                     >
                       {activeGroups.map((group, index) => (
                         <option key={group.role} value={group.role}>
@@ -219,7 +241,7 @@ export default function CommitteeDirectory({
                       <button
                         key={group.role}
                         onClick={() => setSelectedRole(group.role)}
-                        className={`rounded-lg px-3 py-3 text-left text-sm transition ${selectedGroup.role === group.role ? "bg-[#277283] text-[#f1ffff] shadow-[0_8px_24px_rgba(39,114,131,.28)]" : "text-[#c8bbb0] hover:bg-white/5 hover:text-white"}`}
+                        className={`rounded-lg px-3 py-3 text-left text-sm transition ${selectedGroup.role === group.role ? "bg-[#6265fe] text-white shadow-[0_8px_24px_rgba(98,101,254,.28)]" : "text-white/65 hover:bg-white/5 hover:text-white"}`}
                       >
                         <span className="mr-2 font-mono text-[10px] opacity-70">
                           {String(index + 1).padStart(2, "0")}.
@@ -231,25 +253,31 @@ export default function CommitteeDirectory({
                       </button>
                     ))}
                   </div>
-                  <div className="mt-4 border-t border-[#39434e] pt-4 sm:mt-6 sm:pt-5">
-                    <p className="font-mono text-[9px] tracking-[.16em] text-[#8d9ba5]">
+                  <div className="mt-4 border-t border-white/10 pt-4 sm:mt-6 sm:pt-5">
+                    <p className="font-mono text-[9px] tracking-[.16em] text-white/40">
                       {members.length} CORE MEMBERS
                     </p>
                   </div>
                 </aside>
-                <section className="p-4 sm:p-7">
-                  <div className="border-b border-[#39434e] pb-4 sm:pb-5">
-                    <p className="font-mono text-[10px] tracking-[.2em] text-[#8fe0e8]">
+                <motion.section
+                  key={selectedGroup.role}
+                  initial={{ opacity: 0, x: 12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                  className="p-4 sm:p-7"
+                >
+                  <div className="border-b border-white/10 pb-4 sm:pb-5">
+                    <p className="font-mono text-[10px] tracking-[.2em] text-[#7B61FF]">
                       {String(activeGroups.indexOf(selectedGroup) + 1).padStart(
                         2,
                         "0",
                       )}{" "}
                       / CORE COMMITTEE
                     </p>
-                    <h3 className="mt-2 font-tt-lakes text-2xl font-extrabold text-[#fff4e4] sm:text-3xl">
+                    <h3 className="mt-2 font-tt-lakes text-2xl font-extrabold text-white sm:text-3xl">
                       {selectedGroup.role}
                     </h3>
-                    <p className="mt-2 text-sm text-[#bdb1a4]">
+                    <p className="mt-2 text-sm leading-relaxed text-white/65">
                       {descriptions[selectedGroup.role]}
                     </p>
                   </div>
@@ -260,11 +288,11 @@ export default function CommitteeDirectory({
                       <Photo key={member.name} member={member} n={index + 1} />
                     ))}
                   </div>
-                </section>
+                </motion.section>
               </div>
             </div>
           ) : (
-            <p className="border-t border-[#4a413a] py-12 text-[#c8bbb0]">
+            <p className="border-t border-white/10 py-12 text-white/60">
               No committee member matches that search.
             </p>
           )}
